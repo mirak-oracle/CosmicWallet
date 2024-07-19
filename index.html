@@ -3,116 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ReasonAI - Voice Interaction</title>
+    <title>CosmicWallet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        p {
-            color: #666;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        #output {
-            color: #444;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            outline: none;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
+        .hidden { display: none; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>ReasonAI - Voice Interaction</h1>
-        <p>Speak to ReasonAI to engage.</p>
-        <div id="output"></div>
-        <button onclick="startListening()">Start Listening</button>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-4">CosmicWallet</h1>
+        
+        <div id="wallet-connect" class="mb-4 text-center">
+            <button onclick="connectWallet()" class="bg-blue-500 text-white py-2 px-4 rounded">Connect Wallet</button>
+        </div>
+        
+        <div id="balance" class="mb-4 text-center"></div>
+        <div id="transaction-history" class="mb-4"></div>
+        <div id="send-receive" class="mb-4 hidden">
+            <h2 class="text-xl font-bold mb-2">Send CosmicCoin</h2>
+            <form onsubmit="sendCosmicCoin(event)">
+                <input type="text" id="recipient-address" placeholder="Recipient Address" class="border p-2 mb-2 w-full">
+                <input type="number" id="amount" placeholder="Amount" class="border p-2 mb-2 w-full">
+                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded">Send</button>
+            </form>
+        </div>
+
+        <div id="dapp-integration" class="mb-4 hidden">
+            <h2 class="text-xl font-bold mb-2">DApps</h2>
+            <ul class="list-disc list-inside">
+                <li><a href="https://app.uniswap.org/" target="_blank" class="text-blue-500">Uniswap</a></li>
+                <li><a href="https://pancakeswap.finance" target="_blank" class="text-blue-500">PancakeSwap</a></li>
+                <li><a href="https://app.aave.com/" target="_blank" class="text-blue-500">Aave</a></li>
+                <li><a href="https://app.compound.finance/" target="_blank" class="text-blue-500">Compound</a></li>
+                <li><a href="https://www.geckoterminal.com" target="_blank" class="text-blue-500">GeckoTerminal</a></li>
+                <li><a href="https://www.coinscope.co" target="_blank" class="text-blue-500">Coinscope</a></li>
+                <li><a href="https://www.dexview.com" target="_blank" class="text-blue-500">DexView</a></li>
+                <li><a href="https://www.dextools.io/" target="_blank" class="text-blue-500">DexTools</a></li>
+                <li><a href="https://top100token.com/" target="_blank" class="text-blue-500">Top100Token</a></li>
+            </ul>
+        </div>
+
+        <div id="trade-section" class="mb-4 hidden">
+            <h2 class="text-xl font-bold mb-2">Trade</h2>
+            <ul class="list-disc list-inside">
+                <li><a href="https://www.binance.com/" target="_blank" class="text-blue-500">Binance</a></li>
+                <li><a href="https://pro.coinbase.com/" target="_blank" class="text-blue-500">Coinbase Pro</a></li>
+                <li><a href="https://www.kraken.com/" target="_blank" class="text-blue-500">Kraken</a></li>
+            </ul>
+        </div>
+
+        <div id="swap-section" class="mb-4 hidden">
+            <h2 class="text-xl font-bold mb-2">Swap</h2>
+            <ul class="list-disc list-inside">
+                <li><a href="https://app.uniswap.org/" target="_blank" class="text-blue-500">Uniswap</a></li>
+                <li><a href="https://app.1inch.io/" target="_blank" class="text-blue-500">1inch</a></li>
+                <li><a href="https://app.sushi.com/" target="_blank" class="text-blue-500">SushiSwap</a></li>
+            </ul>
+        </div>
+        
+        <div class="fixed bottom-0 left-0 w-full bg-white py-2 shadow-md">
+            <div class="container mx-auto flex justify-around">
+                <button onclick="showSection('wallet-connect')" class="bg-gray-200 py-2 px-4 rounded">Wallet</button>
+                <button onclick="showSection('send-receive')" class="bg-gray-200 py-2 px-4 rounded">Send/Receive</button>
+                <button onclick="showSection('dapp-integration')" class="bg-gray-200 py-2 px-4 rounded">DApps</button>
+                <button onclick="showSection('trade-section')" class="bg-gray-200 py-2 px-4 rounded">Trade</button>
+                <button onclick="showSection('swap-section')" class="bg-gray-200 py-2 px-4 rounded">Swap</button>
+            </div>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
     <script>
-        const recognition = new window.webkitSpeechRecognition();
-        recognition.continuous = false;
+        const cosmicCoinAddress1 = "0x95e27971C1c72717612617D49045AAf947Be518C";
+        const cosmicCoinAddress2 = "0x1957fEC12B41767322B5613DF087A41269ab05aD";
+        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
+        let web3;
+        let accounts;
 
-        const supportedLanguages = [
-            'en-US', 'es-ES', 'fr-FR', 'de-DE', 'it-IT', 
-            'pt-PT', 'nl-NL', 'sv-SE', 'da-DK', 'fi-FI', 
-            'nb-NO', 'tr-TR', 'ru-RU', 'pl-PL', 'cs-CZ', 
-            'hu-HU', 'ro-RO', 'el-GR', 'ja-JP', 'ko-KR', 
-            'zh-CN', 'zh-TW', 'th-TH', 'id-ID', 'ms-MY', 
-            'vi-VN', 'hi-IN', 'bn-IN', 'ta-IN', 'te-IN',
-            'pcm', // Nigerian Pidgin
-        ];
+        async function connectWallet() {
+            const provider = new WalletConnectProvider.default({
+                infuraId: "cf649952bc434d22b4b7a621993c299b"
+            });
 
-        recognition.lang = supportedLanguages;
+            await provider.enable();
+            
+            web3 = new Web3(provider);
+            accounts = await web3.eth.getAccounts();
+            document.getElementById('wallet-connect').innerHTML = `Connected: ${accounts[0]}`;
+            updateBalance(accounts[0]);
+            loadTransactionHistory(accounts[0]);
 
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('output').innerText = 'You said: ' + transcript;
-            // Perform NLU to understand user intents and respond accordingly
-            handleUserInput(transcript);
-        };
+            provider.on("accountsChanged", (accounts) => {
+                console.log(accounts);
+            });
 
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error:', event.error);
-        };
+            provider.on("chainChanged", (chainId) => {
+                console.log(chainId);
+            });
 
-        function startListening() {
-            recognition.start();
-            document.getElementById('output').innerText = 'Listening...';
+            provider.on("networkChanged", (networkId) => {
+                console.log(networkId);
+            });
+
+            provider.on("disconnect", (code, reason) => {
+                console.log(code, reason);
+            });
         }
 
-        function speakResponse(response) {
-            const synthesis = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(response);
-            synthesis.speak(utterance);
+        async function updateBalance(account) {
+            const cosmicCoin1 = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress1);
+            const cosmicCoin2 = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress2);
+            const balance1 = await cosmicCoin1.methods.balanceOf(account).call();
+            const balance2 = await cosmicCoin2.methods.balanceOf(account).call();
+            document.getElementById('balance').innerHTML = `Balance: ${web3.utils.fromWei(balance1, 'ether')} CosmicCoin1, ${web3.utils.fromWei(balance2, 'ether')} CosmicCoin2`;
         }
 
-        function handleUserInput(input) {
-            // Perform NLU and respond accordingly
-            // Example: If input contains a request for help, respond with assistance
-            if (input.toLowerCase().includes('help')) {
-                const response = "Sure, I'm here to assist you. What do you need help with?";
-                speakResponse(response);
-            } else {
-                // Handle other user intents or tasks based on input
-                // Example: Call APIs to solve world problems based on user input
-                // For demonstration purposes, let's just echo the input
-                speakResponse("You said: " + input);
-            }
+        async function sendCosmicCoin(event) {
+            event.preventDefault();
+            const recipient = document.getElementById('recipient-address').value;
+            const amount = document.getElementById('amount').value;
+            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress1);
+            await cosmicCoin.methods.transfer(recipient, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
+            alert('Transaction successful');
+            updateBalance(accounts[0]);
+        }
+
+        async function loadTransactionHistory(account) {
+            document.getElementById('transaction-history').innerHTML = 'Transaction history feature coming soon...';
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(div => {
+                div.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
         }
     </script>
 </body>
