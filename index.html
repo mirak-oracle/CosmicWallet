@@ -5,147 +5,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CosmicWallet</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.6.6/dist/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3modal"></script>
+    <script src="https://unpkg.com/qr-scanner/qr-scanner.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3"></script>
     <style>
         .hidden { display: none; }
-        .container { max-width: 100%; }
-        iframe { width: 100%; height: 300px; }
+        .section-container { 
+            display: grid; 
+            gap: 10px; 
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
+        }
+        .link-card { 
+            background-color: #f0f4f8; 
+            padding: 10px; 
+            border-radius: 8px; 
+            text-align: center; 
+            transition: transform 0.2s; 
+        }
+        .link-card:hover { 
+            transform: scale(1.05); 
+        }
     </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto p-4">
-        <h1 class="text-3xl font-bold text-center mb-4">CosmicWallet</h1>
+<body class="bg-gray-100 text-gray-900">
 
-        <div id="wallet-connect" class="mb-4 text-center">
-            <button onclick="connectWallet()" class="bg-blue-500 text-white py-2 px-4 rounded">Connect Wallet</button>
-        </div>
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">CosmicWallet</h1>
+    <button id="connectButton" class="bg-blue-500 text-white py-2 px-4 rounded mb-4">Connect Wallet</button>
+    <button id="generateAddressButton" class="bg-green-500 text-white py-2 px-4 rounded mb-4">Generate Web3 Wallet</button>
+    <div id="walletInfo" class="hidden">
+        <p class="mb-4">Account: <span id="account"></span></p>
+        <p class="mb-4">Balance: <span id="balance"></span> ETH</p>
+        <form id="sendForm">
+            <input type="text" id="recipient" placeholder="Recipient Address" class="border p-2 mb-2 w-full" required />
+            <input type="number" id="amount" placeholder="Amount" class="border p-2 mb-2 w-full" required />
+            <select id="chain" class="border p-2 mb-2 w-full">
+                <option value="ethereum">Ethereum</option>
+                <option value="cosmiccoin1">CosmicCoin (0x95e27971C1c72717612617D49045AAf947Be518C)</option>
+                <option value="cosmiccoin2">CosmicCoin (0x1957fEC12B41767322B5613DF087A41269ab05aD)</option>
+            </select>
+            <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded">Send</button>
+        </form>
+        <button id="receiveButton" class="bg-blue-500 text-white py-2 px-4 rounded mt-4">Receive</button>
+    </div>
+    <button id="backupButton" class="bg-yellow-500 text-white py-2 px-4 rounded mt-4">Backup Wallet</button>
+    <button id="restoreButton" class="bg-red-500 text-white py-2 px-4 rounded mt-4">Restore Wallet</button>
+</div>
 
-        <div id="balance" class="mb-4 text-center"></div>
-        <div id="transaction-history" class="mb-4"></div>
-        <div id="send-receive" class="mb-4 hidden">
-            <h2 class="text-xl font-bold mb-2">Send CosmicCoin</h2>
-            <form onsubmit="sendCosmicCoin(event)">
-                <input type="text" id="recipient-address" placeholder="Recipient Address" class="border p-2 mb-2 w-full">
-                <input type="number" id="amount" placeholder="Amount" class="border p-2 mb-2 w-full">
-                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded">Send</button>
-            </form>
-        </div>
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+    <div class="grid grid-cols-3 gap-4">
+        <button class="bg-gray-300 py-2 px-4 rounded" onclick="showSection('dappsSection')">DApps</button>
+        <button class="bg-gray-300 py-2 px-4 rounded" onclick="showSection('swapSection')">Swap</button>
+        <button class="bg-gray-300 py-2 px-4 rounded" onclick="showSection('tradeSection')">Trade</button>
+    </div>
+</div>
 
-        <div id="dapp-integration" class="mb-4 hidden">
-            <h2 class="text-xl font-bold mb-2">DApps</h2>
-            <ul class="list-disc list-inside">
-                <li><a href="https://app.uniswap.org/" target="_blank" class="text-blue-500">Uniswap</a></li>
-                <li><a href="https://pancakeswap.finance" target="_blank" class="text-blue-500">PancakeSwap</a></li>
-                <li><a href="https://app.aave.com/" target="_blank" class="text-blue-500">Aave</a></li>
-                <li><a href="https://app.compound.finance/" target="_blank" class="text-blue-500">Compound</a></li>
-                <li><a href="https://www.geckoterminal.com" target="_blank" class="text-blue-500">GeckoTerminal</a></li>
-                <li><a href="https://www.coinscope.co" target="_blank" class="text-blue-500">Coinscope</a></li>
-                <li><a href="https://www.dexview.com" target="_blank" class="text-blue-500">DexView</a></li>
-                <li><a href="https://www.dextools.io/" target="_blank" class="text-blue-500">DexTools</a></li>
-                <li><a href="https://top100token.com/" target="_blank" class="text-blue-500">Top100Token</a></li>
-            </ul>
-        </div>
+<div id="dappsSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
+    <h2 class="text-xl font-bold mb-4">DApps</h2>
+    <div class="section-container">
+        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+        <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
+        <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
+        <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
+        <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
+        <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
+        <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
+        <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
+        <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
+    </div>
+</div>
 
-        <div id="trade-section" class="mb-4 hidden">
-            <h2 class="text-xl font-bold mb-2">Trade</h2>
-            <ul class="list-disc list-inside">
-                <li><a href="https://www.binance.com/" target="_blank" class="text-blue-500">Binance</a></li>
-                <li><a href="https://pro.coinbase.com/" target="_blank" class="text-blue-500">Coinbase Pro</a></li>
-                <li><a href="https://www.kraken.com/" target="_blank" class="text-blue-500">Kraken</a></li>
-            </ul>
-        </div>
+<div id="swapSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
+    <h2 class="text-xl font-bold mb-4">Swap</h2>
+    <div class="section-container">
+        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+        <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
+        <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
+    </div>
+</div>
 
-        <div id="swap-section" class="mb-4 hidden">
-            <h2 class="text-xl font-bold mb-2">Swap</h2>
-            <ul class="list-disc list-inside">
-                <li><a href="https://app.uniswap.org/" target="_blank" class="text-blue-500">Uniswap</a></li>
-                <li><a href="https://app.1inch.io/" target="_blank" class="text-blue-500">1inch</a></li>
-                <li><a href="https://app.sushi.com/" target="_blank" class="text-blue-500">SushiSwap</a></li>
-            </ul>
-        </div>
+<div id="tradeSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
+    <h2 class="text-xl font-bold mb-4">Trade</h2>
+    <div class="section-container">
+        <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
+        <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
+        <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
+    </div>
+</div>
 
-        <div id="extensions" class="mb-4 hidden">
-            <h2 class="text-xl font-bold mb-2">Extensions</h2>
-            <ul class="list-disc list-inside">
-                <li><a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn" target="_blank" class="text-blue-500">MetaMask Extension</a></li>
-            </ul>
-        </div>
-
-        <div id="main-section">
-            <h2 class="text-xl font-bold mb-2">Live Cryptocurrency Updates</h2>
-            <iframe src="https://widget.coinlore.com/widgets/ticker-widget"></iframe>
-            <iframe src="https://widget.coinlib.io/widget?type=full_v2&theme=light&cnt=10&pref_coin_id=1505&graph=yes"></iframe>
-        </div>
-
-        <div class="fixed bottom-0 left-0 w-full bg-white py-2 shadow-md">
-            <div class="container mx-auto flex justify-around">
-                <button onclick="showSection('main-section')" class="bg-gray-200 py-2 px-4 rounded">Main</button>
-                <button onclick="showSection('wallet-connect')" class="bg-gray-200 py-2 px-4 rounded">Wallet</button>
-                <button onclick="showSection('send-receive')" class="bg-gray-200 py-2 px-4 rounded">Send/Receive</button>
-                <button onclick="showSection('dapp-integration')" class="bg-gray-200 py-2 px-4 rounded">DApps</button>
-                <button onclick="showSection('trade-section')" class="bg-gray-200 py-2 px-4 rounded">Trade</button>
-                <button onclick="showSection('swap-section')" class="bg-gray-200 py-2 px-4 rounded">Swap</button>
-                <button onclick="showSection('extensions')" class="bg-gray-200 py-2 px-4 rounded">Extensions</button>
-            </div>
-        </div>
+<div id="qrScannerModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white p-4 rounded-lg">
+        <h2 class="text-xl font-bold mb-4">Scan QR Code</h2>
+        <video id="qrVideo" class="w-full h-auto mb-4"></video>
+        <button id="closeQrScanner" class="bg-red-500 text-white py-2 px-4 rounded">Close</button>
+    </div>
+</div>
+<div class="fingerprint-sign">
+        <p>You can also use fingerprint or biometric to access your wallet.</p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.min.js"></script>
-    <script>
-        const cosmicCoinAddress1 = "0x95e27971C1c72717612617D49045AAf947Be518C";
-        const cosmicCoinAddress2 = "0x1957fEC12B41767322B5613DF087A41269ab05aD";
-        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
-        let web3;
-        let accounts;
+<script>
+    let provider;
+    let signer;
+    let cosmicCoin1, cosmicCoin2;
 
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                web3 = new Web3(window.ethereum);
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                accounts = await web3.eth.getAccounts();
-                document.getElementById('wallet-connect').innerHTML = `Connected: ${accounts[0]}`;
-                updateBalance(accounts[0]);
-                loadTransactionHistory(accounts[0]);
-            } else {
-                const provider = new WalletConnectProvider.default({
-                    infuraId: "cf649952bc434d22b4b7a621993c299b"
-                });
-                await provider.enable();
-                web3 = new Web3(provider);
-                accounts = await web3.eth.getAccounts();
-                document.getElementById('wallet-connect').innerHTML = `Connected: ${accounts[0]}`;
-                updateBalance(accounts[0]);
-                loadTransactionHistory(accounts[0]);
+    const connectButton = document.getElementById('connectButton');
+    const generateAddressButton = document.getElementById('generateAddressButton');
+    const accountSpan = document.getElementById('account');
+    const balanceSpan = document.getElementById('balance');
+    const walletInfo = document.getElementById('walletInfo');
+    const receiveButton = document.getElementById('receiveButton');
+    const qrScannerModal = document.getElementById('qrScannerModal');
+    const closeQrScanner = document.getElementById('closeQrScanner');
+    const qrVideo = document.getElementById('qrVideo');
+    const backupButton = document.getElementById('backupButton');
+    const restoreButton = document.getElementById('restoreButton');
+
+    async function connectWallet() {
+        const providerOptions = {
+            walletconnect: {
+                package: WalletConnectProvider,
+                options: {
+                    infuraId: 'cf649952bc434d22b4b7a621993c299b'
+                }
             }
+        };
+
+        const web3Modal = new Web3Modal({
+            cacheProvider: false,
+            providerOptions
+        });
+
+        const instance = await web3Modal.connect();
+        provider = new ethers.providers.Web3Provider(instance);
+        signer = provider.getSigner();
+
+        const address = await signer.getAddress();
+        const balance = await provider.getBalance(address);
+
+        accountSpan.textContent = address;
+        balanceSpan.textContent = ethers.utils.formatEther(balance);
+
+        walletInfo.classList.remove('hidden');
+
+        cosmicCoin1 = new ethers.Contract(
+            '0x95e27971C1c72717612617D49045AAf947Be518C',
+            [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":""}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":""}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount"}],"name":"transfer","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","internalType":"uint256","name":"amount"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"}],
+            signer
+        );
+
+        cosmicCoin2 = new ethers.Contract(
+            '0x1957fEC12B41767322B5613DF087A41269ab05aD',
+            [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount"}],"name":"approve","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":""}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":""}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":""}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount"}],"name":"transfer","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","internalType":"uint256","name":"amount"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":""}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":""}],"stateMutability":"view","type":"function"}],
+            signer
+        );
+    }
+
+    async function generateAddress() {
+        const wallet = ethers.Wallet.createRandom();
+        alert(`New Wallet Address: ${wallet.address}\nMnemonic: ${wallet.mnemonic.phrase}`);
+    }
+
+    async function sendTransaction(event) {
+        event.preventDefault();
+
+        const recipient = document.getElementById('recipient').value;
+        const amount = document.getElementById('amount').value;
+        const chain = document.getElementById('chain').value;
+
+        let tx;
+        if (chain === 'ethereum') {
+            tx = await signer.sendTransaction({
+                to: recipient,
+                value: ethers.utils.parseEther(amount)
+            });
+        } else if (chain === 'cosmiccoin1' || chain === 'cosmiccoin2') {
+            const contract = chain === 'cosmiccoin1' ? cosmicCoin1 : cosmicCoin2;
+            tx = await contract.transfer(recipient, ethers.utils.parseUnits(amount, 18));
         }
 
-        async function updateBalance(account) {
-            const cosmicCoin1 = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress1);
-            const cosmicCoin2 = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress2);
-            const balance1 = await cosmicCoin1.methods.balanceOf(account).call();
-            const balance2 = await cosmicCoin2.methods.balanceOf(account).call();
-            document.getElementById('balance').innerHTML = `Balance: ${web3.utils.fromWei(balance1, 'ether')} CosmicCoin1, ${web3.utils.fromWei(balance2, 'ether')} CosmicCoin2`;
-        }
+        alert(`Transaction sent! TxHash: ${tx.hash}`);
+    }
 
-        async function sendCosmicCoin(event) {
-            event.preventDefault();
-            const recipient = document.getElementById('recipient-address').value;
-            const amount = document.getElementById('amount').value;
-            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddress1);
-            await cosmicCoin.methods.transfer(recipient, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
-            alert('Transaction Successful');
-            updateBalance(accounts[0]);
-        }
+    function showSection(sectionId) {
+        document.querySelectorAll('.max-w-md').forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
 
-        async function loadTransactionHistory(account) {
-            // Implement the logic to load transaction history
+    const qrScanner = new QrScanner(
+        qrVideo,
+        result => {
+            document.getElementById('recipient').value = result;
+            qrScanner.stop();
+            qrScannerModal.classList.add('hidden');
         }
+    );
 
-        function showSection(section) {
-            document.querySelectorAll('div[id$="section"], div[id$="connect"], div[id$="receive"], div[id$="main-section"], div[id$="dapp-integration"], div[id$="trade-section"], div[id$="swap-section"], div[id$="extensions"]').forEach(div => div.classList.add('hidden'));
-            document.getElementById(section).classList.remove('hidden');
-        }
-    </script>
+    function openQrScanner() {
+        qrScannerModal.classList.remove('hidden');
+        qrScanner.start();
+    }
+
+    async function backupWallet() {
+        const account = await signer.getAddress();
+        const mnemonic = await signer.mnemonic;
+        alert(`Backup your wallet\nAccount: ${account}\nMnemonic: ${mnemonic.phrase}`);
+    }
+
+    async function restoreWallet() {
+        const mnemonic = prompt("Enter your mnemonic to restore your wallet:");
+        const wallet = ethers.Wallet.fromMnemonic(mnemonic);
+        alert(`Wallet restored\nAddress: ${wallet.address}`);
+    }
+
+    connectButton.addEventListener('click', connectWallet);
+    generateAddressButton.addEventListener('click', generateAddress);
+    document.getElementById('sendForm').addEventListener('submit', sendTransaction);
+    receiveButton.addEventListener('click', openQrScanner);
+    closeQrScanner.addEventListener('click', () => qrScannerModal.classList.add('hidden'));
+    backupButton.addEventListener('click', backupWallet);
+    restoreButton.addEventListener('click', restoreWallet);
+
+    async function enableBiometrics() {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        alert(`Biometric data: ${JSON.stringify(result.visitorId)}`);
+    }
+
+    enableBiometrics();
+
+</script>
 </body>
 </html>
