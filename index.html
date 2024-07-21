@@ -5,255 +5,246 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CosmicWallet</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            width: 90%;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        .hidden {
-            display: none;
-        }
-        .button {
-            display: inline-block;
-            padding: 10px 20px;
-            margin: 10px 0;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:disabled {
-            background-color: #ccc;
-        }
-        .button.primary {
-            background-color: #28a745;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .form-group input {
-            width: 100%;
-        }
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .nav-button {
-            flex: 1;
-            padding: 10px;
-            text-align: center;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-        .nav-button:disabled {
-            background-color: #ccc;
-        }
-        .address-display {
-            margin: 15px 0;
-        }
-        .copy-icon {
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .section-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .link-card {
-            display: block;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border-radius: 5px;
-            text-align: center;
-            text-decoration: none;
-            flex: 1;
-            min-width: 45%;
-        }
-        .link-card:hover {
-            background-color: #0056b3;
-        }
+        /* Basic styling */
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .section-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        .link-card { padding: 10px; background: #eee; border-radius: 4px; text-align: center; width: 100%; }
+        .button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #0056b3; }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>CosmicWallet</h1>
-    <div id="wallet-connect" class="hidden"></div>
-    <div id="balance" class="hidden"></div>
-    <button class="button" id="connectWallet">Connect Wallet</button>
-    <button class="button" id="generateAddress">Generate New Address</button>
-    <div id="address-info" class="address-display hidden">
-        <p id="newAddress"></p>
-        <p id="newMnemonic"></p>
-        <span class="copy-icon" id="copyAddress">📋 Copy</span>
+    <div class="container">
+        <h1>CosmicWallet</h1>
+        <button class="button" onclick="generateAddress()">Generate Address</button>
+        <button class="button" onclick="connectWallet()">Connect Wallet</button>
+        <button class="button" onclick="switchChain('BSC')">Switch to BSC</button>
+        <button class="button" onclick="switchChain('ETH')">Switch to ETH</button>
+
+        <div id="wallet-info">
+            <h2>Your Wallet</h2>
+            <p id="wallet-address">Address: </p>
+            <p id="mnemonic">Mnemonic: </p>
+            <button class="button" onclick="copyToClipboard('wallet-address')">Copy Address</button>
+            <button class="button" onclick="copyToClipboard('mnemonic')">Copy Mnemonic</button>
+        </div>
+
+        <div id="balance-section">
+            <h2>Balance</h2>
+            <p id="balance">Balance: </p>
+        </div>
+
+        <div id="send-section">
+            <h2>Send CosmicCoin</h2>
+            <form id="send-form" onsubmit="sendCosmicCoin(event)">
+                <label for="recipient-address">Recipient Address:</label>
+                <input type="text" id="recipient-address" required>
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" required>
+                <button type="submit" class="button">Send</button>
+            </form>
+        </div>
+
+        <div id="dappsSection" class="section-container">
+            <h2 class="text-xl font-bold mb-4">DApps</h2>
+            <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+            <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
+            <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
+            <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
+            <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
+            <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
+            <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
+            <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
+            <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
+        </div>
+
+        <div id="swapSection" class="section-container">
+            <h2 class="text-xl font-bold mb-4">Swap</h2>
+            <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+            <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
+            <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
+        </div>
+
+        <div id="tradeSection" class="section-container">
+            <h2 class="text-xl font-bold mb-4">Trade</h2>
+            <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
+            <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
+            <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label for="recipient-address">Recipient</label>
-        <input type="text" id="recipient-address">
-    </div>
-    <div class="form-group">
-        <label for="amount">Amount</label>
-        <input type="number" id="amount">
-    </div>
-    <button class="button primary" id="sendCosmicCoin">Send CosmicCoin</button>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
+    <script>
+        let web3;
+        const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
+        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
+        let currentChain = 'BSC'; // Default to Binance Smart Chain
 
-    <div id="transaction-history" class="hidden"></div>
+        async function generateAddress() {
+            const wallet = ethers.Wallet.createRandom();
+            document.getElementById('wallet-address').innerText = `Address: ${wallet.address}`;
+            document.getElementById('mnemonic').innerText = `Mnemonic: ${wallet.mnemonic.phrase}`;
+            storeEncryptedData(wallet.mnemonic.phrase);
+        }
 
-    <div class="nav-buttons">
-        <button class="nav-button" id="dappsButton">Dapps</button>
-        <button class="nav-button" id="tradeButton">Trade</button>
-        <button class="nav-button" id="swapButton">Swap</button>
-    </div>
-</div>
-
-<div id="dappsSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
-    <h2 class="text-xl font-bold mb-4">DApps</h2>
-    <div class="section-container">
-        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
-        <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
-        <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
-        <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
-        <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
-        <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
-        <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
-        <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
-        <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
-    </div>
-</div>
-
-<div id="swapSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
-    <h2 class="text-xl font-bold mb-4">Swap</h2>
-    <div class="section-container">
-        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
-        <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
-        <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
-    </div>
-</div>
-
-<div id="tradeSection" class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md hidden">
-    <h2 class="text-xl font-bold mb-4">Trade</h2>
-    <div class="section-container">
-        <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
-        <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
-        <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
-    </div>
-</div>
-
-<script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-<script src="https://cdn.web3js.org/web3js/1.7.0/web3.min.js"></script>
-<script>
-    let web3;
-    const cosmicCoinAddresses = [
-        "0x1957fEC12B41767322B5613DF087A41269ab05aD",
-        "0x95e27971C1c72717612617D49045AAf947Be518C"
-    ];
-    const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
-
-    async function connectWallet() {
-        if (window.ethereum) {
-            web3 = new Web3(window.ethereum);
-            try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                const accounts = await web3.eth.getAccounts();
-                document.getElementById('wallet-connect').innerHTML = `Connected: ${accounts[0]}`;
-                document.getElementById('wallet-connect').classList.remove('hidden');
-                await updateBalance(accounts[0]);
-                await loadTransactionHistory(accounts[0]);
-            } catch (error) {
-                console.error("User denied account access", error);
-                alert("User denied account access");
+        async function storeEncryptedData(mnemonic) {
+            const password = prompt("Enter a password to encrypt the data:");
+            if (password) {
+                const { encrypted, iv } = await encryptData(mnemonic, password);
+                localStorage.setItem('encryptedMnemonic', arrayBufferToBase64(encrypted));
+                localStorage.setItem('iv', arrayBufferToBase64(iv));
+                alert("Mnemonic stored securely.");
             }
-        } else {
-            alert('Please install MetaMask!');
         }
-    }
 
-    async function updateBalance(account) {
-        try {
-            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddresses[0]); // Change index to switch between addresses
-            const balance = await cosmicCoin.methods.balanceOf(account).call();
-            document.getElementById('balance').innerHTML = `Balance: ${web3.utils.fromWei(balance, 'ether')} CosmicCoin`;
-            document.getElementById('balance').classList.remove('hidden');
-        } catch (error) {
-            console.error("Failed to fetch balance", error);
-            alert("Failed to fetch balance");
+        async function encryptData(data, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                "raw", 
+                enc.encode(password), 
+                { name: "PBKDF2" }, 
+                false, 
+                ["deriveKey"]
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: enc.encode("salt"),
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                key,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt"]
+            );
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv },
+                derivedKey,
+                enc.encode(data)
+            );
+            return { encrypted, iv };
         }
-    }
 
-    async function sendCosmicCoin(event) {
-        event.preventDefault();
-        try {
+        async function decryptData(encrypted, iv, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                "raw", 
+                enc.encode(password), 
+                { name: "PBKDF2" }, 
+                false, 
+                ["deriveKey"]
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: enc.encode("salt"),
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                key,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["decrypt"]
+            );
+            const decrypted = await window.crypto.subtle.decrypt(
+                { name: "AES-GCM", iv },
+                derivedKey,
+                base64ToArrayBuffer(encrypted)
+            );
+            return new TextDecoder().decode(decrypted);
+        }
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function base64ToArrayBuffer(base64) {
+            const binary_string = window.atob(base64);
+            const len = binary_string.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binary_string.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+                try {
+                    await window.ethereum.enable();
+                    const accounts = await web3.eth.getAccounts();
+                    document.getElementById('wallet-info').innerHTML = `Connected: ${accounts[0]}`;
+                    updateBalance(accounts[0]);
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                alert('Please install MetaMask!');
+            }
+        }
+
+        function switchChain(chain) {
+            if (chains[chain]) {
+                currentChain = chain;
+                web3 = new Web3(new Web3.providers.HttpProvider(chains[chain].provider));
+                updateBalance(); // Update balance with new chain settings
+            } else {
+                console.error('Chain not supported');
+            }
+        }
+
+        async function updateBalance() {
+            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, chains[currentChain].contractAddress);
+            const accounts = await web3.eth.getAccounts();
+            const balance = await cosmicCoin.methods.balanceOf(accounts[0]).call();
+            document.getElementById('balance').innerHTML = `Balance: ${web3.utils.fromWei(balance, 'ether')} CosmicCoin (${currentChain})`;
+        }
+
+        async function sendCosmicCoin(event) {
+            event.preventDefault();
             const recipient = document.getElementById('recipient-address').value;
             const amount = document.getElementById('amount').value;
+            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, chains[currentChain].contractAddress);
             const accounts = await web3.eth.getAccounts();
-            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, cosmicCoinAddresses[0]); // Change index to switch between addresses
-            await cosmicCoin.methods.transfer(recipient, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
-            alert('Transaction successful');
-            await updateBalance(accounts[0]);
-        } catch (error) {
-            console.error("Failed to send CosmicCoin", error);
-            alert("Failed to send CosmicCoin");
+            try {
+                await cosmicCoin.methods.transfer(recipient, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
+                alert('Transaction successful');
+            } catch (error) {
+                console.error('Transaction failed', error);
+                alert('Transaction failed');
+            }
         }
-    }
 
-    async function generateAddress() {
-        const wallet = ethers.Wallet.createRandom();
-        document.getElementById('newAddress').innerHTML = `New Wallet Address: ${wallet.address}`;
-        document.getElementById('newMnemonic').innerHTML = `Mnemonic: ${wallet.mnemonic.phrase}`;
-        document.getElementById('address-info').classList.remove('hidden');
-    }
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard');
+            }, (err) => {
+                console.error('Failed to copy text:', err);
+            });
+        }
 
-    function copyToClipboard() {
-        const address = document.getElementById('newAddress').innerText.split(": ")[1];
-        navigator.clipboard.writeText(address).then(() => {
-            alert("Address copied to clipboard");
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
-    }
-
-    function showSection(sectionId) {
-        document.getElementById('dappsSection').classList.add('hidden');
-        document.getElementById('tradeSection').classList.add('hidden');
-        document.getElementById('swapSection').classList.add('hidden');
-        document.getElementById(sectionId).classList.remove('hidden');
-    }
-
-    document.getElementById('connectWallet').addEventListener('click', connectWallet);
-    document.getElementById('sendCosmicCoin').addEventListener('click', sendCosmicCoin);
-    document.getElementById('generateAddress').addEventListener('click', generateAddress);
-    document.getElementById('copyAddress').addEventListener('click', copyToClipboard);
-    document.getElementById('dappsButton').addEventListener('click', () => showSection('dappsSection'));
-    document.getElementById('tradeButton').addEventListener('click', () => showSection('tradeSection'));
-    document.getElementById('swapButton').addEventListener('click', () => showSection('swapSection'));
-</script>
+        const chains = {
+            'BSC': {
+                provider: 'https://bsc-dataseed.binance.org/',
+                contractAddress: cosmicCoinAddress
+            },
+            'ETH': {
+                provider: 'https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID',
+                contractAddress: '0x...ETH_CONTRACT_ADDRESS'
+            }
+            // Add other chains here
+        };
+    </script>
 </body>
 </html>
