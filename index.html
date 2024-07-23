@@ -156,7 +156,11 @@
             <h2>Secret Phrase</h2>
             <button onclick="generateSecretPhrase()">Generate Secret Phrase</button>
             <div id="secret-phrase"></div>
-        </div>
+            <div>
+                <label for="recover-phrase">Enter Secret Phrase to Recover Account:</label>
+                <input type="text" id="recover-phrase">
+                <button onclick="recoverAccount()">Recover Account</button>
+            </div>
     </div>
 
     <div class="navbar">
@@ -173,7 +177,7 @@
         const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
 
         function showSection(sectionId) {
-            document.querySelectorAll('.container > div').forEach(section => section.classList.add('hidden'));
+            document.querySelectorAll('.container > div:not(.navbar)').forEach(section => section.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
             document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
             document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
@@ -216,18 +220,17 @@
             event.preventDefault();
             const chain = document.getElementById('receive-crypto-chain').value;
 
-            if (chain === 'ethereum') {
-                // Ethereum address generation
-            } else if (chain === 'bsc') {
-                // Binance Smart Chain address generation
-            } else if (chain === 'cosmicCoin') {
-                const wallet = ethers.Wallet.createRandom();
+            if (chain === 'ethereum' || chain === 'bsc' || chain === 'cosmicCoin') {
+                if (!wallet) {
+                    wallet = ethers.Wallet.createRandom();
+                }
+                const address = wallet.address;
                 document.getElementById('receive-address').innerHTML = `
-                    Address: ${wallet.address}<br>
-                    <button onclick="copyToClipboard('${wallet.address}')">Copy Address</button><br>
+                    Address: ${address}<br>
+                    <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
                     <canvas id="qrcode"></canvas>
                 `;
-                QRCode.toCanvas(document.getElementById('qrcode'), wallet.address, function (error) {
+                QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
                     if (error) console.error(error);
                     console.log('QR code generated!');
                 });
@@ -235,7 +238,7 @@
         }
 
         async function generateSecretPhrase() {
-            const wallet = ethers.Wallet.createRandom();
+            wallet = ethers.Wallet.createRandom();
             const mnemonic = wallet.mnemonic.phrase;
             document.getElementById('secret-phrase').innerHTML = `
                 Secret Phrase: ${mnemonic}<br>
@@ -320,9 +323,20 @@
             return new TextDecoder().decode(decrypted);
         }
 
+        async function recoverAccount() {
+            const phrase = document.getElementById('recover-phrase').value;
+            try {
+                wallet = ethers.Wallet.fromMnemonic(phrase);
+                alert('Account recovered successfully!');
+                // Fetch and display balance, transaction history, etc.
+            } catch (error) {
+                alert('Invalid secret phrase!');
+            }
+        }
+
         window.onload = () => {
             showSection('home-section');
-            web3 = new Web3(Web3.givenProvider || "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID");
+            web3 = new Web3(Web3.givenProvider || "https://mainnet.infura.io/v3/cf649952bc434d22b4b7a621993c299b");
         };
     </script>
 </body>
