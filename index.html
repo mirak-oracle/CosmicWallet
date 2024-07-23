@@ -245,7 +245,82 @@
             );
             return new TextDecoder().decode(decrypted);
        }
-    
+
+      // Function to get and display the user's balance
+async function getAndDisplayBalance(address) {
+    if (!web3) {
+        console.error('Web3 is not initialized');
+        return;
+    }
+
+    try {
+        const balance = await web3.eth.getBalance(address);
+        const balanceInEther = web3.utils.fromWei(balance, 'ether');
+        document.getElementById('balance').innerText = `${balanceInEther} ETH`;
+
+        // Save balance to local storage
+        localStorage.setItem('userBalance', balanceInEther);
+    } catch (error) {
+        console.error('Error fetching balance:', error);
+    }
+}
+
+// Function to display the balance from local storage
+function displayBalanceFromStorage() {
+    const storedBalance = localStorage.getItem('userBalance');
+    if (storedBalance) {
+        document.getElementById('balance').innerText = `${storedBalance} ETH`;
+    } else {
+        document.getElementById('balance').innerText = 'Balance not available';
+    }
+}
+
+// Function to monitor transactions to the user's address
+async function monitorTransactions(address) {
+    if (!web3) {
+        console.error('Web3 is not initialized');
+        return;
+    }
+
+    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
+        if (error) {
+            console.error('Error subscribing to pending transactions:', error);
+        }
+    })
+    .on('data', function (transactionHash) {
+        web3.eth.getTransaction(transactionHash)
+            .then(function (transaction) {
+                if (transaction) {
+                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                        // Update balance after transaction
+                        getAndDisplayBalance(address);
+                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                        // Update balance after transaction
+                        getAndDisplayBalance(address);
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.error('Error fetching transaction details:', error);
+            });
+    });
+
+    return subscription;
+}
+
+// Initialize monitoring when the page loads
+window.onload = () => {
+    if (wallet && wallet.address) {
+        const userAddress = wallet.address;
+        getAndDisplayBalance(userAddress);
+        displayBalanceFromStorage(); // Display balance from storage when the page loads
+        monitorTransactions(userAddress);
+    }
+};
+
+        
         // Check if the browser supports notifications
 if ("Notification" in window) {
     Notification.requestPermission().then(function (result) {
