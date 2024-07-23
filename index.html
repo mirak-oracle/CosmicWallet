@@ -3,248 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CosmicWallet</title>
+    <title>DApp List</title>
     <style>
-        /* Basic styling */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .section-container { display: flex; flex-wrap: wrap; gap: 10px; }
-        .link-card { padding: 10px; background: #eee; border-radius: 4px; text-align: center; width: 100%; }
-        .button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .button:hover { background: #0056b3; }
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        .category {
+            margin-bottom: 20px;
+        }
+        .category h2 {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .dapp {
+            margin-left: 20px;
+        }
+        .dapp a {
+            text-decoration: none;
+            color: #007BFF;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>CosmicWallet</h1>
-        <button class="button" onclick="generateAddress()">Generate Address</button>
-        <button class="button" onclick="connectWallet()">Connect Wallet</button>
-        <button class="button" onclick="switchChain('BSC')">Switch to BSC</button>
-        <button class="button" onclick="switchChain('ETH')">Switch to ETH</button>
 
-        <div id="wallet-info">
-            <h2>Your Wallet</h2>
-            <p id="wallet-address">Address: </p>
-            <p id="mnemonic">Mnemonic: </p>
-            <button class="button" onclick="copyToClipboard('wallet-address')">Copy Address</button>
-            <button class="button" onclick="copyToClipboard('mnemonic')">Copy Mnemonic</button>
-        </div>
+<h1>DApp List</h1>
 
-        <div id="balance-section">
-            <h2>Balance</h2>
-            <p id="balance">Balance: </p>
-        </div>
+<script>
+    const dapps = [
+        {"name": "TokenScript", "description": "Smart Token Labs TokenScript Viewer", "url": "https://viewer.tokenscript.org/", "category": "Infrastructure"},
+        {"name": "SmartLayer", "description": "Smart Token Labs Smart Layer Network", "url": "https://smartlayer.network", "category": "Infrastructure"},
+        {"name": "X", "description": "Social Media", "url": "https://x.com", "category": "Social Media"},
+        {"name": "Aave", "description": "A decentralized non-custodial liquidity protocol where users can participate as depositors or borrowers", "url": "https://app.aave.com/", "category": "Finance"},
+        {"name": "Tbull", "description": "A Utility Token on Binance Smart Chain for Payments for Services", "url": "tbull.live", "category": "Utility"},
+        {"name": "Rare Coin", "description": "Free Crypto Faucet & Yield Farming", "url": "make.rare.claims", "category": "Tool"},
+        {"name": "DeFiBox", "description": "one-stop DeFi asset, data and protocols aggregation platform", "url": "https://www.defibox.com/index?utm_source=2189969", "category": "Tool"},
+        {"name": "TokenSets", "description": "Enhance your portfolio with automated asset management strategies.", "url": "https://www.tokensets.com/", "category": "Finance"},
+        {"name": "State of the ÐApps", "description": "Directory of Decentralized Applications", "url": "https://www.stateofthedapps.com/", "category": "Directory"},
+        {"name": "BulkSender", "description": "Batch sending of tokens", "url": "https://bulksender.app/", "category": "Finance"},
+        {"name": "Fuse Studio", "description": "Turning communities into economies", "url": "https://studio.fusenet.io/", "category": "Finance"},
+        {"name": "Axie Infinity", "description": "Collect and raise fantasy creatures", "url": "https://axieinfinity.com/", "category": "Game"},
+        {"name": "ChickenHunt", "description": "character-growing IDLE game", "url": "https://chickenhunt.io/", "category": "Game"},
+        {"name": "CryptoCare", "description": "Social Impact Collectibles", "url": "https://cryptocare.tech/adopt/cryptocare", "category": "Game"},
+        {"name": "Dice2win", "description": "Simple and fair dice game", "url": "https://dice2.win/", "category": "Game"},
+        {"name": "Dragonereum", "description": "Own and trade dragons, fight with other players", "url": "https://dapp.dragonereum.io/", "category": "Game"},
+        {"name": "HyperDragons", "description": "Large scale strategy battle game", "url": "https://hyperdragons.alfakingdom.com/", "category": "Game"},
+        {"name": "Last Trip", "description": "A RPG game", "url": "http://lasttrip.matrixdapp.com/", "category": "Game"},
+        {"name": "LORDLESS", "description": "Be a bounty hunter in my tavern", "url": "https://game.lordless.io/home", "category": "Game"},
+        {"name": "MLB Crypto Baseball", "description": "Baseball collectible game", "url": "https://mlbcryptobaseball.com", "category": "Game"},
+        {"name": "Radi.Cards", "description": "Creative, unique art pieces from from all around the interwebs.", "url": "https://radi.cards/cardshop", "category": "Game"},
+        {"name": "Augur", "description": "Decentralized prediction market", "url": "https://www.augur.net/ipfs-redirect.html", "category": "Marketplace"},
+        {"name": "Name Bazaar", "description": "A peer-to-peer marketplace for the exchange of names registered via the ENS", "url": "https://namebazaar.io/", "category": "Marketplace"},
+        {"name": "OpenSea", "description": "Peer-to-peer marketplace for scarce digital goods", "url": "https://opensea.io", "category": "Marketplace"},
+        {"name": "SuperRare", "description": "Collect art or submit your art as a creator", "url": "https://superrare.co/", "category": "Marketplace"},
+        {"name": "Veil", "description": "A peer-to-peer trading platform for prediction markets and derivatives", "url": "https://app.veil.co/", "category": "Marketplace"},
+        {"name": "Gravity", "description": "Create your gravatar.", "url": "https://gravity.cool/", "category": "Property"},
+        {"name": "Mokens", "description": "Create your own collectibles", "url": "https://mokens.io/", "category": "Property"},
+        {"name": "TENZ-ID", "description": "TENZ-ID is a Decentralized Blockchain naming system", "url": "https://tenzorum.org/tenz_id/", "category": "Property"},
+        {"name": "MonitorChain", "description": "Real-time surveillance", "url": "https://secure.monitorchain.com/", "category": "Security"},
+        {"name": "Cent", "description": "Earn cryptocurrency sharing your wisdom and creativity.", "url": "https://beta.cent.co/", "category": "Social Media"},
+        {"name": "Indorse", "description": "Professional Network", "url": "https://indorse.io/", "category": "Social Media"},
+        {"name": "Peepeth", "description": "Unstoppable microblogging", "url": "https://peepeth.com/welcome", "category": "Social Media"},
+        {"name": "Amberdata", "description": "Your platform for blockchain health and intelligence.", "url": "https://amberdata.io/", "category": "Tool"},
+        {"name": "Gitcoin", "description": "Incentivize or monetize work.", "url": "https://gitcoin.co/", "category": "Tool"},
+        {"name": "Is that my Contract?", "description": "Find and use all your smart contracts", "url": "https://alphawallet.github.io/dude-where-is-my-dapp/", "category": "Tool"},
+        {"name": "Kickback", "description": "Event management platform", "url": "https://kickback.events/", "category": "Tool"},
+        {"name": "NFT Token Factory", "description": "Create an ERC875 NFT contract at the click of a button", "url": "https://tf.alphawallet.com/", "category": "Tool"},
+        {"name": "SmartDrops", "description": "A platform that lets people earn crypto by joining new token projects.", "url": "https://www.smartdrops.io/", "category": "Tool"},
+        {"name": "xDai Bridge", "description": "xDai/Ethereum bridge for self transfers of Dai to xDai", "url": "https://dai-bridge.poa.network/", "category": "Tool"},
+        {"name": "Alfacash", "description": "Trade crypto instantly. ETH, BTC, XRP and 30+ other coins and tokens", "url": "https://www.alfa.cash/", "category": "Exchange"},
+        {"name": "0x Instant", "description": "A free and flexible way to offer simple crypto purchasing", "url": "http://0x-instant-staging.s3-website-us-east-1.amazonaws.com/", "category": "Exchange"},
+        {"name": "KyberSwap", "description": "Instant and Secure Token to Token Swaps", "url": "https://kyber.network/swap/eth_knc", "category": "Exchange"},
+        {"name": "Kyber Migration Portal", "description": "Migration portal to upgrade legacy KNC to ERC-20 KNC tokens", "url": "https://kyber.org/migrate", "category": "Token Migration"},
+        {"name": "localethereum", "description": "Peer-to-peer marketplace allowing to trade eth to fiat", "url": "https://localethereum.com/", "category": "Exchange"},
+        {"name": "Totle", "description": "Aggregating the liquidity of the top decentralized exchanges", "url": "https://app.totle.com/", "category": "Exchange"},
+        {"name": "Uniswap", "description": "Protocol for automated token exchange", "url": "https://uniswap.exchange/swap", "category": "Exchange"}
+    ];
 
-        <div id="send-section">
-            <h2>Send CosmicCoin</h2>
-            <form id="send-form" onsubmit="sendCosmicCoin(event)">
-                <label for="recipient-address">Recipient Address:</label>
-                <input type="text" id="recipient-address" required>
-                <label for="amount">Amount:</label>
-                <input type="number" id="amount" required>
-                <button type="submit" class="button">Send</button>
-            </form>
-        </div>
+    const categories = [...new Set(dapps.map(dapp => dapp.category))];
 
-        <div id="dappsSection" class="section-container">
-            <h2 class="text-xl font-bold mb-4">DApps</h2>
-            <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
-            <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
-            <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
-            <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
-            <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
-            <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
-            <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
-            <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
-            <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
-        </div>
-
-        <div id="swapSection" class="section-container">
-            <h2 class="text-xl font-bold mb-4">Swap</h2>
-            <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
-            <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
-            <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
-        </div>
-
-        <div id="tradeSection" class="section-container">
-            <h2 class="text-xl font-bold mb-4">Trade</h2>
-            <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
-            <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
-            <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.1/dist/web3.min.js"></script>
-    <script>
-        let web3;
-        const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
-        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
-        let currentChain = 'BSC'; // Default to Binance Smart Chain
-
-        async function generateAddress() {
-            const wallet = ethers.Wallet.createRandom();
-            document.getElementById('wallet-address').innerText = `Address: ${wallet.address}`;
-            document.getElementById('mnemonic').innerText = `Mnemonic: ${wallet.mnemonic.phrase}`;
-            storeEncryptedData(wallet.mnemonic.phrase);
-        }
-
-        async function storeEncryptedData(mnemonic) {
-            const password = prompt("Enter a password to encrypt the data:");
-            if (password) {
-                const { encrypted, iv } = await encryptData(mnemonic, password);
-                localStorage.setItem('encryptedMnemonic', arrayBufferToBase64(encrypted));
-                localStorage.setItem('iv', arrayBufferToBase64(iv));
-                alert("Mnemonic stored securely.");
-            }
-        }
-
-        async function encryptData(data, password) {
-            const enc = new TextEncoder();
-            const key = await window.crypto.subtle.importKey(
-                "raw", 
-                enc.encode(password), 
-                { name: "PBKDF2" }, 
-                false, 
-                ["deriveKey"]
-            );
-            const derivedKey = await window.crypto.subtle.deriveKey(
-                {
-                    name: "PBKDF2",
-                    salt: enc.encode("salt"),
-                    iterations: 100000,
-                    hash: "SHA-256"
-                },
-                key,
-                { name: "AES-GCM", length: 256 },
-                false,
-                ["encrypt"]
-            );
-            const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const encrypted = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv },
-                derivedKey,
-                enc.encode(data)
-            );
-            return { encrypted, iv };
-        }
-
-        async function decryptData(encrypted, iv, password) {
-            const enc = new TextEncoder();
-            const key = await window.crypto.subtle.importKey(
-                "raw", 
-                enc.encode(password), 
-                { name: "PBKDF2" }, 
-                false, 
-                ["deriveKey"]
-            );
-            const derivedKey = await window.crypto.subtle.deriveKey(
-                {
-                    name: "PBKDF2",
-                    salt: enc.encode("salt"),
-                    iterations: 100000,
-                    hash: "SHA-256"
-                },
-                key,
-                { name: "AES-GCM", length: 256 },
-                false,
-                ["decrypt"]
-            );
-            const decrypted = await window.crypto.subtle.decrypt(
-                { name: "AES-GCM", iv },
-                derivedKey,
-                base64ToArrayBuffer(encrypted)
-            );
-            return new TextDecoder().decode(decrypted);
-        }
-
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            const len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return window.btoa(binary);
-        }
-
-        function base64ToArrayBuffer(base64) {
-            const binary_string = window.atob(base64);
-            const len = binary_string.length;
-            const bytes = new Uint8Array(len);
-            for (let i = 0; i < len; i++) {
-                bytes[i] = binary_string.charCodeAt(i);
-            }
-            return bytes.buffer;
-        }
-
-        async function connectWallet() {
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-                try {
-                    await window.ethereum.enable();
-                    const accounts = await web3.eth.getAccounts();
-                    document.getElementById('wallet-info').innerHTML = `Connected: ${accounts[0]}`;
-                    updateBalance(accounts[0]);
-                } catch (error) {
-                    console.error("User denied account access");
-                }
-            } else {
-                alert('Please install MetaMask!');
-            }
-        }
-
-        function switchChain(chain) {
-            if (chains[chain]) {
-                currentChain = chain;
-                web3 = new Web3(new Web3.providers.HttpProvider(chains[chain].provider));
-                updateBalance(); // Update balance with new chain settings
-            } else {
-                console.error('Chain not supported');
-            }
-        }
-
-        async function updateBalance() {
-            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, chains[currentChain].contractAddress);
-            const accounts = await web3.eth.getAccounts();
-            const balance = await cosmicCoin.methods.balanceOf(accounts[0]).call();
-            document.getElementById('balance').innerHTML = `Balance: ${web3.utils.fromWei(balance, 'ether')} CosmicCoin (${currentChain})`;
-        }
-
-        async function sendCosmicCoin(event) {
-            event.preventDefault();
-            const recipient = document.getElementById('recipient-address').value;
-            const amount = document.getElementById('amount').value;
-            const cosmicCoin = new web3.eth.Contract(cosmicCoinAbi, chains[currentChain].contractAddress);
-            const accounts = await web3.eth.getAccounts();
-            try {
-                await cosmicCoin.methods.transfer(recipient, web3.utils.toWei(amount, 'ether')).send({ from: accounts[0] });
-                alert('Transaction successful');
-            } catch (error) {
-                console.error('Transaction failed', error);
-                alert('Transaction failed');
-            }
-        }
-
-        function copyToClipboard(id) {
-            const text = document.getElementById(id).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard');
-            }, (err) => {
-                console.error('Failed to copy text:', err);
+    document.addEventListener("DOMContentLoaded", () => {
+        const container = document.createElement("div");
+        categories.forEach(category => {
+            const categoryDiv = document.createElement("div");
+            categoryDiv.classList.add("category");
+            const categoryTitle = document.createElement("h2");
+            categoryTitle.innerText = category;
+            categoryDiv.appendChild(categoryTitle);
+            dapps.filter(dapp => dapp.category === category).forEach(dapp => {
+                const dappDiv = document.createElement("div");
+                dappDiv.classList.add("dapp");
+                const dappLink = document.createElement("a");
+                dappLink.href = dapp.url;
+                dappLink.innerText = `${dapp.name}: ${dapp.description}`;
+                dappDiv.appendChild(dappLink);
+                categoryDiv.appendChild(dappDiv);
             });
-        }
+            container.appendChild(categoryDiv);
+        });
+        document.body.appendChild(container);
+    });
+</script>
 
-        const chains = {
-            'BSC': {
-                provider: 'https://bsc-dataseed.binance.org/',
-                contractAddress: cosmicCoinAddress
-            },
-            'ETH': {
-                provider: 'https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID',
-                contractAddress: '0x...ETH_CONTRACT_ADDRESS'
-            }
-            // Add other chains here
-        };
-    </script>
 </body>
 </html>
