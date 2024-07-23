@@ -23,41 +23,14 @@
     display: none;
 }
 
-iframe {
-    width: 100%;
-    height: calc(100vh - 100px); /* Adjust the height as needed */
-    border: none; /* Optional: Remove the border if it exists */
-}
-        html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-iframe-container {
-    flex-grow: 1;
-}
-
-
+.hidden { display: none; }
+        
+        iframe { width: 100%; height: 240px; }
+    
     </style>
 </head>
 <body class="bg-gray-100">
-    <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
-        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
-            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
-            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
-            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
-            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
-            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
-        </nav>
-
-        <div id="balance-section" class="flex justify-between items-center my-4">
+    <div id="balance-section" class="flex justify-between items-center my-4">
             <div>
                 <span id="balance-amount" class="text-xl">Balance: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
                 <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
@@ -69,7 +42,18 @@ iframe-container {
                 <option value="USD">USD</option>
                 <option value="NGN">NGN</option>
             </select>
-        </div>
+    </div>
+    
+    <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
+        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
+            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
+            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
+            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
+            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
+            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
+        </nav>
+
+        
 
         <div id="home-section" class="iframe-container">
             <h2 class="text-2xl font-bold mb-4">CRYPTO</h2>
