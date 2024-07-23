@@ -1,269 +1,329 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Web3 Wallet</title>
-  <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .hidden {
-      display: none;
-    }
-    .section-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .link-card {
-      padding: 10px 20px;
-      background: #007bff;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
-      transition: background 0.3s;
-    }
-    .link-card:hover {
-      background: #0056b3;
-    }
-    .navbar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #007bff;
-      color: #fff;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-    }
-    .navbar a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .navbar a.active {
-      text-decoration: underline;
-    }
-    .crypto-iframe {
-      width: 100%;
-      height: 400px;
-      border: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Wallet</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.4.7/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+        .section-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .link-card {
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .link-card:hover {
+            background: #0056b3;
+        }
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #007bff;
+            color: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .navbar a.active {
+            text-decoration: underline;
+        }
+        .crypto-iframe {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        .balance-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .balance-section button {
+            background: none;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .send-receive-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .send-receive-buttons button {
+            background: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .send-receive-buttons button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Web3 Wallet</h1>
+    <div class="container">
+        <div id="balance-section" class="balance-section">
+            <div>
+                <span id="balance-amount">Balance: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
+                <button onclick="toggleBalance()">Hide</button>
+            </div>
+            <select id="balance-currency-selector" onchange="updateBalanceCurrency()">
+                <option value="ETH">ETH</option>
+                <option value="BNB">BNB</option>
+                <option value="COSMIC">COSMIC</option>
+            </select>
+        </div>
 
-    <div id="home-section">
-      <button onclick="showSection('send-section')">Send</button>
-      <button onclick="showSection('receive-section')">Receive</button>
-      <div id="crypto-info">
-        <h2>Cryptocurrency Data</h2>
-        <iframe src="https://cryptowat.ch/" class="crypto-iframe"></iframe>
-      </div>
+        <div class="send-receive-buttons">
+            <button onclick="showSection('send-section')">Send</button>
+            <button onclick="showSection('receive-section')">Receive</button>
+        </div>
+
+        <div id="home-section">
+            <div id="crypto-info">
+                <h2>Cryptocurrency Data</h2>
+                <iframe src="https://cryptowat.ch/" class="crypto-iframe"></iframe>
+            </div>
+        </div>
+
+        <div id="send-section" class="hidden">
+            <h2>Send Cryptocurrency</h2>
+            <form onsubmit="sendCrypto(event)">
+                <select id="send-crypto-chain">
+                    <option value="ethereum">Ethereum</option>
+                    <option value="bsc">Binance Smart Chain</option>
+                    <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+                </select>
+                <input type="text" id="recipient-address" placeholder="Recipient Address" required>
+                <input type="number" id="amount" placeholder="Amount" required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+        <div id="receive-section" class="hidden">
+            <h2>Receive Cryptocurrency</h2>
+            <form onsubmit="generateReceiveAddress(event)">
+                <select id="receive-crypto-chain">
+                    <option value="ethereum">Ethereum</option>
+                    <option value="bsc">Binance Smart Chain</option>
+                    <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+                </select>
+                <button type="submit">Generate Address</button>
+            </form>
+            <div id="receive-address"></div>
+        </div>
+
+        <div id="transaction-history" class="hidden">
+            <h2>Transaction History</h2>
+            <div id="transaction-list"></div>
+        </div>
+
+        <div id="secret-phrase-section" class="hidden">
+            <h2>Secret Phrase</h2>
+            <button onclick="generateSecretPhrase()">Generate Secret Phrase</button>
+            <div id="secret-phrase"></div>
+        </div>
     </div>
 
-    <div id="send-section" class="hidden">
-      <h2>Send Cryptocurrency</h2>
-      <form onsubmit="sendCrypto(event)">
-        <select id="send-crypto-chain">
-          <!-- Add more chains as needed -->
-          <option value="ethereum">Ethereum</option>
-          <option value="bsc">Binance Smart Chain</option>
-          <option value="cosmicCoin">CosmicCoin (BEP20)</option>
-        </select>
-        <input type="text" id="recipient-address" placeholder="Recipient Address" required>
-        <input type="number" id="amount" placeholder="Amount" required>
-        <button type="submit">Send</button>
-      </form>
+    <div class="navbar">
+        <a href="#home-section" onclick="showSection('home-section')" class="active">Home</a>
+        <a href="#send-section" onclick="showSection('send-section')">Send</a>
+        <a href="#receive-section" onclick="showSection('receive-section')">Receive</a>
+        <a href="#transaction-history" onclick="showSection('transaction-history')">History</a>
+        <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')">Secret Phrase</a>
     </div>
 
-    <div id="receive-section" class="hidden">
-      <h2>Receive Cryptocurrency</h2>
-      <form onsubmit="generateReceiveAddress(event)">
-        <select id="receive-crypto-chain">
-          <!-- Add more chains as needed -->
-          <option value="ethereum">Ethereum</option>
-          <option value="bsc">Binance Smart Chain</option>
-          <option value="cosmicCoin">CosmicCoin (BEP20)</option>
-        </select>
-        <button type="submit">Generate Address</button>
-      </form>
-      <div id="receive-address"></div>
-    </div>
+    <script>
+        let web3;
+        const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
+        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
 
-    <div id="transaction-history" class="hidden">
-      <h2>Transaction History</h2>
-      <div id="transaction-list"></div>
-    </div>
+        function showSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
+            document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+        }
 
-    <div id="secret-phrase-section" class="hidden">
-      <h2>Secret Phrase</h2>
-      <button onclick="generateSecretPhrase()">Generate Secret Phrase</button>
-      <div id="secret-phrase"></div>
-    </div>
-  </div>
+        function toggleBalance() {
+            const balanceValue = document.getElementById('balance-value');
+            const balanceButton = document.querySelector('.balance-section button');
+            if (balanceValue.style.display === 'none') {
+                balanceValue.style.display = 'inline';
+                balanceButton.textContent = 'Hide';
+            } else {
+                balanceValue.style.display = 'none';
+                balanceButton.textContent = 'Show';
+            }
+        }
 
-  <div class="navbar">
-    <a href="#home-section" onclick="showSection('home-section')" class="active">Home</a>
-    <a href="#send-section" onclick="showSection('send-section')">Send</a>
-    <a href="#receive-section" onclick="showSection('receive-section')">Receive</a>
-    <a href="#transaction-history" onclick="showSection('transaction-history')">History</a>
-    <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')">Secret Phrase</a>
-  </div>
+        function updateBalanceCurrency() {
+            const currency = document.getElementById('balance-currency-selector').value;
+            document.getElementById('balance-currency').textContent = currency;
+            // Fetch and update the balance value based on selected currency
+        }
 
-  <script>
-    let web3;
-    const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
-    const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
+        async function sendCrypto(event) {
+            event.preventDefault();
+            const chain = document.getElementById('send-crypto-chain').value;
+            const recipient = document.getElementById('recipient-address').value;
+            const amount = document.getElementById('amount').value;
 
-    function showSection(sectionId) {
-      document.querySelectorAll('.container > div').forEach(section => section.classList.add('hidden'));
-      document.getElementById(sectionId).classList.remove('hidden');
-      document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-      document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
-    }
+            if (chain === 'ethereum') {
+                // Ethereum send logic
+            } else if (chain === 'bsc') {
+                // Binance Smart Chain send logic
+            } else if (chain === 'cosmicCoin') {
+                // CosmicCoin send logic
+            }
+        }
 
-    async function sendCrypto(event) {
-      event.preventDefault();
-      const chain = document.getElementById('send-crypto-chain').value;
-      const recipient = document.getElementById('recipient-address').value;
-      const amount = document.getElementById('amount').value;
+        async function generateReceiveAddress(event) {
+            event.preventDefault();
+            const chain = document.getElementById('receive-crypto-chain').value;
 
-      // Implement send logic based on selected chain
-      if (chain === 'ethereum') {
-        // Ethereum send logic
-      } else if (chain === 'bsc') {
-        // Binance Smart Chain send logic
-      } else if (chain === 'cosmicCoin') {
-        // CosmicCoin send logic
-      }
-    }
+            if (chain === 'ethereum') {
+                // Ethereum address generation
+            } else if (chain === 'bsc') {
+                // Binance Smart Chain address generation
+            } else if (chain === 'cosmicCoin') {
+                const wallet = ethers.Wallet.createRandom();
+                document.getElementById('receive-address').innerHTML = `
+                    Address: ${wallet.address}<br>
+                    <button onclick="copyToClipboard('${wallet.address}')">Copy Address</button><br>
+                    <canvas id="qrcode"></canvas>
+                `;
+                QRCode.toCanvas(document.getElementById('qrcode'), wallet.address, function (error) {
+                    if (error) console.error(error);
+                    console.log('QR code generated!');
+                });
+            }
+        }
 
-    async function generateReceiveAddress(event) {
-      event.preventDefault();
-      const chain = document.getElementById('receive-crypto-chain').value;
+        async function generateSecretPhrase() {
+            const wallet = ethers.Wallet.createRandom();
+            const mnemonic = wallet.mnemonic.phrase;
+            document.getElementById('secret-phrase').innerHTML = `
+                Secret Phrase: ${mnemonic}<br>
+                <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
+            `;
+            await storeEncryptedData(mnemonic, 'user-password');
+        }
 
-      // Implement address generation logic based on selected chain
-      if (chain === 'ethereum') {
-        // Ethereum address generation
-      } else if (chain === 'bsc') {
-        // Binance Smart Chain address generation
-      } else if (chain === 'cosmicCoin') {
-        const wallet = ethers.Wallet.createRandom();
-        document.getElementById('receive-address').innerHTML = `
-          Address: ${wallet.address}<br>
-          <button onclick="copyToClipboard('${wallet.address}')">Copy Address</button><br>
-          <canvas id="qrcode"></canvas>
-        `;
-        QRCode.toCanvas(document.getElementById('qrcode'), wallet.address, function (error) {
-          if (error) console.error(error);
-          console.log('QR code generated!');
-        });
-      }
-    }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Copied to clipboard!');
+            });
+        }
 
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => alert('Address copied to clipboard'));
-    }
+        async function storeEncryptedData(data, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: enc.encode('some-salt'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                key,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await window.crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv
+                },
+                derivedKey,
+                enc.encode(data)
+            );
+            localStorage.setItem('encryptedData', JSON.stringify({ iv: Array.from(iv), data: Array.from(new Uint8Array(encrypted)) }));
+        }
 
-    async function generateSecretPhrase() {
-      const wallet = ethers.Wallet.createRandom();
-      document.getElementById('secret-phrase').innerHTML = `
-        Secret Phrase: ${wallet.mnemonic.phrase}<br>
-        <button onclick="copyToClipboard('${wallet.mnemonic.phrase}')">Copy Secret Phrase</button>
-      `;
-    }
+        async function retrieveEncryptedData(password) {
+            const encryptedData = JSON.parse(localStorage.getItem('encryptedData'));
+            return await decryptData(encryptedData, password);
+        }
 
-    async function encryptData(data, password) {
-      const enc = new TextEncoder();
-      const key = await window.crypto.subtle.importKey(
-        'raw',
-        enc.encode(password),
-        { name: 'PBKDF2' },
-        false,
-        ['deriveKey']
-      );
-      const derivedKey = await window.crypto.subtle.deriveKey(
-        {
-          name: 'PBKDF2',
-          salt: enc.encode('some-salt'),
-          iterations: 100000,
-          hash: 'SHA-256'
-        },
-        key,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['encrypt']
-      );
-      const encrypted = await window.crypto.subtle.encrypt(
-        {
-          name: 'AES-GCM',
-          iv: window.crypto.getRandomValues(new Uint8Array(12))
-        },
-        derivedKey,
-        enc.encode(data)
-      );
-      return encrypted;
-    }
+        async function decryptData(encryptedData, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: enc.encode('some-salt'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                key,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+            );
+            const decrypted = await window.crypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: new Uint8Array(encryptedData.iv)
+                },
+                derivedKey,
+                new Uint8Array(encryptedData.data)
+            );
+            return new TextDecoder().decode(decrypted);
+        }
 
-    async function storeEncryptedData(data, password) {
-      const encrypted = await encryptData(data, password);
-      localStorage.setItem('encryptedData', JSON.stringify(encrypted));
-    }
-
-    async function retrieveEncryptedData(password) {
-      const encryptedData = JSON.parse(localStorage.getItem('encryptedData'));
-      return await decryptData(encryptedData, password);
-    }
-
-    async function decryptData(encryptedData, password) {
-      const enc = new TextEncoder();
-      const key = await window.crypto.subtle.importKey(
-        'raw',
-        enc.encode(password),
-        { name: 'PBKDF2' },
-        false,
-        ['deriveKey']
-      );
-      const derivedKey = await window.crypto.subtle.deriveKey(
-        {
-          name: 'PBKDF2',
-          salt: enc.encode('some-salt'),
-          iterations: 100000,
-          hash: 'SHA-256'
-        },
-        key,
-        { name: 'AES-GCM', length: 256 },
-        false,
-        ['decrypt']
-      );
-      const decrypted = await window.crypto.subtle.decrypt(
-        {
-          name: 'AES-GCM',
-          iv: encryptedData.iv
-        },
-        derivedKey,
-        encryptedData
-      );
-      return new TextDecoder().decode(decrypted);
-    }
-  </script>
+        window.onload = () => {
+            showSection('home-section');
+            web3 = new Web3(Web3.givenProvider || "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID");
+        };
+    </script>
 </body>
 </html>
