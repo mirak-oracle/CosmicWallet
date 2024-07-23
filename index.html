@@ -19,10 +19,32 @@
         .hidden {
             display: none;
         }
-        .hidden { display: none; }
-        
-        iframe { width: 100%; height: 240px; }
-    
+        .hidden {
+    display: none;
+}
+
+iframe {
+    width: 100%;
+    height: calc(100vh - 100px); /* Adjust the height as needed */
+    border: none; /* Optional: Remove the border if it exists */
+}
+        html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+iframe-container {
+    flex-grow: 1;
+}
+
+
     </style>
 </head>
 <body class="bg-gray-100">
@@ -49,7 +71,7 @@
             </select>
         </div>
 
-        <div id="home-section">
+        <div id="home-section" class="iframe-container">
             <h2 class="text-2xl font-bold mb-4">CRYPTO</h2>
             <iframe src="https://widget.coinlore.com/widgets/ticker-widget"></iframe>
             <iframe src="https://widget.coinlib.io/widget?type=full_v2&theme=light&cnt=10&pref_coin_id=1505&graph=yes"></iframe>
@@ -314,6 +336,14 @@ async function monitorTransactions(address) {
 
     return subscription;
 }
+        // Refresh balance when iframes load
+function refreshBalance() {
+    const userAddress = localStorage.getItem('userAddress');
+    if (userAddress) {
+        getAndDisplayBalance(userAddress);
+    }
+}
+
 
 // Initialize monitoring when the page loads
 window.onload = () => {
