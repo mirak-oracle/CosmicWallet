@@ -32,7 +32,7 @@
 <body class="bg-gray-100">
     <div id="balance-section" class="flex justify-between items-center my-4">
             <div>
-                <span id="balance-amount" class="text-xl">Balance: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
+                <span id="balance-amount" class="text-xl">♎️💲♎️: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
                 <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
             </div>
             <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="border border-gray-300 rounded p-2">
@@ -55,8 +55,9 @@
 
         
 
-        <div id="home-section"style="margin-top: -20px;">
+        <div id="home-section">
             <h2 class="text-2xl font-bold mb-4">CRYPTO</h2>
+            <div class="iframe-container" style="margin-top: -20px;">
             <iframe src="https://widget.coinlore.com/widgets/ticker-widget"></iframe>
             <iframe src="https://widget.coinlib.io/widget?type=full_v2&theme=light&cnt=10&pref_coin_id=1505&graph=yes"></iframe>
         </div>
