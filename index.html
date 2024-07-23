@@ -7,169 +7,92 @@
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@5.4.7/dist/ethers.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.6.6/dist/umd/index.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
         }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
         .hidden {
             display: none;
         }
-        .section-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .link-card {
-            padding: 10px 20px;
-            background: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-        .link-card:hover {
-            background: #0056b3;
-        }
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #007bff;
-            color: #fff;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-        }
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .navbar a.active {
-            text-decoration: underline;
-        }
-        .crypto-iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-        }
-        .balance-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .balance-section button {
-            background: none;
-            border: none;
-            color: #007bff;
-            cursor: pointer;
-        }
-        .send-receive-buttons {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .send-receive-buttons button {
-            background: #007bff;
-            color: #fff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .send-receive-buttons button:hover {
-            background: #0056b3;
-        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div id="balance-section" class="balance-section">
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
+        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
+            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
+            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
+            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
+            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
+            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
+        </nav>
+
+        <div id="balance-section" class="flex justify-between items-center my-4">
             <div>
-                <span id="balance-amount">Balance: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
-                <button onclick="toggleBalance()">Hide</button>
+                <span id="balance-amount" class="text-xl">Balance: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
+                <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
             </div>
-            <select id="balance-currency-selector" onchange="updateBalanceCurrency()">
+            <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="border border-gray-300 rounded p-2">
                 <option value="ETH">ETH</option>
                 <option value="BNB">BNB</option>
                 <option value="COSMIC">COSMIC</option>
+                <option value="USD">USD</option>
+                <option value="NGN">NGN</option>
             </select>
         </div>
 
-        <div class="send-receive-buttons">
-            <button onclick="showSection('send-section')">Send</button>
-            <button onclick="showSection('receive-section')">Receive</button>
-        </div>
-
         <div id="home-section">
-            <div id="crypto-info">
-                <h2>Cryptocurrency Data</h2>
-                <iframe src="https://cryptowat.ch/" class="crypto-iframe"></iframe>
-            </div>
+            <h2 class="text-2xl font-bold mb-4">Cryptocurrency Data</h2>
+            <iframe src="https://cryptowat.ch/" class="w-full h-96 border rounded-lg"></iframe>
         </div>
 
         <div id="send-section" class="hidden">
-            <h2>Send Cryptocurrency</h2>
-            <form onsubmit="sendCrypto(event)">
-                <select id="send-crypto-chain">
+            <h2 class="text-2xl font-bold mb-4">Send Cryptocurrency</h2>
+            <form onsubmit="sendCrypto(event)" class="space-y-4">
+                <select id="send-crypto-chain" class="block w-full border border-gray-300 rounded p-2">
                     <option value="ethereum">Ethereum</option>
                     <option value="bsc">Binance Smart Chain</option>
                     <option value="cosmicCoin">CosmicCoin (BEP20)</option>
                 </select>
-                <input type="text" id="recipient-address" placeholder="Recipient Address" required>
-                <input type="number" id="amount" placeholder="Amount" required>
-                <button type="submit">Send</button>
+                <input type="text" id="recipient-address" placeholder="Recipient Address" required class="block w-full border border-gray-300 rounded p-2">
+                <input type="number" id="amount" placeholder="Amount" required class="block w-full border border-gray-300 rounded p-2">
+                <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Send</button>
             </form>
         </div>
 
         <div id="receive-section" class="hidden">
-            <h2>Receive Cryptocurrency</h2>
-            <form onsubmit="generateReceiveAddress(event)">
-                <select id="receive-crypto-chain">
+            <h2 class="text-2xl font-bold mb-4">Receive Cryptocurrency</h2>
+            <form onsubmit="generateReceiveAddress(event)" class="space-y-4">
+                <select id="receive-crypto-chain" class="block w-full border border-gray-300 rounded p-2">
                     <option value="ethereum">Ethereum</option>
                     <option value="bsc">Binance Smart Chain</option>
                     <option value="cosmicCoin">CosmicCoin (BEP20)</option>
                 </select>
-                <button type="submit">Generate Address</button>
+                <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Generate Address</button>
             </form>
-            <div id="receive-address"></div>
+            <div id="receive-address" class="mt-4"></div>
         </div>
 
         <div id="transaction-history" class="hidden">
-            <h2>Transaction History</h2>
-            <div id="transaction-list"></div>
+            <h2 class="text-2xl font-bold mb-4">Transaction History</h2>
+            <div id="transaction-list" class="space-y-2"></div>
         </div>
 
         <div id="secret-phrase-section" class="hidden">
-            <h2>Secret Phrase</h2>
-            <button onclick="generateSecretPhrase()">Generate Secret Phrase</button>
-            <div id="secret-phrase"></div>
-            <div>
-                <label for="recover-phrase">Enter Secret Phrase to Recover Account:</label>
-                <input type="text" id="recover-phrase">
-                <button onclick="recoverAccount()">Recover Account</button>
+            <h2 class="text-2xl font-bold mb-4">Secret Phrase</h2>
+            <button onclick="generateSecretPhrase()" class="bg-blue-600 text-white rounded p-2">Generate Secret Phrase</button>
+            <div id="secret-phrase" class="mt-4"></div>
+            <div class="mt-4">
+                <label for="recover-phrase" class="block mb-2">Enter Secret Phrase to Recover Account:</label>
+                <input type="text" id="recover-phrase" class="block w-full border border-gray-300 rounded p-2">
+                <button onclick="recoverAccount()" class="bg-blue-600 text-white rounded p-2 mt-2">Recover Account</button>
             </div>
-    </div>
-
-    <div class="navbar">
-        <a href="#home-section" onclick="showSection('home-section')" class="active">Home</a>
-        <a href="#send-section" onclick="showSection('send-section')">Send</a>
-        <a href="#receive-section" onclick="showSection('receive-section')">Receive</a>
-        <a href="#transaction-history" onclick="showSection('transaction-history')">History</a>
-        <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')">Secret Phrase</a>
-    </div>
+        </div>
+                    
 
     <script>
         let web3;
@@ -321,7 +244,157 @@
                 new Uint8Array(encryptedData.data)
             );
             return new TextDecoder().decode(decrypted);
+       }
+    
+        // Check if the browser supports notifications
+if ("Notification" in window) {
+    Notification.requestPermission().then(function (result) {
+        if (result === 'granted') {
+            console.log('Notification permission granted.');
+        } else if (result === 'denied') {
+            alert('Please enable notifications to receive alerts about transactions.');
         }
+    });
+}
+
+// Function to send a notification
+function sendNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body });
+    } else {
+        alert(`${title}\n\n${body}`);
+    }
+}
+
+// Function to monitor transactions to the user's address
+async function monitorTransactions(address) {
+    if (!web3) {
+        console.error('Web3 is not initialized');
+        return;
+    }
+
+    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
+        if (error) {
+            console.error('Error subscribing to pending transactions:', error);
+        }
+    })
+    .on('data', function (transactionHash) {
+        web3.eth.getTransaction(transactionHash)
+            .then(function (transaction) {
+                if (transaction) {
+                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.error('Error fetching transaction details:', error);
+            });
+    });
+
+    return subscription;
+}
+
+// Function to monitor alerts (customize as needed)
+async function monitorAlerts() {
+    // Example: Poll an API or a contract for custom alerts
+    setInterval(async () => {
+        // Replace with actual alert checking logic
+        const hasAlert = checkForCustomAlerts(); // Define this function based on your needs
+        if (hasAlert) {
+            sendNotification('Alert', 'You have a new alert!');
+        }
+    }, 60000); // Check every 60 seconds
+}
+
+// Function to always send an alert when a transaction occurs (sending or receiving)
+async function notifyTransaction(address) {
+    if (!web3) {
+        console.error('Web3 is not initialized');
+        return;
+    }
+
+    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
+        if (error) {
+            console.error('Error subscribing to pending transactions:', error);
+        }
+    })
+    .on('data', function (transactionHash) {
+        web3.eth.getTransaction(transactionHash)
+            .then(function (transaction) {
+                if (transaction) {
+                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
+                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
+                    }
+                }
+            })
+            .catch(function (error) {
+                console.error('Error fetching transaction details:', error);
+            });
+    });
+
+    return subscription;
+}
+
+// Initialize monitoring when the page loads
+window.onload = () => {
+    if (wallet && wallet.address) {
+        const userAddress = wallet.address;
+        monitorTransactions(userAddress);
+        monitorAlerts();
+        notifyTransaction(userAddress);
+    }
+};
+
+// Placeholder function for custom alerts (customize based on your needs)
+function checkForCustomAlerts() {
+    // Implement your custom alert checking logic here
+    // For example, you could check an API endpoint or a smart contract event
+    // Return true if there's an alert, otherwise return false
+    return false;
+}
+     // Function to fetch and display current gas prices
+async function getGasPrice() {
+    try {
+        const gasPrice = await web3.eth.getGasPrice();
+        document.getElementById('gas-price').textContent = `Current Gas Price: ${web3.utils.fromWei(gasPrice, 'gwei')} Gwei`;
+    } catch (error) {
+        console.error('Failed to fetch gas price', error);
+    }
+}
+
+// Call to update balance and gas price on page load
+window.onload = async function() {
+    if (wallet) {
+        await updateBalance();
+        await getGasPrice();
+    }
+};
+        // Function to save secret phrase
+function saveSecretPhrase(phrase) {
+    localStorage.setItem('secretPhrase', phrase);
+}
+
+// Function to retrieve secret phrase
+function getSecretPhrase() {
+    return localStorage.getItem('secretPhrase');
+}
+
+// Function to save transaction history
+function saveTransactionHistory(transaction) {
+    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+    history.push(transaction);
+    localStorage.setItem('transactionHistory', JSON.stringify(history));
+}
+
+// Function to retrieve transaction history
+function getTransactionHistory() {
+    return JSON.parse(localStorage.getItem('transactionHistory')) || [];
+}
 
         async function recoverAccount() {
             const phrase = document.getElementById('recover-phrase').value;
