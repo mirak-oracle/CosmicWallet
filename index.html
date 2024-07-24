@@ -102,7 +102,85 @@
                 <button onclick="recoverAccount()" class="bg-blue-600 text-white rounded p-2 mt-2">Recover Account</button>
             </div>
         </div>
-                    
+            <div id="dappsSection" class="hidden p-4 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-blue-600">DApps</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+        <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
+        <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
+        <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
+        <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
+        <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
+        <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
+        <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
+        <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
+    </div>
+</div>
+
+<div id="swapSection" class="hidden p-4 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-blue-600">Swap</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+        <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
+        <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
+    </div>
+</div>
+
+<div id="tradeSection" class="hidden p-4 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-blue-600">Trade</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
+        <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
+        <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
+    </div>
+</div>
+
+<div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
+      <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
+    <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
+    <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
+</div>
+
+<style>
+    .link-card {
+        display: block;
+        padding: 12px;
+        background: #f0f0f0;
+        text-align: center;
+        border-radius: 8px;
+        transition: background 0.3s;
+    }
+    .link-card:hover {
+        background: #e0e0e0;
+    }
+    .navbar a.nav-link {
+        flex-grow: 1;
+        text-align: center;
+        padding: 12px 0;
+        transition: background 0.3s;
+    }
+    .navbar a.nav-link:hover {
+        background: #007BFF;
+    }
+    .navbar a.active {
+        background: #0056b3;
+    }
+</style>
+
+<script>
+    function showSection(sectionId) {
+        document.querySelectorAll('.container > div').forEach(section => {
+            section.classList.add('hidden');
+        });
+        document.getElementById(sectionId).classList.remove('hidden');
+
+        document.querySelectorAll('.navbar a.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+    }
+</script>
+        
 
     <script>
         let web3;
