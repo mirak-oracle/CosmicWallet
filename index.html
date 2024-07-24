@@ -165,32 +165,6 @@
         iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=${selectedPair}&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`;
     });
 </script>
-
-</div>
-
-<style>
-    .iframe-container {
-        width: 100%;
-        height: calc(100vh - 160px); /* Adjust the height as needed */
-    }
-    .iframe-container iframe {
-        width: 100%;
-        height: 100%;
-        border: none;
-    }
-</style>
-
-
-</div>
-    
-<div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
-      <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
-    <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
-   <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
-    <a href="#rewardsSection" onclick="showSection('RewardsSection')" class="nav-link">Reward</a>
-
-</div>
-      </nav>
 <!-- Rewards Section -->
         <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-4 text-green-600">Rewards</h2>
@@ -262,6 +236,33 @@
     </script>
 </body>
 </html>
+
+</div>
+
+<style>
+    .iframe-container {
+        width: 100%;
+        height: calc(100vh - 160px); /* Adjust the height as needed */
+    }
+    .iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
+
+
+</div>
+    
+<div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
+      <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
+    <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
+   <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
+    <a href="#rewardsSection" onclick="showSection('RewardsSection')" class="nav-link">Reward</a>
+
+</div>
+      </nav>
+
 
 <style>
     .link-card {
