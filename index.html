@@ -252,60 +252,6 @@
         document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
     }
 
-        
-document.addEventListener('DOMContentLoaded', () => {
-    const encryptionKey = 'your-encryption-key';
-
-    function encryptData(data) {
-        return CryptoJS.AES.encrypt(data, encryptionKey).toString();
-    }
-
-    function decryptData(encryptedData) {
-        const bytes = CryptoJS.AES.decrypt(encryptedData, encryptionKey);
-        return bytes.toString(CryptoJS.enc.Utf8);
-    }
-
-    function sanitizeInput(input) {
-        const element = document.createElement('div');
-        element.innerText = input;
-        return element.innerHTML;
-    }
-
-    function validateAddress(address) {
-        const regex = /^0x[a-fA-F0-9]{40}$/;
-        return regex.test(address);
-    }
-
-    function secureStore(key, data) {
-        const encryptedData = encryptData(data);
-        localStorage.setItem(key, encryptedData);
-    }
-
-    function secureRetrieve(key) {
-        const encryptedData = localStorage.getItem(key);
-        return encryptedData ? decryptData(encryptedData) : null;
-    }
-
-    document.getElementById('sendForm').addEventListener('submit', function (event) {
-        const address = document.getElementById('recipient-address').value;
-        if (!validateAddress(address)) {
-            alert('Invalid address');
-            event.preventDefault();
-        }
-    });
-
-    // Example usage
-    document.getElementById('storePrivateKeyButton').addEventListener('click', () => {
-        const privateKey = sanitizeInput(document.getElementById('privateKeyInput').value);
-        secureStore('encryptedPrivateKey', privateKey);
-        alert('Private key stored securely.');
-    });
-
-    document.getElementById('retrievePrivateKeyButton').addEventListener('click', () => {
-        const privateKey = secureRetrieve('encryptedPrivateKey');
-        alert(`Retrieved private key: ${privateKey}`);
-    });
-});
 </script>
     
     <script>
