@@ -41,9 +41,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CosmicWallet</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        /* Inline CSS for simplicity; move to styles.css as needed */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -63,7 +62,8 @@
         }
 
         .auth-section {
-            max-width: 300px;
+            max-width: 400px;
+            width: 100%;
             margin: auto;
             text-align: center;
         }
@@ -79,16 +79,16 @@
 </head>
 <body>
     <!-- Authentication Page -->
-    <div id="authPage" class="full-page">
-        <div id="setupSection" class="auth-section">
-            <h2>Set Up Authentication</h2>
-            <input type="password" id="setupPin" placeholder="Set your PIN" />
-            <button onclick="setupPIN()">Set Up PIN</button>
+    <div id="authPage" class="full-page bg-gray-100 flex items-center justify-center">
+        <div id="setupSection" class="auth-section bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">Set Up Authentication</h2>
+            <input type="password" id="setupPin" placeholder="Set your PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
+            <button onclick="setupPIN()" class="bg-blue-500 text-white p-2 rounded w-full">Set Up PIN</button>
         </div>
-        <div id="loginSection" class="auth-section hidden">
-            <h2>Login</h2>
-            <input type="password" id="loginPin" placeholder="Enter PIN" />
-            <button onclick="login()">Login</button>
+        <div id="loginSection" class="auth-section bg-white p-8 rounded-lg shadow-lg hidden">
+            <h2 class="text-2xl font-bold mb-4">Login</h2>
+            <input type="password" id="loginPin" placeholder="Enter PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
+            <button onclick="login()" class="bg-blue-500 text-white p-2 rounded w-full">Login</button>
         </div>
     </div>
 
@@ -103,8 +103,11 @@
         </div>
     </div>
 
-    <!-- JavaScript for authentication -->
+    <!-- JavaScript for authentication and inactivity logout -->
     <script>
+        const INACTIVITY_TIMEOUT = 60000; // 1 minutes in milliseconds
+        let inactivityTimer;
+
         function setupPIN() {
             const pin = document.getElementById('setupPin').value;
             if (pin) {
@@ -124,6 +127,7 @@
                 localStorage.setItem('isAuthenticated', 'true');
                 document.getElementById('authPage').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
+                startInactivityTimer();
             } else {
                 alert('Incorrect PIN.');
             }
@@ -134,17 +138,37 @@
             if (isAuthenticated === 'true') {
                 document.getElementById('authPage').classList.add('hidden');
                 document.getElementById('appContainer').classList.remove('hidden');
+                startInactivityTimer();
             } else {
                 document.getElementById('authPage').classList.remove('hidden');
                 document.getElementById('appContainer').classList.add('hidden');
             }
         }
 
+        function startInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
+        }
+
+        function logout() {
+            localStorage.removeItem('isAuthenticated');
+            document.getElementById('authPage').classList.remove('hidden');
+            document.getElementById('appContainer').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('setupSection').classList.add('hidden');
+        }
+
+        // Restart the inactivity timer on any user activity
+        document.addEventListener('mousemove', startInactivityTimer);
+        document.addEventListener('keydown', startInactivityTimer);
+        document.addEventListener('click', startInactivityTimer);
+
         // Check authentication status on page load
         document.addEventListener('DOMContentLoaded', checkAuthentication);
     </script>
 </body>
 </html>
+
 
 <body class="bg-gray-100">
 
