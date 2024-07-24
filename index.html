@@ -544,12 +544,28 @@ async function monitorTransactions(address) {
 }
    
 
+// Function to sanitize input
+function sanitizeInput(input) {
+    const element = document.createElement('div');
+    element.innerText = input;
+    return element.innerHTML;
+}
+
+// Example usage in form submission
+document.getElementById('send-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const recipient = sanitizeInput(document.getElementById('recipient-address').value);
+    const amount = sanitizeInput(document.getElementById('amount').value);
+    
+    // Proceed with sanitized inputs
+});
 
         
 let rewardInterval;
 const rewardAmount = 4; // Adjust this value as needed
 const rewardIntervalTime = 180000; // 3 minutes in milliseconds, adjust as needed
-let rewardInterval;
+
 
 // Function to reward users
 function rewardUser(amount) {
