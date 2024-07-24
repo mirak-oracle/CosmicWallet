@@ -51,8 +51,7 @@
             <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
             <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
             <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
-            <a href="#rewardsSection" onclick="showSection('rewardsSection')" class="nav-link">Rewards</a>
-        </nav>
+             </nav>
 
         <!-- Home Section -->
         <div id="home-section" class="section">
@@ -170,52 +169,19 @@
         <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-4">Rewards</h2>
             <div>
-                <p>Rewards Balance: <span id="rewards-balance">0</span> COSMIC</p>
+                <p>Rewards Balance: <span id="rewards-balance">0</span> COSMICCOIN</p>
                 <p id="rewards-message"></p>
             </div>
         </div>
     </div>
 
     <script>
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
-        function toggleBalance() {
-            const balanceValue = document.getElementById('balance-value');
-            if (balanceValue.style.display === 'none') {
-                balanceValue.style.display = 'inline';
-                document.querySelector('button[onclick="toggleBalance()"]').innerText = 'Hide';
-            } else {
-                balanceValue.style.display = 'none';
-                document.querySelector('button[onclick="toggleBalance()"]').innerText = 'Show';
-            }
-        }
-
-        function updateBalanceCurrency() {
-            const selector = document.getElementById('balance-currency-selector');
-            const currency = selector.value;
-            document.getElementById('balance-currency').innerText = currency;
-        }
-
-        function addReward() {
-            let rewardsBalance = parseInt(localStorage.getItem('rewardsBalance') || '0');
-            rewardsBalance += 1;
-            localStorage.setItem('rewardsBalance', rewardsBalance);
-            document.getElementById('rewards-balance').innerText = rewardsBalance;
-            document.getElementById('rewards-message').innerText = 'You have been rewarded 1 COSMIC for your interaction!';
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const rewardsBalance = localStorage.getItem('rewardsBalance') || '0';
-            document.getElementById('rewards-balance').innerText = rewardsBalance;
-        });
+    document.getElementById('tradingPair').addEventListener('change', function() {
+        const selectedPair = this.value;
+        const iframe = document.getElementById('tradingViewIframe');
+        iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=${selectedPair}&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`;
+    });
     </script>
-</body>
-</html>
 
 
 </div>
@@ -239,8 +205,8 @@
       <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
     <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
    <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
-    <a href="#rewardsSection" onclick="showSection('RewardsSection')" class="nav-link">Reward</a>
-
+    <a href="#rewardsSection" onclick="showSection('rewardsSection')" class="nav-link">Rewards</a>
+       
 </div>
       </nav>
 
