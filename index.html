@@ -169,7 +169,7 @@
         <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-4">Rewards</h2>
             <div>
-                <p>Rewards Balance: <span id="rewards-balance">0</span> COSMICCOIN</p>
+                <p>Rewards Balance: <span id="rewards-balance">$10</span> </p>
                 <p id="rewards-message"></p>
             </div>
         </div>
@@ -595,6 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Optionally, stop rewarding when the user leaves the page
     window.addEventListener('beforeunload', stopRewardingUsers);
 });
+
 
 // Function to monitor alerts (customize as needed)
 async function monitorAlerts() {
