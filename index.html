@@ -537,55 +537,7 @@ async function monitorTransactions(address) {
 
     return subscription;
 }
-   // Function to sanitize input
-function sanitizeInput(input) {
-    const element = document.createElement('div');
-    element.innerText = input;
-    return element.innerHTML;
-}
-
-// Example usage in form submission
-document.getElementById('send-form').addEventListener('submit', function(event) {
-    event.preventDefault();
-    
-    const recipient = sanitizeInput(document.getElementById('recipient-address').value);
-    const amount = sanitizeInput(document.getElementById('amount').value);
-    
-    // Proceed with sanitized inputs
-});
-
-        // Example using Web3.js
-async function sendTransaction(recipient, amount) {
-    if (typeof window.ethereum !== 'undefined') {
-        const web3 = new Web3(window.ethereum);
-        try {
-            await window.ethereum.enable();
-            const accounts = await web3.eth.getAccounts();
-            const transaction = {
-                from: accounts[0],
-                to: recipient,
-                value: web3.utils.toWei(amount, 'ether'),
-                gas: 2000000,
-            };
-            web3.eth.sendTransaction(transaction)
-                .on('transactionHash', hash => {
-                    console.log('Transaction Hash:', hash);
-                })
-                .on('receipt', receipt => {
-                    console.log('Receipt:', receipt);
-                })
-                .on('error', error => {
-                    console.error('Error:', error);
-                });
-        } catch (error) {
-            console.error('User denied account access or error occurred', error);
-        }
-    } else {
-        console.error('No Ethereum browser extension detected');
-    }
-}
-
-        // Simple encryption using CryptoJS
+   // Simple encryption using CryptoJS
 function encryptData(data, key) {
     return CryptoJS.AES.encrypt(data, key).toString();
 }
@@ -595,29 +547,7 @@ function decryptData(ciphertext, key) {
     return bytes.toString(CryptoJS.enc.Utf8);
 }
 
-// Example usage
-const secretPhrase = 'my secret phrase';
-const key = 'encryption_key'; // Ideally, use a more secure key
 
-const encryptedPhrase = encryptData(secretPhrase, key);
-localStorage.setItem('encryptedSecretPhrase', encryptedPhrase);
-
-const decryptedPhrase = decryptData(localStorage.getItem('encryptedSecretPhrase'), key);
-console.log(decryptedPhrase); // Outputs 'my secret phrase'
-
-        }
-        const transactionCooldown = 60000; // 1 minute cooldown
-let lastTransactionTime = 0;
-
-function canSendTransaction() {
-    const currentTime = Date.now();
-    if (currentTime - lastTransactionTime < transactionCooldown) {
-        alert('Please wait before sending another transaction.');
-        return false;
-    }
-    lastTransactionTime = currentTime;
-    return true;
-}
 
 // Example usage in sendCrypto function
 function sendCrypto(event) {
@@ -670,17 +600,8 @@ function sendCrypto(event) {
     if (confirmTransaction(recipient, amount)) {
         // Proceed with transaction
     }
-}
 
-        // Validate Ethereum address
-function isValidAddress(address) {
-    return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
 
-// Validate amount
-function isValidAmount(amount) {
-    return !isNaN(amount) && amount > 0;
-}
 
         
 let rewardInterval;
