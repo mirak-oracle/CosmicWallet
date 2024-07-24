@@ -120,19 +120,31 @@
 <div id="swapSection" class="hidden p-4 bg-white rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4 text-blue-600">Swap</h2>
     <div class="grid grid-cols-2 gap-4">
-        <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
-        <a href="https://app.1inch.io/" target="_blank" class="link-card">1inch</a>
-        <a href="https://app.sushi.com/" target="_blank" class="link-card">SushiSwap</a>
+        <a href="https://uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+        <a href="https://1inch.io/" target="_blank" class="link-card">1inch</a>
+        <a href="https://www.sushi.com/swap" target="_blank" class="link-card">SushiSwap</a>
     </div>
 </div>
 
 <div id="tradeSection" class="hidden p-4 bg-white rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4 text-blue-600">Trade</h2>
-    <div class="grid grid-cols-2 gap-4">
-        <a href="https://www.binance.com/" target="_blank" class="link-card">Binance</a>
-        <a href="https://pro.coinbase.com/" target="_blank" class="link-card">Coinbase</a>
-        <a href="https://www.kraken.com/" target="_blank" class="link-card">Kraken</a>
+    <div class="iframe-container">
+        <iframe src="https://tradingview.com/widget" class="w-full h-96 rounded-md shadow-lg border-none"></iframe>
     </div>
+</div>
+
+<style>
+    .iframe-container {
+        width: 100%;
+        height: calc(100vh - 160px); /* Adjust the height as needed */
+    }
+    .iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
+
 </div>
 
 <div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
