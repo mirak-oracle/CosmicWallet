@@ -35,6 +35,117 @@
     
     </style>
    </head>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmicWallet</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include your CSS file -->
+    <style>
+        /* Inline CSS for simplicity; move to styles.css as needed */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .full-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        .auth-section {
+            max-width: 300px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Authentication Page -->
+    <div id="authPage" class="full-page">
+        <div id="setupSection" class="auth-section">
+            <h2>Set Up Authentication</h2>
+            <input type="password" id="setupPin" placeholder="Set your PIN" />
+            <button onclick="setupPIN()">Set Up PIN</button>
+        </div>
+        <div id="loginSection" class="auth-section hidden">
+            <h2>Login</h2>
+            <input type="password" id="loginPin" placeholder="Enter PIN" />
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="appContainer" class="container hidden">
+        <!-- Your existing CosmicWallet content goes here -->
+        <div id="balance-section" class="flex justify-between items-center my-4">
+            <!-- existing content -->
+        </div>
+        <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
+            <!-- existing content -->
+        </div>
+    </div>
+
+    <!-- JavaScript for authentication -->
+    <script>
+        function setupPIN() {
+            const pin = document.getElementById('setupPin').value;
+            if (pin) {
+                localStorage.setItem('cosmicWalletPIN', pin);
+                alert('PIN set up successfully.');
+                document.getElementById('setupSection').classList.add('hidden');
+                document.getElementById('loginSection').classList.remove('hidden');
+            } else {
+                alert('Please enter a PIN.');
+            }
+        }
+
+        function login() {
+            const storedPIN = localStorage.getItem('cosmicWalletPIN');
+            const inputPIN = document.getElementById('loginPin').value;
+            if (storedPIN === inputPIN) {
+                localStorage.setItem('isAuthenticated', 'true');
+                document.getElementById('authPage').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+            } else {
+                alert('Incorrect PIN.');
+            }
+        }
+
+        function checkAuthentication() {
+            const isAuthenticated = localStorage.getItem('isAuthenticated');
+            if (isAuthenticated === 'true') {
+                document.getElementById('authPage').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+            } else {
+                document.getElementById('authPage').classList.remove('hidden');
+                document.getElementById('appContainer').classList.add('hidden');
+            }
+        }
+
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', checkAuthentication);
+    </script>
+</body>
+</html>
+
 <body class="bg-gray-100">
 
     <div id="balance-section" class="flex justify-between items-center my-4">
