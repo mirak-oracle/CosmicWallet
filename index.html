@@ -528,43 +528,32 @@ const rewardIntervalTime = 300000; // 5 minute in milliseconds, adjust as needed
 
 // Function to reward users
 function rewardUser(amount) {
-    // Get current rewards from localStorage
     let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
-    
-    // Add reward
     currentRewards += amount;
-
-    // Update localStorage
     localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
-
-    // Notify the user
-    alert(`You've earned ${amount} COSMIC! Your total rewards are now ${currentRewards.toFixed(2)} COSMIC.`);
-    
-    // Update the rewards display
+    alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
     updateRewardsDisplay();
 }
 
 // Function to start rewarding users based on time spent
 function startRewardingUsers() {
-    rewardInterval = setInterval(() => {
+    setInterval(() => {
         rewardUser(rewardAmount);
     }, rewardIntervalTime);
-}
-
-// Function to stop rewarding users
-function stopRewardingUsers() {
-    clearInterval(rewardInterval);
 }
 
 // Function to update rewards balance display
 function updateRewardsDisplay() {
     const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
-    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMIC`;
+    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
 }
 
 // Call this function to show the rewards section and update the display
 function showRewardsSection() {
-    document.getElementById('rewardsSection').classList.remove('');
+    document.querySelectorAll('.section').forEach((section) => {
+        section.classList.add('hidden');
+    });
+    document.getElementById('rewardsSection').classList.remove('hidden');
     updateRewardsDisplay();
 }
 
@@ -574,10 +563,10 @@ document.addEventListener('DOMContentLoaded', () => {
     startRewardingUsers();
 
     // Optionally, stop rewarding when the user leaves the page
-    window.addEventListener('beforeunload', stopRewardingUsers);
+    window.addEventListener('beforeunload', () => {
+        clearInterval(rewardInterval);
+    });
 });
-
-
 
 
 // Function to monitor alerts (customize as needed)
