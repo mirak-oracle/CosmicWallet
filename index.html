@@ -128,9 +128,44 @@
 
 <div id="tradeSection" class="hidden p-4 bg-white rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4 text-blue-600">Trade</h2>
-    <div class="iframe-container">
-        <iframe src="https://www.coingecko.com/en/widgets/trending-tickers?locale=en" class="w-full h-96 rounded-md shadow-lg border-none"></iframe>
+    <div class="mb-4">
+        <label for="tradingPair" class="block text-lg font-semibold">Select Trading Pair:</label>
+        <select id="tradingPair" class="w-full p-2 mt-2 border rounded-lg">
+            <option value="BINANCE:BTCUSDT">BTC/USDT</option>
+            <option value="BINANCE:ETHUSDT">ETH/USDT</option>
+            <option value="BINANCE:BNBUSDT">BNB/USDT</option>
+            <option value="BINANCE:ADAUSDT">ADA/USDT</option>
+            <option value="BINANCE:XRPUSDT">XRP/USDT</option>
+            <option value="BINANCE:SOLUSDT">SOL/USDT</option>
+            <option value="BINANCE:DOGEUSDT">DOGE/USDT</option>
+            <option value="BINANCE:MATICUSDT">MATIC/USDT</option>
+            <option value="BINANCE:DOTUSDT">DOT/USDT</option>
+            <option value="BINANCE:SHIBUSDT">SHIB/USDT</option>
+            <option value="BINANCE:LTCUSDT">LTC/USDT</option>
+            <option value="BINANCE:LINKUSDT">LINK/USDT</option>
+            <option value="BINANCE:BCHUSDT">BCH/USDT</option>
+            <option value="BINANCE:ALGOUSDT">ALGO/USDT</option>
+            <option value="BINANCE:AVAXUSDT">AVAX/USDT</option>
+            <option value="BINANCE:ATOMUSDT">ATOM/USDT</option>
+            <option value="BINANCE:TRXUSDT">TRX/USDT</option>
+            <option value="BINANCE:FTTUSDT">FTT/USDT</option>
+            <option value="BINANCE:XLMUSDT">XLM/USDT</option>
+            <option value="BINANCE:VETUSDT">VET/USDT</option>
+        </select>
     </div>
+    <div id="tradingViewContainer" class="iframe-container">
+        <iframe id="tradingViewIframe" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=BINANCE:BTCUSDT&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en" class="w-full h-96 rounded-md shadow-lg border-none"></iframe>
+    </div>
+</div>
+
+<script>
+    document.getElementById('tradingPair').addEventListener('change', function() {
+        const selectedPair = this.value;
+        const iframe = document.getElementById('tradingViewIframe');
+        iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=${selectedPair}&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`;
+    });
+</script>
+
 </div>
 
 <style>
