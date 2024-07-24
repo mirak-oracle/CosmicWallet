@@ -169,7 +169,7 @@
         <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
             <h2 class="text-2xl font-bold mb-4">Rewards</h2>
             <div>
-                <p>Rewards Balance: <span id="rewards-balance">$10</span> </p>
+                <p>Cosmic  Balance: <span id="rewards-balance">$10</span> </p>
                 <p id="rewards-message"></p>
             </div>
         </div>
@@ -537,76 +537,13 @@ async function monitorTransactions(address) {
 
     return subscription;
 }
-   // Simple encryption using CryptoJS
-function encryptData(data, key) {
-    return CryptoJS.AES.encrypt(data, key).toString();
-}
-
-function decryptData(ciphertext, key) {
-    const bytes = CryptoJS.AES.decrypt(ciphertext, key);
-    return bytes.toString(CryptoJS.enc.Utf8);
-}
-
-
-
-// Example usage in sendCrypto function
-function sendCrypto(event) {
-    event.preventDefault();
-
-    if (!canSendTransaction()) {
-        return;
-    }
-
-    const recipient = document.getElementById('recipient-address').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-
-    if (!isValidAddress(recipient)) {
-        alert('Invalid address');
-        return;
-    }
-
-    if (!isValidAmount(amount)) {
-        alert('Invalid amount');
-        return;
-    }
-
-    if (confirmTransaction(recipient, amount)) {
-        // Proceed with transaction
-    }
-}
-
-        // Function to confirm transaction
-function confirmTransaction(recipient, amount) {
-    return confirm(`You are about to send ${amount} COSMICCOIN to ${recipient}. Do you want to proceed?`);
-}
-
-// Example usage in sendCrypto function
-function sendCrypto(event) {
-    event.preventDefault();
-    
-    const recipient = document.getElementById('recipient-address').value;
-    const amount = parseFloat(document.getElementById('amount').value);
-    
-    if (!isValidAddress(recipient)) {
-        alert('Invalid address');
-        return;
-    }
-    
-    if (!isValidAmount(amount)) {
-        alert('Invalid amount');
-        return;
-    }
-    
-    if (confirmTransaction(recipient, amount)) {
-        // Proceed with transaction
-    }
-
+   
 
 
         
 let rewardInterval;
 const rewardAmount = 4; // Adjust this value as needed
-const rewardIntervalTime = 300000; // 5 minute in milliseconds, adjust as needed
+const rewardIntervalTime = 180000; // 3 minute in milliseconds, adjust as needed
 
 // Function to reward users
 function rewardUser(amount) {
