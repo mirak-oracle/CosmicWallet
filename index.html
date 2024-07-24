@@ -181,11 +181,19 @@
 </style>
 
 </div>
-
+<div id="rewardsSection" class="hidden p-4 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4 text-green-600">Rewards</h2>
+    <div id="rewards-balance" class="text-lg">
+        <!-- Reward balance will be displayed here -->
+    </div>
+</div>
+    
 <div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
       <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
     <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
-    <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
+   <a href="#tradeSection" onclick="showSection('tradeSection')" class="nav-link">Trade</a>
+    <a href="#rewardsSection" onclick="showRewardsSection()">Rewards</a>
+
 </div>
 
 <style>
@@ -514,6 +522,65 @@ async function monitorTransactions(address) {
 
     return subscription;
 }
+        // Function to reward users
+function rewardUser(amount) {
+    // Get current rewards from localStorage
+    let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
+    
+    // Add reward
+    currentRewards += amount;
+
+    // Update localStorage
+    localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
+
+    // Notify the user
+    alert(`You've earned ${amount} COSMIC! Your total rewards are now ${currentRewards.toFixed(2)} COSMIC.`);
+}
+
+// Function to handle interactions or transactions
+function handleInteractionOrTransaction() {
+    // Define the reward amount
+    const rewardAmount = 3; // Adjust this value as needed
+
+    // Reward the user
+    rewardUser(rewardAmount);
+}
+
+// Example of calling this function when a transaction is made
+function performTransaction() {
+    // Perform transaction logic
+
+    // Reward the user
+    handleInteractionOrTransaction();
+}
+
+// Add event listeners to reward users for interactions
+document.addEventListener('DOMContentLoaded', () => {
+    // Elements to track for interactions
+    const interactableElements = document.querySelectorAll('.interactable');
+
+    interactableElements.forEach(element => {
+        element.addEventListener('click', handleInteractionOrTransaction);
+    });
+});
+
+// Function to update rewards balance display
+function updateRewardsDisplay() {
+    const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
+    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMIC`;
+}
+
+// Call this function to update the balance when the rewards section is shown
+function showRewardsSection() {
+    document.getElementById('rewardsSection').classList.remove('hidden');
+    updateRewardsDisplay();
+}
+
+// Call this function to hide the rewards section
+function hideRewardsSection() {
+    document.getElementById('rewardsSection').classList.add('hidden');
+}
+
 
 // Function to monitor alerts (customize as needed)
 async function monitorAlerts() {
