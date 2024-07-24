@@ -180,12 +180,78 @@
     }
 </style>
 
-</div>
-<div id="rewardsSection" class="hidden p-4 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4 text-green-600">Rewards</h2>
-    <div id="rewards-balance" class="text-lg">
-        Total Rewards: 0.00 COSMICCOIN 
+<!-- Rewards Section -->
+        <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-green-600">Rewards</h2>
+            <div id="rewards-balance" class="text-lg">
+                Total Rewards: 0.00 COSMICCOIN
+            </div>
+        </div>
+
+        <!-- Other sections here -->
     </div>
+
+    <script>
+        const rewardAmount = 3; // Amount of COSMICCOIN to reward each time
+        const rewardIntervalTime = 300000; // 5 minute interval for rewards
+
+        // Function to reward users
+        function rewardUser(amount) {
+            let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
+            currentRewards += amount;
+            localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
+            alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
+            updateRewardsDisplay();
+        }
+
+        // Function to start rewarding users based on time spent
+        function startRewardingUsers() {
+            setInterval(() => {
+                rewardUser(rewardAmount);
+            }, rewardIntervalTime);
+        }
+
+        // Function to update rewards balance display
+        function updateRewardsDisplay() {
+            const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
+            document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
+        }
+
+        // Call this function to show the rewards section and update the display
+        function showRewardsSection() {
+            document.querySelectorAll('.section').forEach((section) => {
+                section.classList.add('hidden');
+            });
+            document.getElementById('rewardsSection').classList.remove('hidden');
+            updateRewardsDisplay();
+        }
+
+        // Add event listeners to reward users for interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start rewarding users when they are active on the page
+            startRewardingUsers();
+
+            // Optionally, stop rewarding when the user leaves the page
+            window.addEventListener('beforeunload', () => {
+                clearInterval(rewardInterval);
+            });
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach((section) => {
+                section.classList.add('hidden');
+            });
+
+            document.getElementById(sectionId).classList.remove('hidden');
+
+            if (sectionId === 'rewardsSection') {
+                updateRewardsDisplay();
+            }
+        }
+    </script>
+</body>
+</html>
+
 </div>
     
 <div class="navbar fixed bottom-0 left-0 right-0 bg-blue-600 text-white p-4 flex justify-around">
@@ -522,52 +588,7 @@ async function monitorTransactions(address) {
 
     return subscription;
 }
-        let rewardInterval;
-const rewardAmount = 3; // Adjust this value as needed
-const rewardIntervalTime = 300000; // 5 minute in milliseconds, adjust as needed
-
-// Function to reward users
-function rewardUser(amount) {
-    let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
-    currentRewards += amount;
-    localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
-    alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
-    updateRewardsDisplay();
-}
-
-// Function to start rewarding users based on time spent
-function startRewardingUsers() {
-    setInterval(() => {
-        rewardUser(rewardAmount);
-    }, rewardIntervalTime);
-}
-
-// Function to update rewards balance display
-function updateRewardsDisplay() {
-    const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
-    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
-}
-
-// Call this function to show the rewards section and update the display
-function showRewardsSection() {
-    document.querySelectorAll('.section').forEach((section) => {
-        section.classList.add('hidden');
-    });
-    document.getElementById('rewardsSection').classList.remove('hidden');
-    updateRewardsDisplay();
-}
-
-// Add event listeners to reward users for interactions
-document.addEventListener('DOMContentLoaded', () => {
-    // Start rewarding users when they are active on the page
-    startRewardingUsers();
-
-    // Optionally, stop rewarding when the user leaves the page
-    window.addEventListener('beforeunload', () => {
-        clearInterval(rewardInterval);
-    });
-});
-
+        
 
 // Function to monitor alerts (customize as needed)
 async function monitorAlerts() {
