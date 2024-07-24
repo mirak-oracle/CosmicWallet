@@ -303,8 +303,21 @@
             }
         }
      
+// Validate Ethereum address
+function isValidAddress(address) {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+// Validate amount
+function isValidAmount(amount) {
+    return !isNaN(amount) && amount > 0;
+}
 
 
+// Function to confirm transaction
+function confirmTransaction(recipient, amount) {
+    return confirm(`You are about to send ${amount} COSMICCOIN to ${recipient}. Do you want to proceed?`);
+}
 
 
         async function generateReceiveAddress(event) {
