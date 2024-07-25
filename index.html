@@ -314,9 +314,71 @@
             <div>
                 <p>Cosmic  Balance: <span id="rewards-balance">$10</span> </p>
                 <p id="rewards-message"></p>
+                <script>
+                    let rewardInterval;
+const rewardAmount = 2; // Adjust this value as needed
+const rewardIntervalTime = 60000; // 1 minutes in milliseconds, adjust as needed
+
+// Function to reward users
+function rewardUser(amount) {
+    // Get current rewards from localStorage
+    let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
+
+    // Add reward
+    currentRewards += amount;
+
+    // Update localStorage
+    localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
+
+    // Notify the user
+    alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
+
+    // Update the rewards display
+    updateRewardsDisplay();
+}
+
+// Function to start rewarding users based on time spent
+function startRewardingUsers() {
+    rewardInterval = setInterval(() => {
+        rewardUser(rewardAmount);
+    }, rewardIntervalTime);
+}
+
+// Function to stop rewarding users
+function stopRewardingUsers() {
+    clearInterval(rewardInterval);
+}
+
+// Function to update rewards balance display
+function updateRewardsDisplay() {
+    const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
+    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
+}
+
+// Call this function to show the rewards section and update the display
+function showRewardsSection() {
+    document.querySelectorAll('.section').forEach((section) => {
+        section.classList.add('hidden');
+    });
+    document.getElementById('rewardsSection').classList.remove('hidden');
+    updateRewardsDisplay();
+}
+
+// Add event listeners to reward users for interactions
+document.addEventListener('DOMContentLoaded', () => {
+    // Start rewarding users when they are active on the page
+    startRewardingUsers();
+
+    // Update rewards display on page load
+    updateRewardsDisplay();
+
+    // Optionally, stop rewarding when the user leaves the page
+    window.addEventListener('beforeunload', stopRewardingUsers);
+});
+  </script>               
             </div>
         </div>
-    </div>
+    
 
     <script>
     document.getElementById('tradingPair').addEventListener('change', function() {
@@ -717,66 +779,7 @@ document.getElementById('send-form').addEventListener('submit', function(event) 
 });
 
         
-let rewardInterval;
-const rewardAmount = 4; // Adjust this value as needed
-const rewardIntervalTime = 180000; // 3 minutes in milliseconds, adjust as needed
 
-// Function to reward users
-function rewardUser(amount) {
-    // Get current rewards from localStorage
-    let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
-
-    // Add reward
-    currentRewards += amount;
-
-    // Update localStorage
-    localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
-
-    // Notify the user
-    alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
-
-    // Update the rewards display
-    updateRewardsDisplay();
-}
-
-// Function to start rewarding users based on time spent
-function startRewardingUsers() {
-    rewardInterval = setInterval(() => {
-        rewardUser(rewardAmount);
-    }, rewardIntervalTime);
-}
-
-// Function to stop rewarding users
-function stopRewardingUsers() {
-    clearInterval(rewardInterval);
-}
-
-// Function to update rewards balance display
-function updateRewardsDisplay() {
-    const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
-    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
-}
-
-// Call this function to show the rewards section and update the display
-function showRewardsSection() {
-    document.querySelectorAll('.section').forEach((section) => {
-        section.classList.add('hidden');
-    });
-    document.getElementById('rewardsSection').classList.remove('hidden');
-    updateRewardsDisplay();
-}
-
-// Add event listeners to reward users for interactions
-document.addEventListener('DOMContentLoaded', () => {
-    // Start rewarding users when they are active on the page
-    startRewardingUsers();
-
-    // Update rewards display on page load
-    updateRewardsDisplay();
-
-    // Optionally, stop rewarding when the user leaves the page
-    window.addEventListener('beforeunload', stopRewardingUsers);
-});
 
 
 // Function to monitor alerts (customize as needed)
