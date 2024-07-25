@@ -309,15 +309,24 @@
         </div>
 
         <!-- Rewards Section -->
-        <div id="rewardsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
-            <h2 class="text-2xl font-bold mb-4">Rewards</h2>
-            <div>
-                <p>Cosmic  Balance: <span id="rewards-balance">$10</span> </p>
-                <p id="rewards-message"></p>
+<div id="rewardsSection" class="section hidden p-4 bg-gray-100 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Rewards</h2>
+    <div class="grid grid-cols-1 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Cosmic Balance</h3>
+            <p class="text-lg"><span id="rewards-balance">0.00</span> COSMICCOIN</p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Reward Message</h3>
+            <p id="rewards-message" class="text-lg"></p>
+        </div>
+    </div>
+</div>
+
                 <script>
                     let rewardInterval;
-const rewardAmount = 2; // Adjust this value as needed
-const rewardIntervalTime = 60000; // 1 minutes in milliseconds, adjust as needed
+const rewardAmount = 3; // Adjust this value as needed
+const rewardIntervalTime = 300000; // 5 minutes in milliseconds, adjust as needed
 
 // Function to reward users
 function rewardUser(amount) {
