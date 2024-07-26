@@ -109,7 +109,8 @@
     <!-- JavaScript for authentication and inactivity logout -->
     <script>
     
-    document.addEventListener('DOMContentLoaded', () => {
+    
+document.addEventListener('DOMContentLoaded', () => {
     const authPage = document.getElementById('authPage');
     const setupSection = document.getElementById('setupSection');
     const loginSection = document.getElementById('loginSection');
@@ -186,7 +187,7 @@
 
     const authenticateWithFingerprint = () => {
         const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
-        const rawId = atob(localStorage.getItem('cosmicWalletRawId'));
+        const rawId = localStorage.getItem('cosmicWalletRawId');
 
         if (!storedCredentialId || !rawId) {
             alert('No fingerprint credentials found. Please set up your fingerprint first.');
@@ -197,7 +198,7 @@
             challenge: new Uint8Array(32),
             allowCredentials: [{
                 type: 'public-key',
-                id: new Uint8Array([...rawId].map(char => char.charCodeAt(0)))
+                id: Uint8Array.from(atob(rawId), c => c.charCodeAt(0))
             }],
             timeout: 60000,
             userVerification: 'preferred'
@@ -234,7 +235,6 @@
         loginSection.classList.add('hidden');
     }
 });
-
 
 
         </script>
