@@ -114,7 +114,8 @@
     <script>
     
 
-        document.addEventListener('DOMContentLoaded', () => {
+        
+            document.addEventListener('DOMContentLoaded', () => {
             const authPage = document.getElementById('authPage');
             const setupSection = document.getElementById('setupSection');
             const loginSection = document.getElementById('loginSection');
@@ -189,7 +190,14 @@
                     });
             };
 
-            
+            const authenticateWithFingerprint = () => {
+                const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
+                const rawId = localStorage.getItem('cosmicWalletRawId');
+
+                if (!storedCredentialId || !rawId) {
+                    alert('No fingerprint credentials found. Please set up your fingerprint first.');
+                    return;
+                }
 
                 const publicKey = {
                     challenge: new Uint8Array(32),
@@ -244,13 +252,19 @@
     </script>
 </body>
 </html>
+                    
+            
 
-
-
-
-        </script>
+            
+    </script>
 </body>
 </html>
+
+
+
+
+    
+    
 
 
 <body class="bg-gray-100">
