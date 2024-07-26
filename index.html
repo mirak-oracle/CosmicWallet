@@ -108,7 +108,8 @@
 
     <!-- JavaScript for authentication and inactivity logout -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    
+    document.addEventListener('DOMContentLoaded', () => {
     const authPage = document.getElementById('authPage');
     const setupSection = document.getElementById('setupSection');
     const loginSection = document.getElementById('loginSection');
@@ -179,7 +180,7 @@
             })
             .catch((error) => {
                 alert('Fingerprint setup failed. Please try again.');
-                console.error(error);
+                console.error('Error during fingerprint setup:', error);
             });
     };
 
@@ -215,7 +216,7 @@
             })
             .catch((error) => {
                 alert('Fingerprint login failed. Please try again.');
-                console.error(error);
+                console.error('Error during fingerprint authentication:', error);
             });
     };
 
@@ -233,6 +234,7 @@
         loginSection.classList.add('hidden');
     }
 });
+
 
 
         </script>
