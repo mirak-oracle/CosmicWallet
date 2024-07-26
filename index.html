@@ -189,14 +189,7 @@
                     });
             };
 
-            const authenticateWithFingerprint = () => {
-                const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
-                const rawId = localStorage.getItem('cosmicWalletRawId');
-
-                if (!storedCredentialId || !rawId) {
-                    alert('No fingerprint credentials found. Please set up your fingerprint first.');
-                    return;
-                }
+            
 
                 const publicKey = {
                     challenge: new Uint8Array(32),
