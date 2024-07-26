@@ -191,64 +191,62 @@
             };
 
             const authenticateWithFingerprint = () => {
-                const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
-                const rawId = localStorage.getItem('cosmicWalletRawId');
+        if (!window.PublicKeyCredential) {
+            alert('WebAuthn is not supported on this browser.');
+            return;
+        }
 
-                if (!storedCredentialId || !rawId) {
-                    alert('No fingerprint credentials found. Please set up your fingerprint first.');
-                    return;
-                }
+        const publicKey = {
+            challenge: new Uint8Array(32),
+            rp: {
+                name: 'CosmicWallet',
+                id: window.location.hostname
+            },
+            user: {
+                id: new Uint8Array(16),
+                name: 'user@example.com',
+                displayName: 'User'
+            },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            authenticatorSelection: {
+                authenticatorAttachment: 'platform',
+                requireResidentKey: false,
+                userVerification: 'preferred'
+            },
+            timeout: 60000,
+            attestation: 'none'
+        };
 
-                const publicKey = {
-                    challenge: new Uint8Array(32),
-                    allowCredentials: [{
-                        type: 'public-key',
-                        id: Uint8Array.from(atob(rawId), c => c.charCodeAt(0))
-                    }],
-                    timeout: 60000,
-                    userVerification: 'preferred'
-                };
+        navigator.credentials.create({ publicKey })
+            .then((credential) => {
+                // Store the credential ID and rawId for future verification
+                localStorage.setItem('cosmicWalletCredentialId', credential.id);
+                localStorage.setItem('cosmicWalletRawId', credential.rawId);
 
-                navigator.credentials.get({ publicKey })
-                    .then((assertion) => {
-                        if (assertion.id === storedCredentialId) {
-                            alert('Fingerprint login successful!');
-                            authPage.classList.add('hidden');
-                            mainApp.classList.remove('hidden');
-                            startRewardingUsers(); // Start rewards on successful login
-                        } else {
-                            alert('Fingerprint login failed.');
-                        }
-                    })
-                    .catch((error) => {
-                        alert('Fingerprint login failed. Please try again.');
-                        console.error('Error during fingerprint authentication:', error);
-                    });
-            };
-
-            const clearBiometricData = () => {
-                localStorage.removeItem('cosmicWalletCredentialId');
-                localStorage.removeItem('cosmicWalletRawId');
-                alert('Biometric data cleared. You can now set up your fingerprint again.');
-                setupSection.classList.remove('hidden');
-                loginSection.classList.add('hidden');
-            };
-
-            window.setupPIN = setupPIN;
-            window.login = login;
-            window.setupFingerprint = setupFingerprint;
-            window.authenticateWithFingerprint = authenticateWithFingerprint;
-            window.clearBiometricData = clearBiometricData;
-
-            // Check if PIN or Fingerprint is already set
-            if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+                alert('Fingerprint setup successful!');
                 setupSection.classList.add('hidden');
                 loginSection.classList.remove('hidden');
-            } else {
-                setupSection.classList.remove('hidden');
-                loginSection.classList.add('hidden');
-            }
-        });
+            })
+            .catch((error) => {
+                alert('Fingerprint setup failed. Please try again.');
+                console.error(error);
+            });
+    };
+
+    window.setupPIN = setupPIN;
+    window.login = login;
+    window.authenticateWithFingerprint = authenticateWithFingerprint;
+
+    // Check if PIN or Fingerprint is already set
+    if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+        setupSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+    } else {
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    }
+});
+
     </script>
 </body>
 </html>
