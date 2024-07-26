@@ -233,19 +233,29 @@
             });
     };
 
-    window.setupPIN = setupPIN;
-    window.login = login;
-    window.authenticateWithFingerprint = authenticateWithFingerprint;
+    const clearBiometricData = () => {
+                localStorage.removeItem('cosmicWalletCredentialId');
+                localStorage.removeItem('cosmicWalletRawId');
+                alert('Biometric data cleared. You can now set up your fingerprint again.');
+                setupSection.classList.remove('hidden');
+                loginSection.classList.add('hidden');
+            };
 
-    // Check if PIN or Fingerprint is already set
-    if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
-        setupSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-    } else {
-        setupSection.classList.remove('hidden');
-        loginSection.classList.add('hidden');
-    }
-});
+            window.setupPIN = setupPIN;
+            window.login = login;
+            window.setupFingerprint = setupFingerprint;
+            window.authenticateWithFingerprint = authenticateWithFingerprint;
+            window.clearBiometricData = clearBiometricData;
+
+            // Check if PIN or Fingerprint is already set
+            if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+                setupSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+            } else {
+                setupSection.classList.remove('hidden');
+                loginSection.classList.add('hidden');
+            }
+        });
 
     </script>
 </body>
