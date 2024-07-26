@@ -80,16 +80,18 @@
 </head>
 <body>
     <!-- Authentication Page -->
-    <div id="authPage" class="full-page bg-gray-100 flex items-center justify-center">
+    <div id="authPage" class="full-page bg-gray-100 flex items-center justify-center min-h-screen">
         <div id="setupSection" class="auth-section bg-white p-8 rounded-lg shadow-lg">
             <h2 class="text-2xl font-bold mb-4">Set Up Authentication</h2>
             <input type="password" id="setupPin" placeholder="Set your PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
-            <button onclick="setupPIN()" class="bg-blue-500 text-white p-2 rounded w-full">Set Up PIN</button>
+            <button onclick="setupPIN()" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Set Up PIN</button>
+            <button onclick="authenticateWithFingerprint()" class="bg-green-500 text-white p-2 rounded w-full">Set Up Fingerprint</button>
         </div>
         <div id="loginSection" class="auth-section bg-white p-8 rounded-lg shadow-lg hidden">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
             <input type="password" id="loginPin" placeholder="Enter PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
-            <button onclick="login()" class="bg-blue-500 text-white p-2 rounded w-full">Login</button>
+            <button onclick="login()" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Login</button>
+            <button onclick="authenticateWithFingerprint()" class="bg-green-500 text-white p-2 rounded w-full">Login with Fingerprint</button>
         </div>
     </div>
 
@@ -106,67 +108,95 @@
 
     <!-- JavaScript for authentication and inactivity logout -->
     <script>
-        const INACTIVITY_TIMEOUT = 60000; // 1 minutes in milliseconds
-        let inactivityTimer;
+        document.addEventListener('DOMContentLoaded', () => {
+    const authPage = document.getElementById('authPage');
+    const setupSection = document.getElementById('setupSection');
+    const loginSection = document.getElementById('loginSection');
+    const mainApp = document.getElementById('mainApp');
 
-        function setupPIN() {
-            const pin = document.getElementById('setupPin').value;
-            if (pin) {
-                localStorage.setItem('cosmicWalletPIN', pin);
-                alert('PIN set up successfully.');
-                document.getElementById('setupSection').classList.add('hidden');
-                document.getElementById('loginSection').classList.remove('hidden');
-            } else {
-                alert('Please enter a PIN.');
-            }
+    const setupPIN = () => {
+        const pin = document.getElementById('setupPin').value;
+        if (pin) {
+            localStorage.setItem('cosmicWalletPin', CryptoJS.SHA256(pin).toString());
+            alert('PIN set successfully!');
+            setupSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+        } else {
+            alert('Please enter a PIN.');
+        }
+    };
+
+    const login = () => {
+        const pin = document.getElementById('loginPin').value;
+        const storedPinHash = localStorage.getItem('cosmicWalletPin');
+        if (CryptoJS.SHA256(pin).toString() === storedPinHash) {
+            alert('Login successful!');
+            authPage.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            startRewardingUsers(); // Start rewards on successful login
+        } else {
+            alert('Incorrect PIN.');
+        }
+    };
+
+    const authenticateWithFingerprint = () => {
+        if (!window.PublicKeyCredential) {
+            alert('WebAuthn is not supported on this browser.');
+            return;
         }
 
-        function login() {
-            const storedPIN = localStorage.getItem('cosmicWalletPIN');
-            const inputPIN = document.getElementById('loginPin').value;
-            if (storedPIN === inputPIN) {
-                localStorage.setItem('isAuthenticated', 'true');
-                document.getElementById('authPage').classList.add('hidden');
-                document.getElementById('appContainer').classList.remove('hidden');
-                startInactivityTimer();
-            } else {
-                alert('Incorrect PIN.');
-            }
-        }
+        const publicKey = {
+            challenge: new Uint8Array(32),
+            rp: {
+                name: 'CosmicWallet',
+                id: window.location.hostname
+            },
+            user: {
+                id: new Uint8Array(16),
+                name: 'user@example.com',
+                displayName: 'User'
+            },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            authenticatorSelection: {
+                authenticatorAttachment: 'platform',
+                requireResidentKey: false,
+                userVerification: 'preferred'
+            },
+            timeout: 60000,
+            attestation: 'none'
+        };
 
-        function checkAuthentication() {
-            const isAuthenticated = localStorage.getItem('isAuthenticated');
-            if (isAuthenticated === 'true') {
-                document.getElementById('authPage').classList.add('hidden');
-                document.getElementById('appContainer').classList.remove('hidden');
-                startInactivityTimer();
-            } else {
-                document.getElementById('authPage').classList.remove('hidden');
-                document.getElementById('appContainer').classList.add('hidden');
-            }
-        }
+        navigator.credentials.create({ publicKey })
+            .then((credential) => {
+                // Store the credential ID and rawId for future verification
+                localStorage.setItem('cosmicWalletCredentialId', credential.id);
+                localStorage.setItem('cosmicWalletRawId', credential.rawId);
 
-        function startInactivityTimer() {
-            clearTimeout(inactivityTimer);
-            inactivityTimer = setTimeout(logout, INACTIVITY_TIMEOUT);
-        }
+                alert('Fingerprint setup successful!');
+                setupSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+            })
+            .catch((error) => {
+                alert('Fingerprint setup failed. Please try again.');
+                console.error(error);
+            });
+    };
 
-        function logout() {
-            localStorage.removeItem('isAuthenticated');
-            document.getElementById('authPage').classList.remove('hidden');
-            document.getElementById('appContainer').classList.add('hidden');
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('setupSection').classList.add('hidden');
-        }
+    window.setupPIN = setupPIN;
+    window.login = login;
+    window.authenticateWithFingerprint = authenticateWithFingerprint;
 
-        // Restart the inactivity timer on any user activity
-        document.addEventListener('mousemove', startInactivityTimer);
-        document.addEventListener('keydown', startInactivityTimer);
-        document.addEventListener('click', startInactivityTimer);
+    // Check if PIN or Fingerprint is already set
+    if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+        setupSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+    } else {
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    }
+});
 
-        // Check authentication status on page load
-        document.addEventListener('DOMContentLoaded', checkAuthentication);
-    </script>
+        </script>
 </body>
 </html>
 
