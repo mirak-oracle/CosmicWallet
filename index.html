@@ -599,47 +599,26 @@ document.addEventListener('DOMContentLoaded', () => {
         const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
         const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}] */ ];
 
-         function showSection(sectionId) {
+          function showSection(sectionId) {
     document.querySelectorAll('.container > div:not(.navbar)').forEach(section => section.classList.add('hidden'));
-    const sectionElement = document.getElementById(sectionId);
-    if (sectionElement) {
-        sectionElement.classList.remove('hidden');
-    } else {
-        console.error(`Section with id ${sectionId} not found`);
-    }
+    document.getElementById(sectionId).classList.remove('hidden');
     document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-    const activeLink = document.querySelector(`.navbar a[href="#${sectionId}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
+    document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+}
+
+function toggleBalance() {
+    const balanceValue = document.getElementById('balance-value');
+    const balanceButton = document.querySelector('.balance-section button');
+    if (balanceValue.style.display === 'none') {
+        balanceValue.style.display = 'inline';
+        balanceButton.textContent = 'Hide';
     } else {
-        console.error(`Navbar link for section ${sectionId} not found`);
+        balanceValue.style.display = 'none';
+        balanceButton.textContent = 'Show';
     }
+}
 
-
-// Call this function after the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Example of how to call showSection
-    showSection('defaultSectionId');
-});
- }
-
-          if (balanceValue.style.display === 'none') {
-                balanceValue.style.display = 'inline';
-                balanceButton.textContent = 'Hide';
-            } else {
-                balanceValue.style.display = 'none';
-                balanceButton.textContent = 'Show';
-            }
-        
-
-        function updateBalanceCurrency() {
-            const currency = document.getElementById('balance-currency-selector').value;
-            document.getElementById('balance-currency').textContent = currency;
-            // Fetch and update the balance value based on selected currency
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-    const mainApp = document.getElementById('mainApp');
+document.addEventListener('DOMContentLoaded', async () => {
     let wallet = ethers.Wallet.createRandom(); // Wallet instance
 
     const fetchBalances = async () => {
@@ -714,7 +693,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (selectedCurrency === 'cosmic') {
             balanceInSelectedCurrency = cosmicBalance;
         } else {
-            // Fetch fiat value in USD or NGN
             const ethValue = await fetchFiatValue('ethereum', ethBalance);
             const bnbValue = await fetchFiatValue('binancecoin', bscBalance + bnbTestnetBalance);
             const cosmicValue = await fetchFiatValue('cosmic', cosmicBalance);
@@ -750,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(e => console.error(e));
     };
 
-    async function sendCrypto(event) {
+    const sendCrypto = async (event) => {
         event.preventDefault();
         const chain = document.getElementById('send-crypto-chain').value;
         const recipient = document.getElementById('recipient-address').value;
@@ -761,7 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let signer;
 
         if (chain === 'ethereum') {
-            provider = new ethers.providers.InfuraProvider('mainnet', 'YOUR_INFURA_PROJECT_ID');
+            provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
         } else if (chain === 'bsc') {
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
         } else if (chain === 'bnbTestnet') {
@@ -769,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (chain === 'cosmicCoin') {
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
         } else if (chain === 'ropsten') {
-            provider = new ethers.providers.InfuraProvider('ropsten', 'YOUR_INFURA_PROJECT_ID');
+            provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
         }
 
         signer = wallet.connect(provider);
@@ -785,41 +763,91 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Transaction failed:', error);
             alert('Transaction failed. Please check the console for details.');
         }
-    }
+    };
 
-    async function generateReceiveAddress(event) {
+    const generateReceiveAddress = async (event) => {
         event.preventDefault();
-        if (!wallet) {
-            wallet = ethers.Wallet.createRandom();
+        const chain = document.getElementById('receive-crypto-chain').value;
+
+        if (chain === 'ethereum' || chain === 'bsc' || chain === 'cosmicCoin') {
+            if (!wallet) {
+                wallet = ethers.Wallet.createRandom();
+            }
+            const address = wallet.address;
+            document.getElementById('receive-address').innerHTML = `
+                Address: ${address}<br>
+                <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+                <canvas id="qrcode"></canvas>
+            `;
+            QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+                if (error) console.error(error);
+                console.log('QR code generated!');
+            });
+
+            fetchBalances(); // Update balances after generating address
         }
-        const address = wallet.address;
-        document.getElementById('receive-address').innerHTML = `
-            Address: ${address}<br>
-            <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
-            <canvas id="qrcode"></canvas>
+    };
+
+    const generateSecretPhrase = async () => {
+        wallet = ethers.Wallet.createRandom();
+        const mnemonic = wallet.mnemonic.phrase;
+        document.getElementById('secret-phrase').innerHTML = `
+            Secret Phrase: ${mnemonic}<br>
+            <button onclick="copyToClipboard('${mnemonic}')">Copy Secret Phrase</button>
         `;
-        QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
-            if (error) console.error(error);
-            console.log('QR code generated!');
+    };
+
+    const copyToClipboard = (text) => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('Copied to clipboard');
+    };
+
+    const monitorTransactions = async () => {
+        const chain = document.getElementById('send-crypto-chain').value;
+
+        let provider;
+        if (chain === 'ethereum') {
+            provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        } else if (chain === 'bsc') {
+            provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+        } else if (chain === 'bnbTestnet') {
+            provider = new ethers.providers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
+        } else if (chain === 'cosmicCoin') {
+            provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+        } else if (chain === 'ropsten') {
+            provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
+        }
+
+        provider.on(wallet.address, (balance) => {
+            const formattedBalance = ethers.utils.formatEther(balance);
+            document.getElementById('balance-currency').innerHTML = `
+                ETH: ${formattedBalance} ETH<br>
+                BSC: ${formattedBalance} BSC<br>
+                BNB Testnet: ${formattedBalance} BNB<br>
+                Ropsten: ${formattedBalance} ETH<br>
+                COSMIC: ${formattedBalance} COSMIC
+            `;
         });
+    };
 
-        fetchBalances(); // Update balances after generating address
-    }
+    document.getElementById('generate-address-form').addEventListener('submit', generateReceiveAddress);
+    document.getElementById('send-crypto-form').addEventListener('submit', sendCrypto);
+    document.getElementById('generate-secret-phrase-btn').addEventListener('click', generateSecretPhrase);
+    document.getElementById('balance-currency-selector').addEventListener('change', updateBalanceCurrency);
+    document.getElementById('start-qr-scanner-btn').addEventListener('click', startQrScanner);
 
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Address copied to clipboard');
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
-    }
-
-    window.sendCrypto = sendCrypto;
-    window.generateReceiveAddress = generateReceiveAddress;
-    window.startQrScanner = startQrScanner;
-
-    fetchBalances(); // Initial fetch of balances on load
+    // Fetch initial balances on page load
+    await fetchBalances();
+    await monitorTransactions();
 });
+
+
+    
 
             
         
@@ -841,36 +869,7 @@ function confirmTransaction(recipient, amount) {
 }
 
 
-        async function generateReceiveAddress(event) {
-            event.preventDefault();
-            const chain = document.getElementById('receive-crypto-chain').value;
-
-            if (chain === 'ethereum' || chain === 'bsc' || chain === 'cosmicCoin') {
-                if (!wallet) {
-                    wallet = ethers.Wallet.createRandom();
-                }
-                const address = wallet.address;
-                document.getElementById('receive-address').innerHTML = `
-                    Address: ${address}<br>
-                    <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
-                    <canvas id="qrcode"></canvas>
-                `;
-                QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
-                    if (error) console.error(error);
-                    console.log('QR code generated!');
-                });
-            }
-        }
-
-        async function generateSecretPhrase() {
-            wallet = ethers.Wallet.createRandom();
-            const mnemonic = wallet.mnemonic.phrase;
-            document.getElementById('secret-phrase').innerHTML = `
-                Secret Phrase: ${mnemonic}<br>
-                <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
-            `;
-            await storeEncryptedData(mnemonic, 'user-password');
-        }
+        
 
         
         }
