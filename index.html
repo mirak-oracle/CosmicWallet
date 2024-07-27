@@ -12,9 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethereumjs-tx/2.1.2/ethereumjs-tx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.7/ethers.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers/dist/ethers.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/instascan@1.0.0/dist/instascan.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/instascan@1.0.0/dist/instascan.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -582,20 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 </style>
 
-<script>
-    function showSection(sectionId) {
-        document.querySelectorAll('.container > div').forEach(section => {
-            section.classList.add('hidden');
-        });
-        document.getElementById(sectionId).classList.remove('hidden');
 
-        document.querySelectorAll('.navbar a.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
-    }
-
-</script>
     
     <script>
                     
@@ -614,7 +599,7 @@ function showSection(sectionId) {
             link.classList.add('active');
         }
     }
-}
+
 
 function toggleBalance() {
     const balanceValue = document.getElementById('balance-value');
@@ -627,8 +612,8 @@ function toggleBalance() {
             balanceValue.style.display = 'none';
             balanceButton.textContent = 'Show';
         }
-    }
-}
+    
+
 
 function startQrScanner() {
     const video = document.getElementById('qr-video');
@@ -840,10 +825,6 @@ function confirmTransaction(recipient, amount) {
 }
 
 
-        
-
-        
-        }
 
         async function storeEncryptedData(data, password) {
             const enc = new TextEncoder();
@@ -915,34 +896,7 @@ function confirmTransaction(recipient, amount) {
             return new TextDecoder().decode(decrypted);
        }
 
-      // Function to get and display the user's balance
-async function getAndDisplayBalance(address) {
-    if (!web3) {
-        console.error('Web3 is not initialized');
-        return;
-    }
 
-    try {
-        const balance = await web3.eth.getBalance(address);
-        const balanceInEther = web3.utils.fromWei(balance, 'ether');
-        document.getElementById('balance').innerText = `${balanceInEther} ETH`;
-
-        // Save balance to local storage
-        localStorage.setItem('userBalance', balanceInEther);
-    } catch (error) {
-        console.error('Error fetching balance:', error);
-    }
-}
-
-// Function to display the balance from local storage
-function displayBalanceFromStorage() {
-    const storedBalance = localStorage.getItem('userBalance');
-    if (storedBalance) {
-        document.getElementById('balance').innerText = `${storedBalance} ETH`;
-    } else {
-        document.getElementById('balance').innerText = 'Balance not available';
-    }
-}
 
 // Function to monitor transactions to the user's address
 async function monitorTransactions(address) {
