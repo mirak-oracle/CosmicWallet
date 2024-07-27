@@ -113,84 +113,40 @@
     <!-- JavaScript for authentication and inactivity logout -->
     <script>
     
+document.addEventListener('DOMContentLoaded', () => {
+    const authPage = document.getElementById('authPage');
+    const setupSection = document.getElementById('setupSection');
+    const loginSection = document.getElementById('loginSection');
+    const mainApp = document.getElementById('mainApp');
 
-        
-            document.addEventListener('DOMContentLoaded', () => {
-            const authPage = document.getElementById('authPage');
-            const setupSection = document.getElementById('setupSection');
-            const loginSection = document.getElementById('loginSection');
-            const mainApp = document.getElementById('mainApp');
+    const setupPIN = () => {
+        const pin = document.getElementById('setupPin').value;
+        if (pin) {
+            const hashedPin = CryptoJS.SHA256(pin).toString();
+            localStorage.setItem('cosmicWalletPin', hashedPin);
+            alert('PIN set successfully!');
+            setupSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+        } else {
+            alert('Please enter a PIN.');
+        }
+    };
 
-            const setupPIN = () => {
-                const pin = document.getElementById('setupPin').value;
-                if (pin) {
-                    const hashedPin = CryptoJS.SHA256(pin).toString();
-                    localStorage.setItem('cosmicWalletPin', hashedPin);
-                    alert('PIN set successfully!');
-                    setupSection.classList.add('hidden');
-                    loginSection.classList.remove('hidden');
-                } else {
-                    alert('Please enter a PIN.');
-                }
-            };
+    const login = () => {
+        const pin = document.getElementById('loginPin').value;
+        const storedPinHash = localStorage.getItem('cosmicWalletPin');
+        if (CryptoJS.SHA256(pin).toString() === storedPinHash) {
+            alert('Login successful!');
+            authPage.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            startRewardingUsers(); // Start rewards on successful login
+            fetchBalances(); // Fetch balances on successful login
+        } else {
+            alert('Incorrect PIN.');
+        }
+    };
 
-            const login = () => {
-                const pin = document.getElementById('loginPin').value;
-                const storedPinHash = localStorage.getItem('cosmicWalletPin');
-                if (CryptoJS.SHA256(pin).toString() === storedPinHash) {
-                    alert('Login successful!');
-                    authPage.classList.add('hidden');
-                    mainApp.classList.remove('hidden');
-                    startRewardingUsers(); // Start rewards on successful login
-                } else {
-                    alert('Incorrect PIN.');
-                }
-            };
-
-            const setupFingerprint = () => {
-                if (!window.PublicKeyCredential) {
-                    alert('WebAuthn is not supported on this browser.');
-                    return;
-                }
-
-                const publicKey = {
-                    challenge: new Uint8Array(32),
-                    rp: {
-                        name: 'CosmicWallet',
-                        id: window.location.hostname
-                    },
-                    user: {
-                        id: new Uint8Array(16),
-                        name: 'user@example.com',
-                        displayName: 'User'
-                    },
-                    pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
-                    authenticatorSelection: {
-                        authenticatorAttachment: 'platform',
-                        requireResidentKey: false,
-                        userVerification: 'preferred'
-                    },
-                    timeout: 60000,
-                    attestation: 'none'
-                };
-
-                navigator.credentials.create({ publicKey })
-                    .then((credential) => {
-                        const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
-                        localStorage.setItem('cosmicWalletCredentialId', credential.id);
-                        localStorage.setItem('cosmicWalletRawId', rawId);
-
-                        alert('Fingerprint setup successful!');
-                        setupSection.classList.add('hidden');
-                        loginSection.classList.remove('hidden');
-                    })
-                    .catch((error) => {
-                        alert('Fingerprint setup failed. Please try again.');
-                        console.error('Error during fingerprint setup:', error);
-                    });
-            };
-
-            const authenticateWithFingerprint = () => {
+    const setupFingerprint = () => {
         if (!window.PublicKeyCredential) {
             alert('WebAuthn is not supported on this browser.');
             return;
@@ -219,9 +175,9 @@
 
         navigator.credentials.create({ publicKey })
             .then((credential) => {
-                // Store the credential ID and rawId for future verification
+                const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
                 localStorage.setItem('cosmicWalletCredentialId', credential.id);
-                localStorage.setItem('cosmicWalletRawId', credential.rawId);
+                localStorage.setItem('cosmicWalletRawId', rawId);
 
                 alert('Fingerprint setup successful!');
                 setupSection.classList.add('hidden');
@@ -229,33 +185,97 @@
             })
             .catch((error) => {
                 alert('Fingerprint setup failed. Please try again.');
-                console.error(error);
+                console.error('Error during fingerprint setup:', error);
+            });
+    };
+
+    const authenticateWithFingerprint = () => {
+        const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
+        const rawId = localStorage.getItem('cosmicWalletRawId');
+
+        if (!storedCredentialId || !rawId) {
+            alert('No fingerprint credentials found. Please set up your fingerprint first.');
+            return;
+        }
+
+        const publicKey = {
+            challenge: new Uint8Array(32),
+            allowCredentials: [{
+                type: 'public-key',
+                id: Uint8Array.from(atob(rawId), c => c.charCodeAt(0))
+            }],
+            timeout: 60000,
+            userVerification: 'preferred'
+        };
+
+        navigator.credentials.get({ publicKey })
+            .then((assertion) => {
+                if (assertion.id === storedCredentialId) {
+                    alert('Fingerprint login successful!');
+                    authPage.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    startRewardingUsers(); // Start rewards on successful login
+                    fetchBalances(); // Fetch balances on successful login
+                } else {
+                    alert('Fingerprint login failed.');
+                }
+            })
+            .catch((error) => {
+                alert('Fingerprint login failed. Please try again.');
+                console.error('Error during fingerprint authentication:', error);
             });
     };
 
     const clearBiometricData = () => {
-                localStorage.removeItem('cosmicWalletCredentialId');
-                localStorage.removeItem('cosmicWalletRawId');
-                alert('Biometric data cleared. You can now set up your fingerprint again.');
-                setupSection.classList.remove('hidden');
-                loginSection.classList.add('hidden');
-            };
+        localStorage.removeItem('cosmicWalletCredentialId');
+        localStorage.removeItem('cosmicWalletRawId');
+        alert('Biometric data cleared. You can now set up your fingerprint again.');
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    };
 
-            window.setupPIN = setupPIN;
-            window.login = login;
-            window.setupFingerprint = setupFingerprint;
-            window.authenticateWithFingerprint = authenticateWithFingerprint;
-            window.clearBiometricData = clearBiometricData;
+    const fetchBalances = async () => {
+        const ethBalance = await getEthBalance();
+        const cosmicBalance = await getCosmicBalance();
+        const bnbBalance = await getBnbBalance();
 
-            // Check if PIN or Fingerprint is already set
-            if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
-                setupSection.classList.add('hidden');
-                loginSection.classList.remove('hidden');
-            } else {
-                setupSection.classList.remove('hidden');
-                loginSection.classList.add('hidden');
-            }
-        });
+        document.getElementById('eth-balance').textContent = `${ethBalance} ETH`;
+        document.getElementById('cosmic-balance').textContent = `${cosmicBalance} COSMIC`;
+        document.getElementById('bnb-balance').textContent = `${bnbBalance} BNB`;
+    };
+
+    const getEthBalance = async () => {
+        // Add your logic to fetch Ethereum balance
+        return 0; // Placeholder
+    };
+
+    const getCosmicBalance = async () => {
+        // Add your logic to fetch CosmicCoin balance
+        return 0; // Placeholder
+    };
+
+    const getBnbBalance = async () => {
+        // Add your logic to fetch BNB balance
+        return 0; // Placeholder
+    };
+
+    window.setupPIN = setupPIN;
+    window.login = login;
+    window.setupFingerprint = setupFingerprint;
+    window.authenticateWithFingerprint = authenticateWithFingerprint;
+    window.clearBiometricData = clearBiometricData;
+
+    // Check if PIN or Fingerprint is already set
+    if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+        setupSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+    } else {
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    }
+});
+
+        
 
     </script>
 </body>
@@ -264,16 +284,7 @@
             
 
             
-    </script>
-</body>
-</html>
-
-
-
-
     
-    
-
 
 <body class="bg-gray-100">
 
