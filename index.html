@@ -289,23 +289,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <body class="bg-gray-100">
 
-    <div id="balance-section" class="flex justify-between items-center my-4">
-        <div>
-            <span id="balance-amount" class="text-xl"> 💲: <span id="balance-value">0</span> <span id="balance-currency">ETH</span></span>
+    <!-- Balance Section -->
+    <div id="balance-section" class="section">
+        <h2 class="text-2xl font-bold mb-4">Balances</h2>
+        <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
+            <option value="ETH">ETH</option>
+            <option value="BSC">BSC</option>
+            <option value="BNBTestnet">BNB Testnet</option>
+            <option value="Ropsten">Ropsten</option>
+            <option value="COSMIC">COSMIC</option>
+        </select>
+        <div id="balance-currency" class="mt-4">
+            <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
             <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
         </div>
-        <!-- Balance Section -->
-<div id="balance-section" class="section">
-    <h2 class="text-2xl font-bold mb-4">Balances</h2>
-    <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
-        <option value="ETH">ETH</option>
-        <option value="BNB">BNB</option>
-        <option value="COSMIC">COSMIC</option>
-        <option value="USD">USD</option>
-        <option value="NGN">NGN</option>
-    </select>
-    <div id="balance-currency" class="mt-4"></div>
-</div>
 
     </div>
 
@@ -586,21 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainApp = document.getElementById('mainApp');
     let wallet = ethers.Wallet.createRandom(); // Wallet instance
 
-    const fetchBalances = async () => {
-        const ethBalance = await getEthBalance();
-        const bscBalance = await getBscBalance();
-        const bnbTestnetBalance = await getBnbTestnetBalance();
-        const ropstenBalance = await getRopstenBalance();
-        const cosmicBalance = await getCosmicBalance();
-
-        document.getElementById('balance-currency').innerHTML = `
-            ETH: ${ethBalance} ETH<br>
-            BSC: ${bscBalance} BSC<br>
-            BNB Testnet: ${bnbTestnetBalance} BNB<br>
-            Ropsten: ${ropstenBalance} ETH<br>
-            COSMIC: ${cosmicBalance} COSMIC
-        `;
-    };
+    
 
     const getEthBalance = async () => {
         const provider = new ethers.providers.InfuraProvider('mainnet', 'YOUR_INFURA_PROJECT_ID');
@@ -807,17 +790,50 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
     
 <script>
-    function toggleBalance() {
-    const balanceValue = document.getElementById('balance-value');
-    const balanceButton = document.querySelector('.balance-section button');
-    if (balanceValue.style.display === 'none') {
-        balanceValue.style.display = 'inline';
-        balanceButton.textContent = 'Hide';
-    } else {
-        balanceValue.style.display = 'none';
-        balanceButton.textContent = 'Show';
-    }
-}
+    const fetchBalances = async () => {
+            const ethBalance = await getEthBalance();
+            const bscBalance = await getBscBalance();
+            const bnbTestnetBalance = await getBnbTestnetBalance();
+            const ropstenBalance = await getRopstenBalance();
+            const cosmicBalance = await getCosmicBalance();
+
+            const balanceMap = {
+                ETH: ethBalance,
+                BSC: bscBalance,
+                BNBTestnet: bnbTestnetBalance,
+                Ropsten: ropstenBalance,
+                COSMIC: cosmicBalance
+            };
+
+            document.getElementById('balance-value').textContent = balanceMap.ETH;
+            document.getElementById('balance-currency-type').textContent = 'ETH';
+
+            document.getElementById('balance-currency-selector').addEventListener('change', function () {
+                const selectedCurrency = this.value;
+                document.getElementById('balance-value').textContent = balanceMap[selectedCurrency];
+                document.getElementById('balance-currency-type').textContent = selectedCurrency;
+            });
+        };
+    const toggleBalance = () => {
+            const balanceValue = document.getElementById('balance-value');
+            const balanceButton = document.querySelector('.balance-section button');
+            if (balanceValue.style.display === 'none') {
+                balanceValue.style.display = 'inline';
+                balanceButton.textContent = 'Hide';
+            } else {
+                balanceValue.style.display = 'none';
+                balanceButton.textContent = 'Show';
+            }
+        };
+
+        const updateBalanceCurrency = () => {
+            const currency = document.getElementById('balance-currency-selector').value;
+            document.getElementById('balance-currency-type').textContent = currency;
+            // Fetch and update the balance value based on selected currency
+        };
+
+        document.addEventListener('DOMContentLoaded', fetchBalances);
+   
 
 </script>
     
