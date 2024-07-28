@@ -602,26 +602,34 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(sectionId).classList.remove('hidden');
             document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
             document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+       
         }
 
-        function toggleBalance() {
-            const balanceValue = document.getElementById('balance-value');
-            const balanceButton = document.querySelector('.balance-section button');
-            if (balanceValue.style.display === 'none') {
-                balanceValue.style.display = 'inline';
-                balanceButton.textContent = 'Hide';
-            } else {
-                balanceValue.style.display = 'none';
-                balanceButton.textContent = 'Show';
-            }
-        }
+    function toggleBalance() {
+    const balanceValue = document.getElementById('balance-value');
+    const balanceButton = document.querySelector('.balance-section button');
+    if (balanceValue.style.display === 'none') {
+        balanceValue.style.display = 'inline';
+        balanceButton.textContent = 'Hide';
+    } else {
+        balanceValue.style.display = 'none';
+        balanceButton.textContent = 'Show';
+    }
+}
 
-        function updateBalanceCurrency() {
-            const currency = document.getElementById('balance-currency-selector').value;
-            document.getElementById('balance-currency').textContent = currency;
-            // Fetch and update the balance value based on selected currency
-        }
+function updateBalanceCurrency() {
+    const currency = document.getElementById('balance-currency-selector').value;
+    document.getElementById('balance-currency').textContent = currency;
+    // Fetch and update the balance value based on selected currency
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('.balance-section button').addEventListener('click', toggleBalance);
+    document.getElementById('balance-currency-selector').addEventListener('change', updateBalanceCurrency);
+});
+
+                
+        
         async function sendCrypto(event) {
             event.preventDefault();
             const chain = document.getElementById('send-crypto-chain').value;
