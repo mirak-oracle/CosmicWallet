@@ -659,14 +659,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function generateSecretPhrase() {
-            wallet = ethers.Wallet.createRandom();
-            const mnemonic = wallet.mnemonic.phrase;
-            document.getElementById('secret-phrase').innerHTML = `
-                Secret Phrase: ${mnemonic}<br>
-                <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
-            `;
-            await storeEncryptedData(mnemonic, 'user-password');
-        }
+    wallet = ethers.Wallet.createRandom();
+    const mnemonic = wallet.mnemonic.phrase;
+    document.getElementById('secret-phrase').innerHTML = `
+        Secret Phrase: ${mnemonic}<br>
+        <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
+    `;
+    await storeEncryptedData(mnemonic, 'user-password');
+}
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
@@ -745,14 +745,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function recoverAccount() {
-            const phrase = document.getElementById('recover-phrase').value;
-            try {
-                wallet = ethers.Wallet.fromMnemonic(phrase);
-                alert('Account recovered successfully!');
-                // Fetch and display balance, transaction history, etc.
-            } catch (error) {
-                alert('Invalid secret phrase!');
-            }
+    const phrase = document.getElementById('recover-phrase').value;
+    try {
+        wallet = ethers.Wallet.fromMnemonic(phrase);
+        alert('Account recovered successfully!');
+        // Fetch and display balance, transaction history, etc.
+    } catch (error) {
+        alert('Invalid secret phrase!');
+    }
+}
+
+
         
 
 
