@@ -291,8 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     <!-- Balance Section -->
     <div id="balance-section" class="section">
-        <h2 class="text-2xl font-bold mb-4">Balances</h2>
-        <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
+         <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
             <option value="ETH">ETH</option>
             <option value="BSC">BSC</option>
             <option value="BNBTestnet">BNB Testnet</option>
@@ -334,7 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
         </select>
         <input type="text" id="recipient-address" placeholder="Recipient Address" required class="block w-full border border-gray-300 rounded p-2">
         <input type="number" id="amount" placeholder="Amount" required class="block w-full border border-gray-300 rounded p-2">
-        <button type="button" onclick="startQrScanner()" class="block w-full bg-blue-600 text-white rounded p-2">Scan QR Code</button>
+      <button type="button" onclick="startQrScanner()" class="block w-full bg-blue-600 text-white rounded p-2">Scan QR Code</button>
+        <button onclick="stopQrScanner()">Stop QR Scanner</button>
         <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Send</button>
     </form>
     <video id="qr-video" class="hidden"></video>
@@ -656,11 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('balance-currency').innerHTML = `${balanceInSelectedCurrency} ${selectedCurrency.toUpperCase()}`;
     };
 
-    const startQrScanner = () => {
+    let scanner = null;
+
+        const startQrScanner = () => {
             const video = document.getElementById('qr-video');
             video.classList.remove('hidden');
 
-            const scanner = new Instascan.Scanner({ video });
+            scanner = new Instascan.Scanner({ video });
             scanner.addListener('scan', function (content) {
                 document.getElementById('recipient-address').value = content;
                 video.classList.add('hidden');
@@ -668,7 +670,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             Instascan.Camera.getCameras().then(cameras => {
-                if (cameras.length > 0) {
+                const backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+                if (backCamera) {
+                    scanner.start(backCamera);
+                } else if (cameras.length > 0) {
                     scanner.start(cameras[0]);
                 } else {
                     console.error('No cameras found.');
@@ -676,6 +681,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }).catch(e => console.error(e));
         };
+
+        const stopQrScanner = () => {
+            if (scanner) {
+                scanner.stop();
+                document.getElementById('qr-video').classList.add('hidden');
+                scanner = null;
+            }
+        };
+    
 
     async function sendCrypto(event) {
         event.preventDefault();
