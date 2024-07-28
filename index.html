@@ -572,6 +572,70 @@ document.addEventListener('DOMContentLoaded', () => {
         background: #0056b3;
     }
 </style>
+
+    <script>
+        let wallet;
+
+async function recoverAccount() {
+    const phrase = document.getElementById('recover-phrase').value;
+    try {
+        wallet = ethers.Wallet.fromMnemonic(phrase);
+        alert('Account recovered successfully!');
+        // Fetch and display balance, transaction history, etc.
+    } catch (error) {
+        alert('Invalid secret phrase!');
+    }
+}
+
+async function generateReceiveAddress(event) {
+    event.preventDefault();
+    const chain = document.getElementById('receive-crypto-chain').value;
+
+    if (chain === 'ethereum' || chain === 'bsc' || chain === 'cosmicCoin') {
+        if (!wallet) {
+            wallet = ethers.Wallet.createRandom();
+        }
+        const address = wallet.address;
+        document.getElementById('receive-address').innerHTML = `
+            Address: ${address}<br>
+            <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+            <canvas id="qrcode"></canvas>
+        `;
+        QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+            if (error) console.error(error);
+            console.log('QR code generated!');
+        });
+    }
+}
+
+async function generateSecretPhrase() {
+    wallet = ethers.Wallet.createRandom();
+    const mnemonic = wallet.mnemonic.phrase;
+    document.getElementById('secret-phrase').innerHTML = `
+        Secret Phrase: ${mnemonic}<br>
+        <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
+    `;
+    await storeEncryptedData(mnemonic, 'user-password');
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Copied to clipboard!');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+async function storeEncryptedData(data, password) {
+    // Your implementation for storing encrypted data
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('receive-address-form').addEventListener('submit', generateReceiveAddress);
+    document.querySelector('.balance-section button').addEventListener('click', toggleBalance);
+    document.getElementById('balance-currency-selector').addEventListener('change', updateBalanceCurrency);
+});
+    </script>
     
 <script>
     function toggleBalance() {
