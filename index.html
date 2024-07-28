@@ -13,7 +13,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethereumjs-tx/2.1.2/ethereumjs-tx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.7/ethers.umd.min.js"></script>
         <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
-    
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -99,6 +100,16 @@
     </div>
 
     </div>
+    <!-- KYC Page -->
+<div id="kycPage" class="full-page bg-gray-100 flex items-center justify-center min-h-screen hidden">
+    <div class="auth-section bg-white p-8 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
+        <video id="kyc-video" width="720" height="560" autoplay muted class="hidden"></video>
+        <button onclick="startKycVerification()" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Start KYC Verification</button>
+        <button onclick="stopKycVerification()" class="bg-red-500 text-white p-2 rounded w-full hidden">Stop KYC Verification</button>
+        <div id="kyc-status" class="mt-4"></div>
+    </div>
+
 
     <!-- Main Application -->
     <div id="appContainer" class="container hidden">
@@ -276,7 +287,79 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-        
+        const videoElement = document.getElementById('kyc-video');
+let faceMatcher;
+let kycStatus = 'not_verified';
+
+async function loadModels() {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+    console.log('Face-API models loaded');
+}
+
+async function startKycVerification() {
+    videoElement.classList.remove('hidden');
+    document.querySelector('button[onclick="stopKycVerification()"]').classList.remove('hidden');
+    document.querySelector('button[onclick="startKycVerification()"]').classList.add('hidden');
+
+    await loadModels();
+    navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
+        videoElement.srcObject = stream;
+    });
+
+    videoElement.addEventListener('play', () => {
+        const canvas = faceapi.createCanvasFromMedia(videoElement);
+        document.body.append(canvas);
+        const displaySize = { width: videoElement.width, height: videoElement.height };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        setInterval(async () => {
+            const detections = await faceapi.detectAllFaces(videoElement, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+
+            if (resizedDetections.length > 0) {
+                console.log('Face detected', resizedDetections);
+                document.getElementById('kyc-status').textContent = 'Face detected!';
+                kycStatus = 'verified';
+                storeKycStatusLocally();
+                alert('KYC Verification Successful!');
+                stopKycVerification();
+            }
+        }, 100);
+    });
+}
+
+function stopKycVerification() {
+    videoElement.classList.add('hidden');
+    document.querySelector('button[onclick="stopKycVerification()"]').classList.add('hidden');
+    document.querySelector('button[onclick="startKycVerification()"]').classList.remove('hidden');
+
+    const stream = videoElement.srcObject;
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    videoElement.srcObject = null;
+}
+
+function storeKycStatusLocally() {
+    localStorage.setItem('kycStatus', kycStatus);
+}
+
+function loadKycStatus() {
+    const status = localStorage.getItem('kycStatus');
+    if (status === 'verified') {
+        kycStatus = 'verified';
+        document.getElementById('kyc-status').textContent = 'KYC Verification Successful!';
+    }
+}
+
+loadKycStatus();
+
 
     </script>
 </body>
