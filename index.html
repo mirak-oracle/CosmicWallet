@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethereumjs-tx/2.1.2/ethereumjs-tx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.7/ethers.umd.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/instascan@1.0.0/dist/instascan.min.js"></script>
+        <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -628,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getCosmicBalance = async () => {
         const provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-        const contract = new ethers.Contract('COSMIC_COIN_CONTRACT_ADDRESS', [
+        const contract = new ethers.Contract('0x95e27971C1c72717612617D49045AAf947Be518C', [
             'function balanceOf(address) view returns (uint256)'
         ], provider);
         const balance = await contract.balanceOf(wallet.address);
@@ -674,25 +674,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const startQrScanner = () => {
-        const video = document.getElementById('qr-video');
-        video.classList.remove('hidden');
+            const video = document.getElementById('qr-video');
+            video.classList.remove('hidden');
 
-        const scanner = new Instascan.Scanner({ video });
-        scanner.addListener('scan', function (content) {
-            document.getElementById('recipient-address').value = content;
-            video.classList.add('hidden');
-            scanner.stop();
-        });
+            const scanner = new Instascan.Scanner({ video });
+            scanner.addListener('scan', function (content) {
+                document.getElementById('recipient-address').value = content;
+                video.classList.add('hidden');
+                scanner.stop();
+            });
 
-        Instascan.Camera.getCameras().then(cameras => {
-            if (cameras.length > 0) {
-                scanner.start(cameras[0]);
-            } else {
-                console.error('No cameras found.');
-                alert('No cameras found.');
-            }
-        }).catch(e => console.error(e));
-    };
+            Instascan.Camera.getCameras().then(cameras => {
+                if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    console.error('No cameras found.');
+                    alert('No cameras found.');
+                }
+            }).catch(e => console.error(e));
+        };
 
     async function sendCrypto(event) {
         event.preventDefault();
@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let signer;
 
         if (chain === 'ethereum') {
-            provider = new ethers.providers.InfuraProvider('mainnet', 'YOUR_INFURA_PROJECT_ID');
+            provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
         } else if (chain === 'bsc') {
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
         } else if (chain === 'bnbTestnet') {
@@ -713,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (chain === 'cosmicCoin') {
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
         } else if (chain === 'ropsten') {
-            provider = new ethers.providers.InfuraProvider('ropsten', 'YOUR_INFURA_PROJECT_ID');
+            provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
         }
 
         signer = wallet.connect(provider);
