@@ -101,18 +101,8 @@
 
     </div>
     
-<!DOCTYPE html> 
-<html> 
-<head>
-    <title>Liveness detection demo</title>
-    <script src="liveness.js"></script>
-</head>
-
-<body>
-    <div>
-        <h2>Liveness detection</h2>
         <!-- KYC Page -->
-    <div id="kycPage" class="full-page hidden">
+    <div id="kycPage" class="full-page ">
         <div class="auth-section">
             <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
             <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
@@ -124,46 +114,35 @@
 </body>
 
 <script>
-const API_TOKEN = "6b7845a497bb4275ac7c7768d434a67f";
-        let authenticated = false;
+const files = {
+  "photo": document.querySelector("#photo").files[0],
+};
 
-    function liveness(image, callback){
-    var myHeaders = new Headers();
-    myHeaders.append("token", API_TOKEN);
+// Endpoint URL
+const url = "https://api.luxand.cloud/photo/liveness/v2";
 
-    var formdata = new FormData();    
+// Request headers
+const headers = {
+  "token": "6b7845a497bb4275ac7c7768d434a67f",
 
-    if ((typeof image == "string") && (image.indexOf("https://") == 0))
-        formdata.append("photo", image);
-    else
-        formdata.append("photo", image, "file");
+};
 
-    var requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: formdata,
-      redirect: 'follow'
-    };
+const formData = new FormData();
+Object.keys(data).forEach(key => formData.append(key, data[key]));
+Object.keys(files).forEach(key => formData.append(key, files[key]));
 
-    fetch("https://api.luxand.cloud/photo/liveness", requestOptions)
-      .then(response => response.json())
-      .then(result => callback(result))
-      .catch(error => console.log('error', error)); 
-    }
-function detect_liveness(){
-    var photo = document.getElementsByName("photo")[0].files[0];
-    
-    liveness(photo, function(result){
-        document.getElementById("detect-result").innerHTML = JSON.stringify(result, null, 8)
-            .replace(/\ /g, "&nbsp;")
-            .replace(/\n/g, "<br/>")
-
-        document.getElementById("detect-result")["style"]["display"] = "block"
-    });
-}
+// Making the POST request to Detect Liveness
+fetch(url, {
+  method: "POST",
+  headers: headers,
+  body: formData
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('An error occurred:', error));
 </script>
 
-            </html>
+            
 
     <!-- Main Application -->
     <div id="appContainer" class="container hidden">
@@ -396,9 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </select>
         <input type="text" id="recipient-address" placeholder="Recipient Address" required class="block w-full border border-gray-300 rounded p-2">
         <input type="number" id="amount" placeholder="Amount" required class="block w-full border border-gray-300 rounded p-2">
-      <button type="button" onclick="startQrScanner()" class="block w-full bg-blue-600 text-white rounded p-2">Scan QR Code</button>
-        <button onclick="stopQrScanner()">Stop QR Scanner</button>
-        <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Send</button>
+      <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Send</button>
     </form>
     <video id="qr-video" class="hidden"></video>
 </div>
