@@ -100,15 +100,16 @@
     </div>
 
     
-    <div>
-        <!-- KYC Page -->
+    <!-- KYC Page -->
 <div id="kycPage" class="full-page">
     <div class="auth-section">
+        <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
         <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
-        <input type="file" name="photo" onchange="javascript:detect_liveness()"/>
+        <input type="file" id="photo" name="photo" onchange="detect_liveness()"/>
         <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
     </div>
-</body>
+</div>
+
 
 <script>
 function detect_liveness(){
