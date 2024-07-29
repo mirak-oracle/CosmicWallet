@@ -14,6 +14,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.7/ethers.umd.min.js"></script>
         <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <script defer src="script.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -100,62 +102,60 @@
     </div>
 
     
-    <!-- KYC Page -->
-<div id="kycPage" class="full-page">
-    <div class="auth-section">
-        <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
-        <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
-        <input type="file" id="photo" name="photo" onchange="detect_liveness()"/>
-        <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
-    </div>
-</div>
+        <!-- KYC Page -->
+    <div id="kycPage" class="full-page">
+        <div class="auth-section">
+            <div id="kyc-container">
+                <h2>KYC Liveness Detection</h2>
+                <video id="video" width="640" height="480" autoplay muted></video>
+                <button id="scan-button">Scan for Liveness</button>
+                <p id="message"></p>
+            </div>
 
+            <script>
+                const video = document.getElementById('video');
+const scanButton = document.getElementById('scan-button');
+const message = document.getElementById('message');
+const kycContainer = document.getElementById('kyc-container');
+const authContainer = document.getElementById('auth-container');
 
-<script>
-function detect_liveness(){
-    var photo = document.getElementsByName("photo")[0].files[0];
-    
-    liveness(photo, function(result){
-        document.getElementById("detect-result").innerHTML = JSON.stringify(result, null, 8)
-            .replace(/\ /g, "&nbsp;")
-            .replace(/\n/g, "<br/>")
-
-        document.getElementById("detect-result")["style"]["display"] = "block"
+async function setupCamera() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+    video.srcObject = stream;
+    return new Promise((resolve) => {
+        video.onloadedmetadata = () => {
+            resolve(video);
+        };
     });
 }
-</script>
 
-</html>
-     <script>
-         function liveness(image, callback){
-    var myHeaders = new Headers();
-    myHeaders.append("token", 6b7845a497bb4275ac7c7768d434a67f);
+async function loadModels() {
+    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
+    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
+    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
+    await faceapi.nets.faceExpressionNet.loadFromUri('/models');
+}
 
-    var formdata = new FormData();    
+async function startLivenessDetection() {
+    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
 
-    if ((typeof image == "string") && (image.indexOf("https://") == 0))
-        formdata.append("photo", image);
-    else
-        formdata.append("photo", image, "file");
+    if (detections.length > 0) {
+        message.textContent = 'Liveness detection successful!';
+        kycContainer.style.display = 'none';
+        authContainer.style.display = 'block';
+    } else {
+        message.textContent = 'Liveness detection failed. Please try again.';
+    }
+}
 
-    var requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: formdata,
-      redirect: 'follow'
-    };
+setupCamera().then(() => {
+    video.play();
+    loadModels();
+});
 
-    fetch("https://api.luxand.cloud/photo/liveness", requestOptions)
-      .then(response => response.json())
-      .then(result => callback(result))
-      .catch(error => console.log('error', error)); 
-         }
-         function displayResult(data) {
-    const resultDiv = document.getElementById("detect-result");
-    resultDiv.style.display = "block";
-    resultDiv.innerHTML = JSON.stringify(data, null, 2);
-         }
-     </script>      
+scanButton.addEventListener('click', startLivenessDetection);
+
+            </script>
 
     <!-- Main Application -->
     <div id="appContainer" class="container hidden">
