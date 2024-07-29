@@ -100,46 +100,57 @@
     </div>
 
     </div>
-    
-        <!-- KYC Page -->
-    <div id="kycPage" class="full-page ">
-        <div class="auth-section">
-            <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
-            <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
-            <input type="file" name="photo" onchange="detect_liveness()"/>
-            <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
-        </div>
+    <!-- KYC Page -->
+<div id="kycPage" class="full-page">
+    <div class="auth-section">
+        <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
+        <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
+        <input type="file" id="photo" name="photo" onchange="detect_liveness()"/>
+        <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
     </div>
-        
-</body>
+</div>
 
 <script>
-const files = {
-  "photo": document.querySelector("#photo").files[0],
-};
+    function detect_liveness() {
+    const photoInput = document.querySelector("#photo");
+    const files = {
+        "photo": photoInput.files[0]
+    };
 
-// Endpoint URL
-const url = "https://api.luxand.cloud/photo/liveness/v2";
+    // Endpoint URL
+    const url = "https://api.luxand.cloud/photo/liveness/v2";
 
-// Request headers
-const headers = {
-  "token": "6b7845a497bb4275ac7c7768d434a67f",
+    // Request headers
+    const headers = {
+        "token": "6b7845a497bb4275ac7c7768d434a67f"
+    };
 
-};
+    const formData = new FormData();
+    Object.keys(files).forEach(key => formData.append(key, files[key]));
 
-const formData = new FormData();
-Object.keys(data).forEach(key => formData.append(key, data[key]));
-Object.keys(files).forEach(key => formData.append(key, files[key]));
+    // Making the POST request to Detect Liveness
+    fetch(url, {
+        method: "POST",
+        headers: headers,
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        displayResult(data);
+    })
+    .catch(error => {
+        console.error('An error occurred:', error);
+        displayResult({ error: 'An error occurred during the liveness detection.' });
+    });
+}
 
-// Making the POST request to Detect Liveness
-fetch(url, {
-  method: "POST",
-  headers: headers,
-  body: formData
-})
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('An error occurred:', error));
+function displayResult(data) {
+    const resultDiv = document.getElementById("detect-result");
+    resultDiv.style.display = "block";
+    resultDiv.innerHTML = JSON.stringify(data, null, 2);
+}
+
 </script>
 
             
