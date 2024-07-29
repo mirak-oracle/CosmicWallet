@@ -100,7 +100,55 @@
     </div>
 
     
-            
+    <div>
+        <h2>Liveness detection </h2>
+        
+        <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
+        <input type="file" name="photo" onchange="javascript:detect_liveness()"/>
+        <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
+    </div>
+</body>
+
+<script>
+function detect_liveness(){
+    var photo = document.getElementsByName("photo")[0].files[0];
+    
+    liveness(photo, function(result){
+        document.getElementById("detect-result").innerHTML = JSON.stringify(result, null, 8)
+            .replace(/\ /g, "&nbsp;")
+            .replace(/\n/g, "<br/>")
+
+        document.getElementById("detect-result")["style"]["display"] = "block"
+    });
+}
+</script>
+
+</html>
+     <script>
+         function liveness(image, callback){
+    var myHeaders = new Headers();
+    myHeaders.append("token", 6b7845a497bb4275ac7c7768d434a67f);
+
+    var formdata = new FormData();    
+
+    if ((typeof image == "string") && (image.indexOf("https://") == 0))
+        formdata.append("photo", image);
+    else
+        formdata.append("photo", image, "file");
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formdata,
+      redirect: 'follow'
+    };
+
+    fetch("https://api.luxand.cloud/photo/liveness", requestOptions)
+      .then(response => response.json())
+      .then(result => callback(result))
+      .catch(error => console.log('error', error)); 
+         }
+     </script>      
 
     <!-- Main Application -->
     <div id="appContainer" class="container hidden">
@@ -284,62 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </html>
                     
             
-<!DOCTYPE html> 
-<html> 
-<head>
-    <title>Liveness detection demo</title>
-    <script>
-        function liveness(image, callback){
-    var myHeaders = new Headers();
-    myHeaders.append("token", 6b7845a497bb4275ac7c7768d434a67f);
 
-    var formdata = new FormData();    
-
-    if ((typeof image == "string") && (image.indexOf("https://") == 0))
-        formdata.append("photo", image);
-    else
-        formdata.append("photo", image, "file");
-
-    var requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      body: formdata,
-      redirect: 'follow'
-    };
-
-    fetch("https://api.luxand.cloud/photo/liveness", requestOptions)
-      .then(response => response.json())
-      .then(result => callback(result))
-      .catch(error => console.log('error', error)); 
-}
-    </script>
-</head>
-
-<body>
-    <div>
-        <h2>Liveness detection </h2>
-        
-        <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
-        <input type="file" name="photo" onchange="javascript:detect_liveness()"/>
-        <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
-    </div>
-</body>
-
-<script>
-function detect_liveness(){
-    var photo = document.getElementsByName("photo")[0].files[0];
-    
-    liveness(photo, function(result){
-        document.getElementById("detect-result").innerHTML = JSON.stringify(result, null, 8)
-            .replace(/\ /g, "&nbsp;")
-            .replace(/\n/g, "<br/>")
-
-        document.getElementById("detect-result")["style"]["display"] = "block"
-    });
-}
-</script>
-
-</html>
     
 
 <body class="bg-gray-100">
