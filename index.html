@@ -150,6 +150,11 @@ function detect_liveness(){
       .then(result => callback(result))
       .catch(error => console.log('error', error)); 
          }
+         function displayResult(data) {
+    const resultDiv = document.getElementById("detect-result");
+    resultDiv.style.display = "block";
+    resultDiv.innerHTML = JSON.stringify(data, null, 2);
+         }
      </script>      
 
     <!-- Main Application -->
