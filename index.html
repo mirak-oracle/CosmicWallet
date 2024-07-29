@@ -910,11 +910,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await storeEncryptedData(mnemonic, 'user-password');
 }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                alert('Copied to clipboard!');
-            });
-        }
+        
 
         async function storeEncryptedData(data, password) {
             const enc = new TextEncoder();
