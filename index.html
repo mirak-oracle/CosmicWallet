@@ -279,85 +279,111 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-        const videoElement = document.getElementById('kyc-video');
-let faceMatcher;
-let kycStatus = 'not_verified';
-
-async function loadModels() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-    await faceapi.nets.faceExpressionNet.loadFromUri('/models');
-    console.log('Face-API models loaded');
-}
-
-async function startKycVerification() {
-    videoElement.classList.remove('hidden');
-    document.querySelector('button[onclick="stopKycVerification()"]').classList.remove('hidden');
-    document.querySelector('button[onclick="startKycVerification()"]').classList.add('hidden');
-
-    await loadModels();
-    navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
-        videoElement.srcObject = stream;
-    });
-
-    videoElement.addEventListener('play', () => {
-        const canvas = faceapi.createCanvasFromMedia(videoElement);
-        document.body.append(canvas);
-        const displaySize = { width: videoElement.width, height: videoElement.height };
-        faceapi.matchDimensions(canvas, displaySize);
-
-        setInterval(async () => {
-            const detections = await faceapi.detectAllFaces(videoElement, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
-            const resizedDetections = faceapi.resizeResults(detections, displaySize);
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
-
-            if (resizedDetections.length > 0) {
-                console.log('Face detected', resizedDetections);
-                document.getElementById('kyc-status').textContent = 'Face detected!';
-                kycStatus = 'verified';
-                storeKycStatusLocally();
-                alert('KYC Verification Successful!');
-                stopKycVerification();
-            }
-        }, 100);
-    });
-}
-
-function stopKycVerification() {
-    videoElement.classList.add('hidden');
-    document.querySelector('button[onclick="stopKycVerification()"]').classList.add('hidden');
-    document.querySelector('button[onclick="startKycVerification()"]').classList.remove('hidden');
-
-    const stream = videoElement.srcObject;
-    const tracks = stream.getTracks();
-    tracks.forEach(track => track.stop());
-    videoElement.srcObject = null;
-}
-
-function storeKycStatusLocally() {
-    localStorage.setItem('kycStatus', kycStatus);
-}
-
-function loadKycStatus() {
-    const status = localStorage.getItem('kycStatus');
-    if (status === 'verified') {
-        kycStatus = 'verified';
-        document.getElementById('kyc-status').textContent = 'KYC Verification Successful!';
-    }
-}
-
-loadKycStatus();
-
-
+        
     </script>
 </body>
 </html>
                     
             
+<!DOCTYPE html>
+<html>
+<head>
+    <title>KYC Verification</title>
+    <style>
+        .full-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            z-index: 1000; /* Ensure it's above other content */
+        }
+        .auth-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- KYC Page -->
+    <div id="kycPage" class="full-page">
+        <div class="auth-section">
+            <h2 class="text-2xl font-bold mb-4">KYC Verification</h2>
+            <div style="padding-bottom: 20px;">Please choose the photo for liveness detection</div>
+            <input type="file" name="photo" onchange="detect_liveness()"/>
+            <div id="detect-result" style="display: none; font-family: monospace; background-color: #606a94; color: white; margin-top: 20px; max-width: 600px; padding: 10px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_TOKEN = "6b7845a497bb4275ac7c7768d434a67f";
+
+        function detect_liveness() {
+            var photo = document.getElementsByName("photo")[0].files[0];
+            
+            liveness(photo, function(result) {
+                document.getElementById("detect-result").innerHTML = JSON.stringify(result, null, 8)
+                    .replace(/\ /g, "&nbsp;")
+                    .replace(/\n/g, "<br/>");
+
+                document.getElementById("detect-result").style.display = "block";
+                
+                if (result.result === "real") {
+                    alert('KYC Verification Successful!');
+                    storeKycStatusLocally();
+                    // Redirect to the main wallet page or show the main wallet section
+                    showMainWalletPage();
+                } else {
+                    alert('KYC Verification Failed. Please try again.');
+                }
+            });
+        }
+
+        function liveness(image, callback) {
+            var myHeaders = new Headers();
+            myHeaders.append("token", API_TOKEN);
+
+            var formdata = new FormData();    
+
+            if ((typeof image === "string") && (image.indexOf("https://") === 0)) {
+                formdata.append("photo", image);
+            } else {
+                formdata.append("photo", image, "file");
+            }
+
+            var requestOptions = {
+                method: 'POST',
+                headers: myHeaders,
+                body: formdata,
+                redirect: 'follow'
+            };
+
+            fetch("https://api.luxand.cloud/photo/liveness", requestOptions)
+                .then(response => response.json())
+                .then(result => callback(result))
+                .catch(error => console.log('error', error)); 
+        }
+
+        function storeKycStatusLocally() {
+            localStorage.setItem('kycStatus', 'verified');
+        }
+
+        function showMainWalletPage() {
+            document.getElementById('kycPage').classList.add('hidden');
+            // Code to show the main wallet section goes here
+        }
+    </script>
+</body>
+</html>
 
             
     
