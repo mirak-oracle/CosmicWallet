@@ -22,7 +22,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #452B1F;
+            background-color: #262433;
             margin: 0;
             padding: 0;
         }
@@ -36,7 +36,7 @@
 .hidden { display: none; }
         
         iframe { width: 100%; height: 499px; }
-    
+    @import url("https://fonts.googlesapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
     </style>
    </head>
     <body>
@@ -102,60 +102,7 @@
     </div>
 
     
-        <!-- KYC Page -->
-    <div id="kycPage" class="full-page">
-        <div class="auth-section">
-            <div id="kyc-container">
-                <h2>KYC Liveness Detection</h2>
-                <video id="video" width="640" height="480" autoplay muted></video>
-                <button id="scan-button">Scan for Liveness</button>
-                <p id="message"></p>
-            </div>
-
-            <script>
-                const video = document.getElementById('video');
-const scanButton = document.getElementById('scan-button');
-const message = document.getElementById('message');
-const kycContainer = document.getElementById('kyc-container');
-const authContainer = document.getElementById('auth-container');
-
-async function setupCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-    video.srcObject = stream;
-    return new Promise((resolve) => {
-        video.onloadedmetadata = () => {
-            resolve(video);
-        };
-    });
-}
-
-async function loadModels() {
-    await faceapi.nets.tinyFaceDetector.loadFromUri('/models');
-    await faceapi.nets.faceLandmark68Net.loadFromUri('/models');
-    await faceapi.nets.faceRecognitionNet.loadFromUri('/models');
-    await faceapi.nets.faceExpressionNet.loadFromUri('/models');
-}
-
-async function startLivenessDetection() {
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions();
-
-    if (detections.length > 0) {
-        message.textContent = 'Liveness detection successful!';
-        kycContainer.style.display = 'none';
-        authContainer.style.display = 'block';
-    } else {
-        message.textContent = 'Liveness detection failed. Please try again.';
-    }
-}
-
-setupCamera().then(() => {
-    video.play();
-    loadModels();
-});
-
-scanButton.addEventListener('click', startLivenessDetection);
-
-            </script>
+        
 
     <!-- Main Application -->
     <div id="appContainer" class="container hidden">
