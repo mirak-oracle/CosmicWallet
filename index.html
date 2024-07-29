@@ -111,7 +111,8 @@
 </div>
 
 <script>
-    function detect_liveness() {
+    
+function detect_liveness() {
     const photoInput = document.querySelector("#photo");
     if (photoInput.files.length === 0) {
         alert("Please select a photo for liveness detection.");
@@ -125,9 +126,9 @@
     // Endpoint URL
     const url = "https://api.luxand.cloud/photo/liveness/v2";
 
-    // Token needs to be set in the header Authorization field
+    // Request headers
     const headers = new Headers({
-        "Authorization": "Bearer 6b7845a497bb4275ac7c7768d434a67f"
+        "token": "6b7845a497bb4275ac7c7768d434a67f"
     });
 
     const formData = new FormData();
@@ -160,7 +161,6 @@ function displayResult(data) {
     resultDiv.style.display = "block";
     resultDiv.innerHTML = JSON.stringify(data, null, 2);
 }
-
 
 </script>
 
