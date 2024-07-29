@@ -36,7 +36,36 @@
 .hidden { display: none; }
         
         iframe { width: 100%; height: 499px; }
-    @import url("https://fonts.googlesapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
+    * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+:root {
+  /* ===== Colors ===== */
+  --body-color: #e4e9f7;
+  --sidebar-color: #fff;
+  --primary-color: #dc143c;
+  --primary-color-light: #f6f5ff;
+  --toggle-color: #ddd;
+  --text-color: #707070;
+
+  /* ====== Transition ====== */
+  --tran-03: all 0.2s ease;
+  --tran-03: all 0.3s ease;
+  --tran-04: all 0.3s ease;
+  --tran-05: all 0.3s ease;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--body-color);
+  transition: var(--tran-05);
+}
+
+        @import url("https://fonts.googlesapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
     </style>
    </head>
     <body>
@@ -307,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     </div>
 
-    <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
+    <div  mx-auto p-4 bg-white rounded-lg shadow-lg">
         <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
             <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
             <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
