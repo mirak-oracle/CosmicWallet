@@ -585,20 +585,17 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
     <script>
-     document.addEventListener('DOMContentLoaded', () => {
-    const mainApp = document.getElementById('mainApp');
-    let wallet = ethers.Wallet.createRandom(); // Wallet instance
-
+     
     
 
     const getEthBalance = async () => {
-        const provider = new ethers.providers.InfuraProvider('mainnet', 'YOUR_INFURA_PROJECT_ID');
+        const provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     };
 
     const getRopstenBalance = async () => {
-        const provider = new ethers.providers.InfuraProvider('ropsten', 'YOUR_INFURA_PROJECT_ID');
+        const provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     };
