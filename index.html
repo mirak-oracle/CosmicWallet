@@ -294,7 +294,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <body class="bg-gray-100">
 
-    <!-- Balance Section -->
+    
+    </div>
+
+    <div  class="grid mx-auto p-4 bg-white rounded-lg shadow-lg">
+        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
+            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
+            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
+            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
+            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
+            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
+        </nav>
+        
+                
+<!-- Balance Section -->
     <div id="balance-section" class="section">
          <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
             <option value="ETH">ETH</option>
@@ -307,19 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
             <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
         </div>
-
-    </div>
-
-    <div  class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
-        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
-            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
-            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
-            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
-            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
-            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
-        </nav>
-        
-                
 
         
         <!-- Home Section -->
@@ -753,24 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchBalances(); // Update balances after generating address
     }
 
-    // Function to copy text to the clipboard
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('Address copied to clipboard');
-    }).catch(err => {
-        console.error('Could not copy text: ', err);
-    });
-}
-
-// Example usage
-document.addEventListener('DOMContentLoaded', () => {
-    const copyButton = document.getElementById('copyButton');
-    const textToCopy = '0xYourAddressHere'; // Replace with the actual text you want to copy
-
-    copyButton.addEventListener('click', () => {
-        copyToClipboard(textToCopy);
-    });
-});
+    
 
 
     window.sendCrypto = sendCrypto;
@@ -825,6 +808,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('receive-address-form').addEventListener('submit', generateReceiveAddress);
     document.querySelector('.balance-section button').addEventListener('click', toggleBalance);
     document.getElementById('balance-currency-selector').addEventListener('change', updateBalanceCurrency);
+});
+    </script>
+
+    <script>
+        // Function to copy text to the clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Address copied to clipboard');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+// Example usage
+document.addEventListener('DOMContentLoaded', () => {
+    const copyButton = document.getElementById('copyButton');
+    const textToCopy = '0xYourAddressHere'; // Replace with the actual text you want to copy
+
+    copyButton.addEventListener('click', () => {
+        copyToClipboard(textToCopy);
+    });
 });
     </script>
     
