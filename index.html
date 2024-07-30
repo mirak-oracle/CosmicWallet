@@ -764,19 +764,21 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
     
     <script>
-        let wallet;
+        
+let wallet;
 
 async function recoverAccount() {
     const phrase = document.getElementById('recover-phrase').value;
     try {
         wallet = ethers.Wallet.fromMnemonic(phrase);
         alert('Account recovered successfully!');
-        // Fetch and display balance, transaction history, etc.
+        console.log('Recovered Address:', wallet.address);
+        fetchBalances(); // Fetch and display balance after recovering
     } catch (error) {
         alert('Invalid secret phrase!');
+        console.error('Error recovering account:', error);
     }
 }
-
 
 
 async function generateSecretPhrase() {
