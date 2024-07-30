@@ -36,7 +36,7 @@
 
 .hidden { display: none; }
         
-        iframe { width: 100%; height: 499px; }
+        iframe { width: 100%; height: 139px; }
     
 
 
@@ -533,10 +533,13 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <style>
-    
+    .iframe-container {
+        width: 100%;
+        height: calc(100vh - 120px); /* Adjust the height as needed */
+    }
     .iframe-container iframe {
         width: 100%;
-        height: 140%;
+        height: 100%;
         border: none;
   }
 </style>
