@@ -732,23 +732,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function generateReceiveAddress(event) {
-        event.preventDefault();
-        if (!wallet) {
-            wallet = ethers.Wallet.createRandom();
-        }
-        const address = wallet.address;
-        document.getElementById('receive-address').innerHTML = `
-            Address: ${address}<br>
-            <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
-            <canvas id="qrcode"></canvas>
-        `;
-        QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
-            if (error) console.error(error);
-            console.log('QR code generated!');
-        });
-
-        fetchBalances(); // Update balances after generating address
+    event.preventDefault();
+    if (!wallet) {
+        alert('Please recover your account first.');
+        return;
     }
+    const address = wallet.address;
+    document.getElementById('receive-address').innerHTML = `
+        Address: ${address}<br>
+        <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+        <canvas id="qrcode"></canvas>
+    `;
+    QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+    });
+
+    fetchBalances(); // Update balances after generating address
+}
 
     
 
