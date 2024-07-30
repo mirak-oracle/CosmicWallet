@@ -294,44 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <body class="bg-gray-100">
 
-    
-
-    </div>
-
-    <div  class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
-        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
-            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
-            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
-            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
-            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
-            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
-        </nav>
-        
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-    const sections = document.querySelectorAll('.section');
-
-    // Ensure balance section is always visible
-    document.getElementById('balance-section').style.display = 'block';
-
-    window.showSection = function(sectionId) {
-        sections.forEach(section => {
-            if (section.id === sectionId) {
-                section.classList.remove('hidden');
-                section.classList.add('block');
-            } else {
-                section.classList.remove('block');
-                section.classList.add('hidden');
-            }
-        });
-    }
-});
-
-
-
-        </script>        
-
-        <!-- Balance Section -->
+    <!-- Balance Section -->
     <div id="balance-section" class="section">
          <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
             <option value="ETH">ETH</option>
@@ -344,6 +307,21 @@ document.addEventListener('DOMContentLoaded', () => {
             <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
             <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
         </div>
+
+    </div>
+
+    <div  class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
+        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
+            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
+            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
+            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
+            <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
+            <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
+        </nav>
+        
+                
+
+        
         <!-- Home Section -->
         <div id="home-section" class="section">
             <h2 class="text-2xl font-bold mb-4"> <p></p>CRYPTO<p/></h2>
