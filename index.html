@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
 
     <div class="container mx-auto p-4 bg-white rounded-lg shadow-lg">
-        <nav class="flex justify-between p-4 bg-blue-600 text-white rounded-t-lg">
+        <nav class="grid grid-cols-2 gap-4 p-4 bg-blue-600 text-white rounded-t-lg">
             <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
             <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
             <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
@@ -319,12 +319,30 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
         </nav>
         <div class="grid grid-cols-2 gap-4 mt-4">
-            <div id="home-section" class="section hidden col-span-2">Home Content</div>
-            <div id="send-section" class="section hidden">Send Content</div>
-            <div id="receive-section" class="section hidden">Receive Content</div>
-            <div id="transaction-history" class="section hidden">Transaction History Content</div>
-            <div id="secret-phrase-section" class="section hidden">Secret Phrase Content</div>
+            <div id="home-section" class="section hidden col-span-2 bg-gray-100 p-4 rounded-lg">Home Content</div>
+            <div id="send-section" class="section hidden bg-gray-100 p-4 rounded-lg">Send Content</div>
+            <div id="receive-section" class="section hidden bg-gray-100 p-4 rounded-lg">Receive Content</div>
+            <div id="transaction-history" class="section hidden bg-gray-100 p-4 rounded-lg">Transaction History Content</div>
+            <div id="secret-phrase-section" class="section hidden bg-gray-100 p-4 rounded-lg">Secret Phrase Content</div>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+    const sections = document.querySelectorAll('.section');
+
+    window.showSection = function(sectionId) {
+        sections.forEach(section => {
+            if (section.id === sectionId) {
+                section.classList.remove('hidden');
+                section.classList.add('block');
+            } else {
+                section.classList.remove('block');
+                section.classList.add('hidden');
+            }
+        });
+    }
+});
+
+        </script>        
 
         
         <!-- Home Section -->
@@ -758,13 +776,25 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchBalances(); // Update balances after generating address
     }
 
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Address copied to clipboard');
-        }).catch(err => {
-            console.error('Could not copy text: ', err);
-        });
-    }
+    // Function to copy text to the clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Address copied to clipboard');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+// Example usage
+document.addEventListener('DOMContentLoaded', () => {
+    const copyButton = document.getElementById('copyButton');
+    const textToCopy = '0xYourAddressHere'; // Replace with the actual text you want to copy
+
+    copyButton.addEventListener('click', () => {
+        copyToClipboard(textToCopy);
+    });
+});
+
 
     window.sendCrypto = sendCrypto;
     window.generateReceiveAddress = generateReceiveAddress;
