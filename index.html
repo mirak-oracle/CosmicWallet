@@ -329,6 +329,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.addEventListener('DOMContentLoaded', function() {
     const sections = document.querySelectorAll('.section');
 
+    // Ensure balance section is always visible
+    document.getElementById('balance-section').style.display = 'block';
+
     window.showSection = function(sectionId) {
         sections.forEach(section => {
             if (section.id === sectionId) {
@@ -341,6 +344,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+function updateBalanceCurrency() {
+    const selector = document.getElementById('balance-currency-selector');
+    const currencyType = selector.value;
+    document.getElementById('balance-currency-type').innerText = currencyType;
+    // Update balance fetching logic based on selected currency
+}
+
+function toggleBalance() {
+    const balanceDiv = document.getElementById('balance-currency');
+    if (balanceDiv.style.display === 'none') {
+        balanceDiv.style.display = 'block';
+    } else {
+        balanceDiv.style.display = 'none';
+    }
+}
+
 
         </script>        
 
