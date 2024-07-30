@@ -318,13 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="#transaction-history" onclick="showSection('transaction-history')" class="nav-link">History</a>
             <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Secret Phrase</a>
         </nav>
-        <div class="grid grid-cols-2 gap-4 mt-4">
-            <div id="home-section" class="section hidden col-span-2 bg-gray-100 p-4 rounded-lg">Home Content</div>
-            <div id="send-section" class="section hidden bg-gray-100 p-4 rounded-lg">Send Content</div>
-            <div id="receive-section" class="section hidden bg-gray-100 p-4 rounded-lg">Receive Content</div>
-            <div id="transaction-history" class="section hidden bg-gray-100 p-4 rounded-lg">Transaction History Content</div>
-            <div id="secret-phrase-section" class="section hidden bg-gray-100 p-4 rounded-lg">Secret Phrase Content</div>
-        </div>
+        
         <script>
             document.addEventListener('DOMContentLoaded', function() {
     const sections = document.querySelectorAll('.section');
@@ -345,21 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function updateBalanceCurrency() {
-    const selector = document.getElementById('balance-currency-selector');
-    const currencyType = selector.value;
-    document.getElementById('balance-currency-type').innerText = currencyType;
-    // Update balance fetching logic based on selected currency
-}
-
-function toggleBalance() {
-    const balanceDiv = document.getElementById('balance-currency');
-    if (balanceDiv.style.display === 'none') {
-        balanceDiv.style.display = 'block';
-    } else {
-        balanceDiv.style.display = 'none';
-    }
-}
 
 
         </script>        
