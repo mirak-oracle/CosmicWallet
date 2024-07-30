@@ -294,19 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <body class="bg-gray-100">
 
-    <!-- Balance Section -->
-    <div id="balance-section" class="section">
-         <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
-            <option value="ETH">ETH</option>
-            <option value="BSC">BSC</option>
-            <option value="BNBTestnet">BNB Testnet</option>
-            <option value="Ropsten">Ropsten</option>
-            <option value="COSMIC">COSMIC</option>
-        </select>
-        <div id="balance-currency" class="mt-4">
-            <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
-            <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
-        </div>
+    
 
     </div>
 
@@ -343,7 +331,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         </script>        
 
-        
+        <!-- Balance Section -->
+    <div id="balance-section" class="section">
+         <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="block w-full border border-gray-300 rounded p-2">
+            <option value="ETH">ETH</option>
+            <option value="BSC">BSC</option>
+            <option value="BNBTestnet">BNB Testnet</option>
+            <option value="Ropsten">Ropsten</option>
+            <option value="COSMIC">COSMIC</option>
+        </select>
+        <div id="balance-currency" class="mt-4">
+            <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
+            <button onclick="toggleBalance()" class="ml-2 text-blue-600">Hide</button>
+        </div>
         <!-- Home Section -->
         <div id="home-section" class="section">
             <h2 class="text-2xl font-bold mb-4"> <p></p>CRYPTO<p/></h2>
