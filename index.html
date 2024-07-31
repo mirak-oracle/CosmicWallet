@@ -713,7 +713,9 @@ const amountInWei = ethers.utils.parseEther(amount);
         return 'Error';
     }
 };
+    </script>
 
+    <script>
 const getRopstenBalance = async () => {
     try {
         const provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
@@ -981,21 +983,50 @@ document.addEventListener('DOMContentLoaded', fetchBalances);
     
 <script>
     function showSection(sectionId) {
-    document.querySelectorAll('.container > div:not(.navbar)').forEach(section => section.classList.add('hidden'));
-    document.getElementById(sectionId).classList.remove('hidden');
-    document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-    document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+    // Hide all sections except the navbar
+    document.querySelectorAll('.container > div:not(.navbar)').forEach(section => {
+        if (section) {
+            section.classList.add('hidden');
+        }
+    });
+
+    // Show the selected section
+    const section = document.getElementById(sectionId);
+    if (section) {
+        section.classList.remove('hidden');
+    } else {
+        console.warn(`Section with ID ${sectionId} not found.`);
+    }
+
+    // Remove 'active' class from all navbar links
+    document.querySelectorAll('.navbar a').forEach(link => {
+        if (link) {
+            link.classList.remove('active');
+        }
+    });
+
+    // Add 'active' class to the selected navbar link
+    const activeLink = document.querySelector(`.navbar a[href="#${sectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+    } else {
+        console.warn(`Navbar link for section ID ${sectionId} not found.`);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Attach event listeners to navbar links
     document.querySelectorAll('.navbar a').forEach(link => {
-        link.addEventListener('click', (event) => {
-            event.preventDefault();
-            const sectionId = link.getAttribute('href').substring(1);
-            showSection(sectionId);
-        });
+        if (link) {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const sectionId = link.getAttribute('href').substring(1);
+                showSection(sectionId);
+            });
+        }
     });
 });
+
 
 </script>
     
