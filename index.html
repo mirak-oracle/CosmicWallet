@@ -646,13 +646,12 @@ const derivationPaths = {
     const amount = document.getElementById('amount').value;
 
     // Check minimum transaction amount
-    if (parseFloat(amount) < 0.00001) {
-        alert('Minimum transaction amount is 0.00001.');
-        return;
-    }
-
-    const amountInWei = ethers.utils.parseEther(amount);
-
+if (ethers.utils.parseEther(amount).lt(ethers.utils.parseEther('0.00001'))) {
+  alert('Minimum transaction amount is 0.00001.');
+  return;
+}
+const amountInWei = ethers.utils.parseEther(amount);
+            
     let provider;
     let signer;
 
