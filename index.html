@@ -585,13 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
 <script>
-    const derivationPaths = {
-            ethereum: "m/44'/60'/0'/0/0",
-            ropsten: "m/44'/1'/0'/0/0",
-            bsc: "m/44'/60'/0'/0/0",
-            bscTestnet: "m/44'/1'/0'/0/0",
-            cosmicCoin: "m/44'/60'/0'/0/0" // Assuming CosmicCoin follows the same derivation as Ethereum/BSC
-        };
+    
 
     async function generateReceiveAddress(event) {
             event.preventDefault();
@@ -790,7 +784,15 @@ document.addEventListener('DOMContentLoaded', () => {
     <script>
         
 let wallet;
-
+        
+const derivationPaths = {
+            ethereum: "m/44'/60'/0'/0/0",
+            ropsten: "m/44'/1'/0'/0/0",
+            bsc: "m/44'/60'/0'/0/0",
+            bscTestnet: "m/44'/1'/0'/0/0",
+            cosmicCoin: "m/44'/60'/0'/0/0" // Assuming CosmicCoin follows the same derivation as Ethereum/BSC
+        };
+        
 async function recoverAccount() {
     const phrase = document.getElementById('recover-phrase').value;
     try {
