@@ -602,37 +602,23 @@ const derivationPaths = {
     
 
     async function generateReceiveAddress(event) {
-    event.preventDefault();
-    if (!wallet) {
-        alert('Please recover your account first.');
-        return;
+        event.preventDefault();
+        if (!wallet) {
+            wallet = ethers.Wallet.createRandom();
+        }
+        const address = wallet.address;
+        document.getElementById('receive-address').innerHTML = `
+            Address: ${address}<br>
+            <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+            <canvas id="qrcode"></canvas>
+        `;
+        QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+            if (error) console.error(error);
+            console.log('QR code generated!');
+        });
+
+        fetchBalances(); // Update balances after generating address
     }
-
-    const network = document.getElementById('network').value;
-    const path = derivationPaths[network];
-    
-    if (!path) {
-        alert('Invalid network selected!');
-        return;
-    }
-
-    const masterNode = ethers.utils.HDNode.fromMnemonic(wallet.mnemonic.phrase);
-    const derivedNode = masterNode.derivePath(path);
-    const networkWallet = new ethers.Wallet(derivedNode.privateKey);
-
-    const address = networkWallet.address;
-    document.getElementById('receive-address').innerHTML = `
-        Address: ${address}<br>
-        <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
-        <canvas id="qrcode"></canvas>
-    `;
-    QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
-        if (error) console.error(error);
-        console.log('QR code generated!');
-    });
-
-    fetchBalances(); // Update balances after generating address
-}
 
 
 
@@ -713,9 +699,7 @@ const amountInWei = ethers.utils.parseEther(amount);
         return 'Error';
     }
 };
-    </script>
-
-    <script>
+        
 const getRopstenBalance = async () => {
     try {
         const provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
@@ -763,8 +747,9 @@ const getCosmicBalance = async () => {
     }
 };
 
-    
+    </script>
 
+    <script>
     const fetchFiatValue = async (currency, amount) => {
         const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${currency}&vs_currencies=usd,ngn`);
         const data = await response.json();
@@ -983,50 +968,21 @@ document.addEventListener('DOMContentLoaded', fetchBalances);
     
 <script>
     function showSection(sectionId) {
-    // Hide all sections except the navbar
-    document.querySelectorAll('.container > div:not(.navbar)').forEach(section => {
-        if (section) {
-            section.classList.add('hidden');
-        }
-    });
-
-    // Show the selected section
-    const section = document.getElementById(sectionId);
-    if (section) {
-        section.classList.remove('hidden');
-    } else {
-        console.warn(`Section with ID ${sectionId} not found.`);
-    }
-
-    // Remove 'active' class from all navbar links
-    document.querySelectorAll('.navbar a').forEach(link => {
-        if (link) {
-            link.classList.remove('active');
-        }
-    });
-
-    // Add 'active' class to the selected navbar link
-    const activeLink = document.querySelector(`.navbar a[href="#${sectionId}"]`);
-    if (activeLink) {
-        activeLink.classList.add('active');
-    } else {
-        console.warn(`Navbar link for section ID ${sectionId} not found.`);
-    }
+    document.querySelectorAll('.container > div:not(.navbar)').forEach(section => section.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+    document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
+    document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Attach event listeners to navbar links
     document.querySelectorAll('.navbar a').forEach(link => {
-        if (link) {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const sectionId = link.getAttribute('href').substring(1);
-                showSection(sectionId);
-            });
-        }
+        link.addEventListener('click', (event) => {
+            event.preventDefault();
+            const sectionId = link.getAttribute('href').substring(1);
+            showSection(sectionId);
+        });
     });
 });
-
 
 </script>
     
