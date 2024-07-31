@@ -588,20 +588,20 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
     async function generateReceiveAddress(event) {
-            event.preventDefault();
-            if (!wallet) {
-                alert('Please recover your account first.');
-                return;
-            }
-            
-            const network = document.getElementById('network').value;
-            const path = derivationPaths[network];
-            
-            const masterNode = ethers.utils.HDNode.fromMnemonic(wallet.mnemonic.phrase);
-            const derivedNode = masterNode.derivePath(path);
-            const networkWallet = new ethers.Wallet(derivedNode.privateKey);
+    event.preventDefault();
+    if (!wallet) {
+        alert('Please recover your account first.');
+        return;
+    }
+    
+    const network = document.getElementById('network').value;
+    const path = derivationPaths[network];
+    
+    const masterNode = ethers.utils.HDNode.fromMnemonic(wallet.mnemonic.phrase);
+    const derivedNode = masterNode.derivePath(path);
+    const networkWallet = new ethers.Wallet(derivedNode.privateKey);
 
-    const address = wallet.address;
+    const address = networkWallet.address;
     document.getElementById('receive-address').innerHTML = `
         Address: ${address}<br>
         <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
@@ -614,6 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchBalances(); // Update balances after generating address
 }
+
 
     
 </script>
