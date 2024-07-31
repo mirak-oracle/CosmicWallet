@@ -585,13 +585,28 @@ document.addEventListener('DOMContentLoaded', () => {
 </style>
 
 <script>
-    
+    const derivationPaths = {
+            ethereum: "m/44'/60'/0'/0/0",
+            ropsten: "m/44'/1'/0'/0/0",
+            bsc: "m/44'/60'/0'/0/0",
+            bscTestnet: "m/44'/1'/0'/0/0",
+            cosmicCoin: "m/44'/60'/0'/0/0" // Assuming CosmicCoin follows the same derivation as Ethereum/BSC
+        };
+
     async function generateReceiveAddress(event) {
-    event.preventDefault();
-    if (!wallet) {
-        alert('Please recover your account first.');
-        return;
-    }
+            event.preventDefault();
+            if (!wallet) {
+                alert('Please recover your account first.');
+                return;
+            }
+            
+            const network = document.getElementById('network').value;
+            const path = derivationPaths[network];
+            
+            const masterNode = ethers.utils.HDNode.fromMnemonic(wallet.mnemonic.phrase);
+            const derivedNode = masterNode.derivePath(path);
+            const networkWallet = new ethers.Wallet(derivedNode.privateKey);
+
     const address = wallet.address;
     document.getElementById('receive-address').innerHTML = `
         Address: ${address}<br>
