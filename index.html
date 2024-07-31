@@ -631,11 +631,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (chain === 'ethereum') {
             provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
         } else if (chain === 'bsc') {
-            provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
         } else if (chain === 'bnbTestnet') {
-            provider = new ethers.providers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
+            provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
         } else if (chain === 'cosmicCoin') {
-            provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
         } else if (chain === 'ropsten') {
             provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
         }
@@ -675,19 +675,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getBscBalance = async () => {
-        const provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     };
 
     const getBnbTestnetBalance = async () => {
-        const provider = new ethers.providers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     };
 
     const getCosmicBalance = async () => {
-        const provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
         const contract = new ethers.Contract('0x95e27971C1c72717612617D49045AAf947Be518C', [
             'function balanceOf(address) view returns (uint256)'
         ], provider);
@@ -785,13 +785,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
 let wallet;
         
-const derivationPaths = {
-            ethereum: "m/44'/60'/0'/0/0",
-            ropsten: "m/44'/1'/0'/0/0",
-            bsc: "m/44'/60'/0'/0/0",
-            bscTestnet: "m/44'/1'/0'/0/0",
-            cosmicCoin: "m/44'/60'/0'/0/0" // Assuming CosmicCoin follows the same derivation as Ethereum/BSC
-        };
         
 async function recoverAccount() {
     const phrase = document.getElementById('recover-phrase').value;
