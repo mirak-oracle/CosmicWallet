@@ -944,12 +944,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const ropstenBalance = await getRopstenBalance();
         const cosmicBalance = await getCosmicBalance();
 
+        // Add fetching for USD and NGN if needed
+        const usdBalance = await getCurrencyBalance('USD');
+        const ngnBalance = await getCurrencyBalance('NGN');
+
         const balanceMap = {
             ETH: ethBalance,
             BSC: bscBalance,
             BNBTestnet: bnbTestnetBalance,
             Ropsten: ropstenBalance,
             COSMIC: cosmicBalance
+            USD: usdBalance,
+            NGN: ngnBalance
+     
         };
 
         // Set default balance display
