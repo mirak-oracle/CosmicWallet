@@ -301,8 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="BSC">BSC</option>
         <option value="BNBTestnet">BNB Testnet</option>
           <option value="COSMIC">COSMIC</option>
-         <option value="USD">USD</option>
-        <option value="NGN">NGN</option>
+         
     </select>
     <div id="balance-currency" class="mt-4">
         <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
@@ -944,20 +943,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const ropstenBalance = await getRopstenBalance();
         const cosmicBalance = await getCosmicBalance();
 
-        // Add fetching for USD and NGN if needed
-        const usdBalance = await getCurrencyBalance('USD');
-        const ngnBalance = await getCurrencyBalance('NGN');
-
+        
         const balanceMap = {
             ETH: ethBalance,
             BSC: bscBalance,
             BNBTestnet: bnbTestnetBalance,
             Ropsten: ropstenBalance,
             COSMIC: cosmicBalance
-            USD: usdBalance,
-            NGN: ngnBalance
-     
-        };
+            
+       };
 
         // Set default balance display
         document.getElementById('balance-value').textContent = balanceMap.ETH;
