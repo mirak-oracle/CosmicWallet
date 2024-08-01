@@ -300,8 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <option value="ETH">ETH</option>
         <option value="BSC">BSC</option>
         <option value="BNBTestnet">BNB Testnet</option>
-        <option value="Ropsten">Ropsten</option>
-        <option value="COSMIC">COSMIC</option>
+          <option value="COSMIC">COSMIC</option>
     </select>
     <div id="balance-currency" class="mt-4">
         <span id="balance-amount" class="text-xl">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
@@ -338,8 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="ethereum">Ethereum</option>
             <option value="bsc">Binance Smart Chain</option>
             <option value="bnbTestnet">BNB Testnet</option>
-            <option value="ropsten">Ethereum Ropsten</option>
-            <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+         <option value="cosmicCoin">CosmicCoin (BEP20)</option>
         </select>
         <input type="text" id="recipient-address" placeholder="Recipient Address" required class="block w-full border border-gray-300 rounded p-2">
         <input type="number" id="amount" placeholder="Amount" required class="block w-full border border-gray-300 rounded p-2">
@@ -356,21 +354,20 @@ document.addEventListener('DOMContentLoaded', () => {
             <option value="ethereum">Ethereum</option>
             <option value="bsc">Binance Smart Chain</option>
             <option value="bnbTestnet">BNB Testnet</option>
-            <option value="ropsten">Ethereum Ropsten</option>
-            <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+              <option value="cosmicCoin">CosmicCoin (BEP20)</option>
         </select>
         <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Generate Address</button>
     </form>
     <div id="receive-address" class="mt-4"></div>
 </div>
 
-
-
-        <!-- Transaction History Section -->
-        <div id="transaction-history" class="section hidden">
-            <h2 class="text-2xl font-bold mb-4">Transaction History</h2>
-            <div id="transaction-list" class="space-y-2"></div>
-        </div>
+     <!-- Transaction History Section -->
+    <div id="transaction-history" class="section hidden">
+        <h2 class="text-2xl font-bold mb-4">Transaction History</h2>
+        <div id="transaction-list" class="space-y-2"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  
 
         <!-- Secret Phrase Section -->
         <div id="secret-phrase-section" class="section hidden">
@@ -985,7 +982,111 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 </script>
-    
+
+
+    <script>
+        let wallet;
+
+// Function to save transaction history
+function saveTransactionHistory(transaction) {
+    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+    history.push(transaction);
+    localStorage.setItem('transactionHistory', JSON.stringify(history));
+}
+
+// Function to retrieve transaction history
+function getTransactionHistory() {
+    return JSON.parse(localStorage.getItem('transactionHistory')) || [];
+}
+
+// Function to send a notification
+function sendNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body });
+    } else {
+        alert(`${title}\n\n${body}`);
+    }
+}
+
+// Function to monitor transactions to the user's address
+async function monitorTransactions(address) {
+    if (!wallet) {
+        console.error('Wallet is not initialized');
+        return;
+    }
+
+    const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+    provider.on('pending', async (txHash) => {
+        try {
+            const transaction = await provider.getTransaction(txHash);
+            if (transaction && transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
+                sendNotification('Transaction Received', `You have received ${ethers.utils.formatEther(transaction.value)} ETH`);
+                saveTransactionHistory(transaction); // Save transaction to history
+                displayTransactionHistory(); // Update displayed history
+            }
+        } catch (error) {
+            console.error('Error fetching transaction details:', error);
+        }
+    });
+}
+
+// Function to display transaction history
+function displayTransactionHistory() {
+    const history = getTransactionHistory();
+    const historyContainer = document.getElementById('transaction-list');
+    historyContainer.innerHTML = '';
+
+    if (history.length === 0) {
+        historyContainer.textContent = 'No transactions found.';
+        return;
+    }
+
+    history.forEach(transaction => {
+        const transactionElement = document.createElement('div');
+        transactionElement.classList.add('transaction-item');
+        transactionElement.innerHTML = `
+            <p>Hash: ${transaction.hash}</p>
+            <p>From: ${transaction.from}</p>
+            <p>To: ${transaction.to}</p>
+            <p>Value: ${ethers.utils.formatEther(transaction.value)} ETH</p>
+        `;
+        historyContainer.appendChild(transactionElement);
+    });
+}
+
+// Initialize wallet and start monitoring transactions
+window.onload = async () => {
+    try {
+        // Assuming wallet is already initialized
+        if (!wallet) {
+            console.error('Wallet is not initialized');
+            return;
+        }
+
+        // Display wallet address
+        console.log('Wallet Address:', wallet.address);
+
+        // Monitor transactions
+        monitorTransactions(wallet.address);
+        displayTransactionHistory();
+        document.getElementById('transaction-history').classList.remove('hidden'); // Show the transaction history section
+
+        // Request notification permissions
+        if ("Notification" in window) {
+            Notification.requestPermission().then(function (result) {
+                if (result === 'granted') {
+                    console.log('Notification permission granted.');
+                } else if (result === 'denied') {
+                    alert('Please enable notifications to receive alerts about transactions.');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing wallet:', error);
+    }
+};
+
+    </script>
     
     <script>
                     
@@ -1100,13 +1201,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         
 
-
-
-
-    
-
-            
-        
      
 // Validate Ethereum address
 function isValidAddress(address) {
@@ -1128,40 +1222,7 @@ function confirmTransaction(recipient, amount) {
 
         
 
-// Function to monitor transactions to the user's address
-async function monitorTransactions(address) {
-    if (!web3) {
-        console.error('Web3 is not initialized');
-        return;
-    }
 
-    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
-        if (error) {
-            console.error('Error subscribing to pending transactions:', error);
-        }
-    })
-    .on('data', function (transactionHash) {
-        web3.eth.getTransaction(transactionHash)
-            .then(function (transaction) {
-                if (transaction) {
-                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                        // Update balance after transaction
-                        getAndDisplayBalance(address);
-                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                        // Update balance after transaction
-                        getAndDisplayBalance(address);
-                    }
-                }
-            })
-            .catch(function (error) {
-                console.error('Error fetching transaction details:', error);
-            });
-    });
-
-    return subscription;
-}
         // Refresh balance when iframes load
 function refreshBalance() {
     const userAddress = localStorage.getItem('userAddress');
@@ -1202,36 +1263,7 @@ function sendNotification(title, body) {
     }
 }
 
-// Function to monitor transactions to the user's address
-async function monitorTransactions(address) {
-    if (!web3) {
-        console.error('Web3 is not initialized');
-        return;
-    }
 
-    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
-        if (error) {
-            console.error('Error subscribing to pending transactions:', error);
-        }
-    })
-    .on('data', function (transactionHash) {
-        web3.eth.getTransaction(transactionHash)
-            .then(function (transaction) {
-                if (transaction) {
-                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                    }
-                }
-            })
-            .catch(function (error) {
-                console.error('Error fetching transaction details:', error);
-            });
-    });
-
-    return subscription;
-}
    
 
 // Function to sanitize input
@@ -1267,36 +1299,7 @@ async function monitorAlerts() {
     }, 60000); // Check every 60 seconds
 }
 
-// Function to always send an alert when a transaction occurs (sending or receiving)
-async function notifyTransaction(address) {
-    if (!web3) {
-        console.error('Web3 is not initialized');
-        return;
-    }
 
-    const subscription = web3.eth.subscribe('pendingTransactions', function (error, result) {
-        if (error) {
-            console.error('Error subscribing to pending transactions:', error);
-        }
-    })
-    .on('data', function (transactionHash) {
-        web3.eth.getTransaction(transactionHash)
-            .then(function (transaction) {
-                if (transaction) {
-                    if (transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Received', `You have received ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                    } else if (transaction.from && transaction.from.toLowerCase() === address.toLowerCase()) {
-                        sendNotification('Transaction Sent', `You have sent ${web3.utils.fromWei(transaction.value, 'ether')} ETH`);
-                    }
-                }
-            })
-            .catch(function (error) {
-                console.error('Error fetching transaction details:', error);
-            });
-    });
-
-    return subscription;
-}
 
 // Initialize monitoring when the page loads
 window.onload = () => {
@@ -1342,17 +1345,7 @@ function getSecretPhrase() {
     return localStorage.getItem('secretPhrase');
 }
 
-// Function to save transaction history
-function saveTransactionHistory(transaction) {
-    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
-    history.push(transaction);
-    localStorage.setItem('transactionHistory', JSON.stringify(history));
-}
 
-// Function to retrieve transaction history
-function getTransactionHistory() {
-    return JSON.parse(localStorage.getItem('transactionHistory')) || [];
-}
 
         async function recoverAccount() {
             const phrase = document.getElementById('recover-phrase').value;
