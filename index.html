@@ -630,9 +630,7 @@ async function sendCrypto(event) {
     const amount = document.getElementById('amount').value;
 
     // Check minimum transaction amount
-    const minAmount = ethers.utils.parseEther('0.00001');
     let amountInWei;
-
     try {
         amountInWei = ethers.utils.parseEther(amount);
     } catch (error) {
@@ -640,6 +638,7 @@ async function sendCrypto(event) {
         return;
     }
 
+    const minAmount = ethers.utils.parseEther('0.00001');
     if (amountInWei.lt(minAmount)) {
         alert('Minimum transaction amount is 0.00001.');
         return;
@@ -649,14 +648,18 @@ async function sendCrypto(event) {
     let signer;
 
     try {
-        if (chain === 'ethereum') {
-            provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
-        } else if (chain === 'bsc') {
-            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
-        } else if (chain === 'bnbTestnet') {
-            provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
-        } else if (chain === 'cosmicCoin') {
-            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+        switch (chain) {
+            case 'ethereum':
+                provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+                break;
+            case 'bsc':
+            case 'bnbTestnet':
+            case 'cosmicCoin':
+                provider = new ethers.providers.JsonRpcProvider(chain === 'bnbTestnet' ? 'https://bsc-testnet.drpc.org' : 'https://bsc.drpc.org');
+                break;
+            default:
+                alert('Unsupported chain selected.');
+                return;
         }
 
         signer = wallet.connect(provider);
@@ -668,7 +671,7 @@ async function sendCrypto(event) {
         const balance = await provider.getBalance(wallet.address);
 
         if (balance.lt(amountInWei.add(totalGasCost))) {
-            alert(`Insufficient funds to send ${amount} ETH and cover gas fees. Total required: ${ethers.utils.formatEther(amountInWei.add(totalGasCost))} ETH`);
+            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${ethers.utils.formatEther(amountInWei.add(totalGasCost))} ${chain.toUpperCase()}`);
             return;
         }
 
@@ -683,15 +686,17 @@ async function sendCrypto(event) {
     } catch (error) {
         console.error('Transaction failed:', error);
 
+        let errorMessage = 'Transaction failed. Please check the console for details.';
         if (error.code === 'INSUFFICIENT_FUNDS') {
-            alert('Transaction failed: Insufficient funds to cover the transaction amount and gas fees.');
+            errorMessage = 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
         } else if (error.code === 'NETWORK_ERROR') {
-            alert('Transaction failed: Network error. Please try again later.');
-        } else {
-            alert(`Transaction failed: ${error.message}. Please check the console for details.`);
+            errorMessage = 'Transaction failed: Network error. Please try again later.';
         }
+
+        alert(errorMessage);
     }
 }
+
 
 
         </script>
