@@ -622,63 +622,61 @@ const derivationPaths = {
     
 </script>
         <script>
-        async function sendCrypto(event) {
+        
+async function sendCrypto(event) {
     event.preventDefault();
     const chain = document.getElementById('send-crypto-chain').value;
     const recipient = document.getElementById('recipient-address').value;
     const amount = document.getElementById('amount').value;
 
-    // Ensure the amount is a valid number
-    if (isNaN(amount) || parseFloat(amount) <= 0) {
-        alert('Please enter a valid amount.');
+    // Check minimum transaction amount
+    const minAmount = ethers.utils.parseEther('0.00001');
+    let amountInWei;
+
+    try {
+        amountInWei = ethers.utils.parseEther(amount);
+    } catch (error) {
+        alert('Invalid amount. Please enter a valid number.');
         return;
     }
 
-    // Check minimum transaction amount
-    if (ethers.utils.parseEther(amount).lt(ethers.utils.parseEther('0.00001'))) {
+    if (amountInWei.lt(minAmount)) {
         alert('Minimum transaction amount is 0.00001.');
         return;
     }
 
-    const amountInWei = ethers.utils.parseEther(amount);
-            
     let provider;
     let signer;
 
-    if (chain === 'ethereum') {
-        provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
-    } else if (chain === 'bsc') {
-        provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
-    } else if (chain === 'bnbTestnet') {
-        provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
-    } else if (chain === 'cosmicCoin') {
-        provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
-    } else {
-        alert('Unsupported chain selected.');
-        return;
-    }
-
     try {
-        // Check for insufficient funds, including gas fees
-        const balance = await provider.getBalance(wallet.address);
-        const gasPrice = await provider.getGasPrice();
-        const gasEstimate = await provider.estimateGas({
-            to: recipient,
-            value: amountInWei
-        });
-        const totalCost = amountInWei.add(gasPrice.mul(gasEstimate));
-
-        if (balance.lt(totalCost)) {
-            alert('Insufficient funds to cover the transaction and gas fees.');
-            return;
+        if (chain === 'ethereum') {
+            provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        } else if (chain === 'bsc') {
+            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+        } else if (chain === 'bnbTestnet') {
+            provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
+        } else if (chain === 'cosmicCoin') {
+            provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
         }
 
         signer = wallet.connect(provider);
+
+        // Check for sufficient funds including gas fees
+        const gasPrice = await provider.getGasPrice();
+        const gasLimit = ethers.utils.hexlify(21000); // Basic gas limit for a simple transfer
+        const totalGasCost = gasPrice.mul(gasLimit);
+        const balance = await provider.getBalance(wallet.address);
+
+        if (balance.lt(amountInWei.add(totalGasCost))) {
+            alert(`Insufficient funds to send ${amount} ETH and cover gas fees. Total required: ${ethers.utils.formatEther(amountInWei.add(totalGasCost))} ETH`);
+            return;
+        }
+
         const tx = await signer.sendTransaction({
             to: recipient,
             value: amountInWei,
-            gasLimit: gasEstimate,
-            gasPrice: gasPrice
+            gasPrice: gasPrice,
+            gasLimit: gasLimit
         });
 
         alert(`Transaction sent! TX Hash: ${tx.hash}`);
@@ -686,11 +684,11 @@ const derivationPaths = {
         console.error('Transaction failed:', error);
 
         if (error.code === 'INSUFFICIENT_FUNDS') {
-            alert('Transaction failed: Insufficient funds.');
+            alert('Transaction failed: Insufficient funds to cover the transaction amount and gas fees.');
         } else if (error.code === 'NETWORK_ERROR') {
             alert('Transaction failed: Network error. Please try again later.');
         } else {
-            alert('Transaction failed. Please check the console for details.');
+            alert(`Transaction failed: ${error.message}. Please check the console for details.`);
         }
     }
 }
