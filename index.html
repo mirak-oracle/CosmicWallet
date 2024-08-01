@@ -623,6 +623,7 @@ const derivationPaths = {
 </script>
         <script>
         
+
 async function sendCrypto(event) {
     event.preventDefault();
     const chain = document.getElementById('send-crypto-chain').value;
@@ -653,9 +654,13 @@ async function sendCrypto(event) {
                 provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
                 break;
             case 'bsc':
+                provider = new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+                break;
             case 'bnbTestnet':
+                provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
+                break;
             case 'cosmicCoin':
-                provider = new ethers.providers.JsonRpcProvider(chain === 'bnbTestnet' ? 'https://bsc-testnet.drpc.org' : 'https://bsc.drpc.org');
+                provider = new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com'); // Update if different
                 break;
             default:
                 alert('Unsupported chain selected.');
@@ -691,6 +696,8 @@ async function sendCrypto(event) {
             errorMessage = 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
         } else if (error.code === 'NETWORK_ERROR') {
             errorMessage = 'Transaction failed: Network error. Please try again later.';
+        } else if (error.code === 'SERVER_ERROR') {
+            errorMessage = 'Transaction failed: Server error. Please check the server status or try a different provider.';
         }
 
         alert(errorMessage);
