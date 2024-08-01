@@ -628,12 +628,19 @@ const derivationPaths = {
     const recipient = document.getElementById('recipient-address').value;
     const amount = document.getElementById('amount').value;
 
+    // Ensure the amount is a valid number
+    if (isNaN(amount) || parseFloat(amount) <= 0) {
+        alert('Please enter a valid amount.');
+        return;
+    }
+
     // Check minimum transaction amount
-if (ethers.utils.parseEther(amount).lt(ethers.utils.parseEther('0.00001'))) {
-  alert('Minimum transaction amount is 0.00001.');
-  return;
-}
-const amountInWei = ethers.utils.parseEther(amount);
+    if (ethers.utils.parseEther(amount).lt(ethers.utils.parseEther('0.00001'))) {
+        alert('Minimum transaction amount is 0.00001.');
+        return;
+    }
+
+    const amountInWei = ethers.utils.parseEther(amount);
             
     let provider;
     let signer;
@@ -646,23 +653,32 @@ const amountInWei = ethers.utils.parseEther(amount);
         provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
     } else if (chain === 'cosmicCoin') {
         provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
-    } else if (chain === 'ropsten') {
-        provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
+    } else {
+        alert('Unsupported chain selected.');
+        return;
     }
 
-    signer = wallet.connect(provider);
-
     try {
-        // Check for insufficient funds
+        // Check for insufficient funds, including gas fees
         const balance = await provider.getBalance(wallet.address);
-        if (balance.lt(amountInWei)) {
-            alert('Insufficient funds.');
+        const gasPrice = await provider.getGasPrice();
+        const gasEstimate = await provider.estimateGas({
+            to: recipient,
+            value: amountInWei
+        });
+        const totalCost = amountInWei.add(gasPrice.mul(gasEstimate));
+
+        if (balance.lt(totalCost)) {
+            alert('Insufficient funds to cover the transaction and gas fees.');
             return;
         }
 
+        signer = wallet.connect(provider);
         const tx = await signer.sendTransaction({
             to: recipient,
-            value: amountInWei
+            value: amountInWei,
+            gasLimit: gasEstimate,
+            gasPrice: gasPrice
         });
 
         alert(`Transaction sent! TX Hash: ${tx.hash}`);
@@ -679,6 +695,7 @@ const amountInWei = ethers.utils.parseEther(amount);
     }
 }
 
+
         </script>
 
 
@@ -692,7 +709,7 @@ const amountInWei = ethers.utils.parseEther(amount);
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     } catch (error) {
-        console.error('Error fetching ETH balance:', error);
+        console.error(' fetching ETH balance:', error);
         return 'Error';
     }
 };
@@ -703,7 +720,7 @@ const getRopstenBalance = async () => {
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     } catch (error) {
-        console.error('Error fetching Ropsten balance:', error);
+        console.error(' fetching Ropsten balance:', error);
         return 'Error';
     }
 };
@@ -714,7 +731,7 @@ const getBscBalance = async () => {
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     } catch (error) {
-        console.error('Error fetching BSC balance:', error);
+        console.error(' fetching BSC balance:', error);
         return 'Error';
     }
 };
@@ -725,7 +742,7 @@ const getBnbTestnetBalance = async () => {
         const balance = await provider.getBalance(wallet.address);
         return ethers.utils.formatEther(balance);
     } catch (error) {
-        console.error('Error fetching BNB Testnet balance:', error);
+        console.error(' fetching BNB Testnet balance:', error);
         return 'Error';
     }
 };
@@ -739,7 +756,7 @@ const getCosmicBalance = async () => {
         const balance = await contract.balanceOf(wallet.address);
         return ethers.utils.formatEther(balance);
     } catch (error) {
-        console.error('Error fetching Cosmic balance:', error);
+        console.error(' fetching Cosmic balance:', error);
         return 'Error';
     }
 };
@@ -985,7 +1002,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     <script>
-        let wallet;
+       let wallet; // Make sure this is defined globally
+let provider;
 
 // Function to save transaction history
 function saveTransactionHistory(transaction) {
@@ -1015,7 +1033,7 @@ async function monitorTransactions(address) {
         return;
     }
 
-    const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+    provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org'); // Define provider globally for reuse
     provider.on('pending', async (txHash) => {
         try {
             const transaction = await provider.getTransaction(txHash);
@@ -1057,7 +1075,8 @@ function displayTransactionHistory() {
 // Initialize wallet and start monitoring transactions
 window.onload = async () => {
     try {
-        // Assuming wallet is already initialized
+        // Assuming wallet is already initialized, for example:
+        wallet = ethers.Wallet.createRandom(); // Or recover from mnemonic/seed phrase
         if (!wallet) {
             console.error('Wallet is not initialized');
             return;
@@ -1067,7 +1086,7 @@ window.onload = async () => {
         console.log('Wallet Address:', wallet.address);
 
         // Monitor transactions
-        monitorTransactions(wallet.address);
+        await monitorTransactions(wallet.address);
         displayTransactionHistory();
         document.getElementById('transaction-history').classList.remove('hidden'); // Show the transaction history section
 
@@ -1085,7 +1104,7 @@ window.onload = async () => {
         console.error('Error initializing wallet:', error);
     }
 };
-
+ 
     </script>
     
     <script>
@@ -1318,15 +1337,7 @@ function checkForCustomAlerts() {
     // Return true if there's an alert, otherwise return false
     return false;
 }
-     // Function to fetch and display current gas prices
-async function getGasPrice() {
-    try {
-        const gasPrice = await web3.eth.getGasPrice();
-        document.getElementById('gas-price').textContent = `Current Gas Price: ${web3.utils.fromWei(gasPrice, 'gwei')} Gwei`;
-    } catch (error) {
-        console.error('Failed to fetch gas price', error);
-    }
-}
+     
 
 // Call to update balance and gas price on page load
 window.onload = async function() {
