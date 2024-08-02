@@ -631,20 +631,19 @@ async function sendCrypto(event) {
     const amount = document.getElementById('amount').value;
 
     // Check and parse amount
-    let amountInWei;
-    try {
-        amountInWei = ethers.utils.parseUnits(amount, 18);
-    } catch (error) {
-        alert('Invalid amount. Please enter a valid number.');
-        return;
-    }
+let amountInWei;
+try {
+  amountInWei = ethers.utils.parseEther(amount);
+} catch (error) {
+  alert('Invalid amount. Please enter a valid number.');
+  return;
+}
 
-    const minAmount = ethers.utils.parseUnits('0.00001', 18);
-    if (amountInWei.lt(minAmount)) {
-        alert('Minimum transaction amount is 0.00001.');
-        return;
-    }
-
+const minAmount = ethers.utils.parseEther('0.00001');
+if (amountInWei.lt(minAmount)) {
+  alert('Minimum transaction amount is 0.00001.');
+  return;
+}
     let provider;
     let signer;
 
@@ -684,7 +683,7 @@ async function sendCrypto(event) {
         }
 
         const gasPrice = ethers.utils.parseUnits(gasData.result.SafeGasPrice, 'gwei'); // Use the safe gas price
-        const gasLimit = ethers.utils.hexlify(50000); // Increased gas limit for more complex transactions
+        const gasLimit = ethers.utils.hexlify(10000); // Increased gas limit for more complex transactions
         const totalGasCost = gasPrice.mul(gasLimit);
         const balance = await provider.getBalance(wallet.address);
 
