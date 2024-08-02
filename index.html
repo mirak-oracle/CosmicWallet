@@ -642,37 +642,61 @@ async function sendCrypto(event) {
     switch (chain) {
         case 'ethereum':
             provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
-            tx = {
-                to: recipient,
-                value: ethers.utils.parseEther(amount)
-            };
             break;
         case 'bsc':
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/');
-            tx = {
-                to: recipient,
-                value: ethers.utils.parseUnits(amount, 'ether')
-            };
             break;
         case 'bnbTestnet':
             provider = new ethers.providers.JsonRpcProvider('https://data-seed-prebsc-1-s1.binance.org:8545/');
-            tx = {
-                to: recipient,
-                value: ethers.utils.parseUnits(amount, 'ether')
-            };
             break;
         case 'cosmicCoin':
             provider = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org/'); // Adjust if different
-            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, wallet.connect(provider));
-            tx = await contract.populateTransaction.transfer(recipient, ethers.utils.parseUnits(amount, 'ether'));
             break;
         default:
             alert('Unsupported chain selected.');
             return;
     }
 
+    const signer = wallet.connect(provider);
+
+    // Fetch gas price
+    let gasPrice;
     try {
-        const signer = wallet.connect(provider);
+        const response = await fetch(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`);
+        const gasData = await response.json();
+        gasPrice = ethers.utils.parseUnits(gasData.result.SafeGasPrice, 'gwei');
+    } catch (error) {
+        console.error('Failed to fetch gas price:', error);
+        alert('Failed to fetch gas price. Please try again.');
+        return;
+    }
+
+    const gasLimit = ethers.utils.hexlify(50000); // Adjust gas limit if necessary
+
+    try {
+        if (chain === 'cosmicCoin') {
+            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
+            tx = await contract.populateTransaction.transfer(recipient, ethers.utils.parseUnits(amount, 'ether'));
+            tx.gasPrice = gasPrice;
+            tx.gasLimit = gasLimit;
+        } else {
+            tx = {
+                to: recipient,
+                value: ethers.utils.parseUnits(amount, 'ether'),
+                gasPrice: gasPrice,
+                gasLimit: gasLimit
+            };
+        }
+
+        // Check for sufficient funds including gas fees
+        const totalGasCost = gasPrice.mul(gasLimit);
+        const balance = await signer.getBalance();
+
+        if (balance.lt(ethers.utils.parseUnits(amount, 'ether').add(totalGasCost))) {
+            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${ethers.utils.formatEther(totalGasCost.add(ethers.utils.parseUnits(amount, 'ether')))} ${chain.toUpperCase()}`);
+            return;
+        }
+
         const transaction = await signer.sendTransaction(tx);
         alert(`Transaction sent! Hash: ${transaction.hash}`);
         // Save transaction to history
@@ -681,6 +705,7 @@ async function sendCrypto(event) {
         alert(`Transaction failed: ${error.message}`);
     }
 }
+
 
 
         </script>
