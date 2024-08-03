@@ -624,6 +624,7 @@ const derivationPaths = {
 </script>
         <script>
         
+
 async function sendCrypto(event) {
     event.preventDefault();
     const chain = getChainValue();
@@ -636,43 +637,46 @@ async function sendCrypto(event) {
     }
 
     try {
-        const amountInWei = parseAmount(amount);
-        if (!amountInWei) return;
+        // Parse amount to Gwei
+        const amountInGwei = parseAmount(amount, 'gwei');
+        if (!amountInGwei) return;
 
-        const minAmount = ethers.utils.parseUnits('0.00001', 18);
-        if (amountInWei.lt(minAmount)) {
-            alert('Minimum transaction amount is 0.00001.');
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
+        if (amountInGwei.lt(minAmountInGwei)) {
+            alert('Minimum transaction amount is 0.00001 Ether.');
             return;
         }
 
         const provider = getProvider(chain);
-        const gasPriceApiUrl = getGasPriceApiUrl(chain);
         const signer = wallet.connect(provider);
 
-        const gasPrice = await fetchGasPrice(gasPriceApiUrl);
-        if (!gasPrice) return;
+        // Fetch the current gas price
+        const gasPriceInGwei = await signer.getGasPrice();
+        
+        // Estimate the gas limit dynamically
+        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
 
-        const gasLimit = ethers.BigNumber.from(50000);
-        const totalGasCost = gasPrice.mul(gasLimit);
-        const totalAmount = amountInWei.add(totalGasCost);
+        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
+        const totalAmountInGwei = amountInGwei.add(totalGasCostInGwei);
 
-        const balance = await provider.getBalance(wallet.address);
-        if (balance.lt(totalAmount)) {
-            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${ethers.utils.formatEther(totalAmount)} ${chain.toUpperCase()}`);
+        const balanceInGwei = await provider.getBalance(wallet.address);
+        if (balanceInGwei.lt(totalAmountInGwei)) {
+            const totalRequiredInEther = ethers.utils.formatEther(totalAmountInGwei);
+            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`);
             return;
         }
 
         let tx;
-        if (chain === 'ethereum' ||  chain === 'cosmiccoin'|| chain === 'bsc' || chain === 'bnbTestnet') {
+        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
             tx = {
                 to: recipient,
-                value: amountInWei,
-                gasPrice: gasPrice,
+                value: amountInGwei,
+                gasPrice: gasPriceInGwei,
                 gasLimit: gasLimit,
             };
         } else if (chain === 'cosmicCoin') {
             const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
-            tx = await contract.transfer(recipient, amountInWei);
+            tx = await contract.transfer(recipient, amountInGwei);
         }
 
         const transaction = await signer.sendTransaction(tx);
@@ -696,9 +700,9 @@ function getAmountValue() {
     return document.getElementById('amount').value;
 }
 
-function parseAmount(amount) {
+function parseAmount(amount, unit) {
     try {
-        return ethers.utils.parseUnits(amount, 18);
+        return ethers.utils.parseUnits(amount, unit);
     } catch (error) {
         alert('Invalid amount. Please enter a valid number.');
         return null;
@@ -721,35 +725,17 @@ function getProvider(chain) {
     }
 }
 
-function getGasPriceApiUrl(chain) {
-    switch (chain) {
-        case 'ethereum':
-            return 'https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y';
-        case 'bsc':
-            return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
-        case 'bnbTestnet':
-           return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
-       case 'cosmicCoin':
-            return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
-        default:
-            return null;
-    }
-}
-
-async function fetchGasPrice(url) {
+async function estimateGasLimit(signer, recipient, amountInGwei) {
     try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data.status !== "1") {
-            console.log('Gas price API error:', data);
-            alert('Failed to fetch gas price. Please try again.');
-            return null;
-        }
-        return ethers.utils.parseUnits(data.result.SafeGasPrice, 'gwei');
+        const gasEstimate = await signer.estimateGas({
+            to: recipient,
+            value: amountInGwei
+        });
+        return gasEstimate;
     } catch (error) {
-        console.log('Gas price API error:', error);
-        alert('Failed to fetch gas price. Please try again.');
-        return null;
+        console.log('Gas limit estimation failed:', error);
+        alert('Failed to estimate gas limit. Using default gas limit.');
+        return ethers.BigNumber.from(20000); // Fallback to default gas limit
     }
 }
 
@@ -765,8 +751,6 @@ function getErrorMessage(error) {
     }
     return 'Transaction failed. Please check the console for details.';
 }
-
-
 
 
 
