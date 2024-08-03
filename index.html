@@ -639,15 +639,16 @@ async function sendCrypto(event) {
     }
 
     try {
-        // Parse amount to Gwei
-        const amountInGwei = parseAmount(amount, 'gwei');
-        if (!amountInGwei) return;
+        // Function to parse amount to specified unit
+function parseAmount(amount, unit) {
+  try {
+    const decimalAmount = new Decimal(amount);
+    return ethers.utils.parseUnits(decimalAmount.toString(), unit);
+  } catch (error) {
+    alert('Invalid amount. Please enter a valid number.');
+    return null;
+  }
 
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.utils.parseUnits('1', 'gwei'));
-        if (amountInGwei.lt(minAmountInGwei)) {
-            alert('Minimum transaction amount is 0.00001 Ether.');
-            return;
-        }
 
         const provider = getProvider(chain);
         const signer = wallet.connect(provider);
@@ -720,14 +721,16 @@ function getAmountValue() {
     return document.getElementById('amount').value;
 }
 
-function parseAmount(amount, unit) {
-    try {
-        const decimalAmount = new Decimal(amount);
-        return ethers.utils.parseUnits(decimalAmount.toString(), unit);
-    } catch (error) {
-        alert('Invalid amount. Please enter a valid number.');
-        return null;
-    }
+// Function to format amount from Gwei to Ether
+function formatAmount(amountInGwei) {
+  try {
+    const amountInGweiBN = ethers.BigNumber.from(amountInGwei);
+    const amountInEther = ethers.utils.formatUnits(amountInGweiBN, 'gwei');
+    return new Decimal(amountInEther).toString();
+  } catch (error) {
+    alert('Invalid amount. Please enter a valid number.');
+    return null;
+  }
 }
 
 function getProvider(chain) {
