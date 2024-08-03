@@ -402,8 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
             <script>
     
-            
-document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
+            document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
 
 async function sendCrypto(event) {
     event.preventDefault();
@@ -464,8 +463,7 @@ async function sendCrypto(event) {
         const explorerLink = getExplorerLink(chain, transaction.hash);
         displayPopup(`Transaction sent! TX Hash: <a href="${explorerLink}" target="_blank">${transaction.hash}</a> <button class="copy-button" onclick="copyToClipboard('${transaction.hash}')">Copy</button>`, 'success');
 
-         
-                // Fetch and display transaction history
+        // Fetch and display transaction history
         await displayTransactionHistory(wallet.address, chain, provider);
     } catch (error) {
         console.log('Transaction failed:', error);
@@ -576,17 +574,22 @@ async function displayTransactionHistory(address, chain, provider) {
         });
 
         document.getElementById('transaction-history').classList.remove('hidden');
-        
-        // Store transaction in history
-        await displayTransactionHistory(wallet.address, chain, provider);
-
     } catch (error) {
         console.log('Failed to fetch transaction history:', error);
         displayPopup('Failed to fetch transaction history.', 'error');
     }
 }
 
+function displayPopup(message, type) {
+    const popup = document.getElementById('popup-message');
+    popup.innerHTML = message;
+    popup.className = type === 'success' ? 'success' : 'error';
+    popup.style.display = 'block';
 
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300000);
+}
 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
@@ -609,33 +612,13 @@ function getErrorMessage(error) {
     return 'Transaction failed. Please check the console for details.';
 }
 
+            
+
+
         
    </script>
 
-<script>
-    
 
-function showPopupMessage(type, message) {
-    const popup = document.getElementById('popup-message');
-    popup.className = `popup ${type}`;
-    popup.innerHTML = message;
-    popup.style.display = 'block';
-
-    setTimeout(() => {
-        popup.style.display = 'none';
-    }, 300000); // Hide after 5 minutes 
-
-    // Save to localStorage
-    saveMessageToLocalStorage(type, message);
-}
-
-function saveMessageToLocalStorage(type, message) {
-    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
-    history.push({ type, message, timestamp: new Date().toISOString() });
-    localStorage.setItem('transactionHistory', JSON.stringify(history));
-}     
-
-</script>
         
             
 <!-- Receive Section -->
