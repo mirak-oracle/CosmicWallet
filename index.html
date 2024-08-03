@@ -623,11 +623,8 @@ const derivationPaths = {
     
 </script>
         <script>
-    const ethers = require('ethers');
-const Decimal = require('decimal.js');
     
-
-async function sendCrypto(event) {
+            async function sendCrypto(event) {
     event.preventDefault();
     const chain = getChainValue();
     const recipient = getRecipientValue();
@@ -639,16 +636,14 @@ async function sendCrypto(event) {
     }
 
     try {
-        // Function to parse amount to specified unit
-function parseAmount(amount, unit) {
-  try {
-    const decimalAmount = new Decimal(amount);
-    return ethers.utils.parseUnits(decimalAmount.toString(), unit);
-  } catch (error) {
-    alert('Invalid amount. Please enter a valid number.');
-    return null;
-  }
+        const amountInGwei = parseAmount(amount, 'gwei');
+        if (!amountInGwei) return;
 
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.utils.parseUnits('1', 'gwei'));
+        if (amountInGwei.lt(minAmountInGwei)) {
+            alert('Minimum transaction amount is 0.00001 Ether.');
+            return;
+        }
 
         const provider = getProvider(chain);
         const signer = wallet.connect(provider);
@@ -684,14 +679,6 @@ function parseAmount(amount, unit) {
 
         const transaction = await signer.sendTransaction(tx);
         alert(`Transaction sent! TX Hash: ${transaction.hash}`);
-    } catch (error) {
-        console.log('Transaction failed:', error);
-        alert(getErrorMessage(error));
-    }
-}
-            
-const transaction = await signer.sendTransaction(tx);
-        alert(`Transaction sent! TX Hash: ${transaction.hash}`);
 
         // Display link to the transaction on the blockchain explorer
         const explorerLink = getExplorerLink(chain, transaction.hash);
@@ -708,7 +695,29 @@ const transaction = await signer.sendTransaction(tx);
     }
 }
 
-// Helper functions
+// Function to parse amount to specified unit
+function parseAmount(amount, unit) {
+    try {
+        const decimalAmount = new Decimal(amount);
+        return ethers.utils.parseUnits(decimalAmount.toString(), unit);
+    } catch (error) {
+        alert('Invalid amount. Please enter a valid number.');
+        return null;
+    }
+}
+
+// Function to format amount from Gwei to Ether
+function formatAmount(amountInGwei) {
+    try {
+        const amountInGweiBN = ethers.BigNumber.from(amountInGwei);
+        const amountInEther = ethers.utils.formatUnits(amountInGweiBN, 'gwei');
+        return new Decimal(amountInEther).toString();
+    } catch (error) {
+        alert('Invalid amount. Please enter a valid number.');
+        return null;
+    }
+}
+
 function getChainValue() {
     return document.getElementById('send-crypto-chain').value;
 }
@@ -719,18 +728,6 @@ function getRecipientValue() {
 
 function getAmountValue() {
     return document.getElementById('amount').value;
-}
-
-// Function to format amount from Gwei to Ether
-function formatAmount(amountInGwei) {
-  try {
-    const amountInGweiBN = ethers.BigNumber.from(amountInGwei);
-    const amountInEther = ethers.utils.formatUnits(amountInGweiBN, 'gwei');
-    return new Decimal(amountInEther).toString();
-  } catch (error) {
-    alert('Invalid amount. Please enter a valid number.');
-    return null;
-  }
 }
 
 function getProvider(chain) {
@@ -762,7 +759,8 @@ async function estimateGasLimit(signer, recipient, amountInGwei) {
         return ethers.BigNumber.from(20000); // Fallback to default gas limit
     }
 }
-    function getExplorerLink(chain, txHash) {
+
+function getExplorerLink(chain, txHash) {
     switch (chain) {
         case 'ethereum':
             return `https://etherscan.io/tx/${txHash}`;
@@ -774,6 +772,7 @@ async function estimateGasLimit(signer, recipient, amountInGwei) {
             return null;
     }
 }
+
 async function displayTransactionHistory(address, chain, provider) {
     let explorerApiUrl;
     switch (chain) {
@@ -795,7 +794,7 @@ async function displayTransactionHistory(address, chain, provider) {
         const data = await response.json();
         const transactions = data.result;
         
-const transactionList = document.getElementById('transaction-list');
+        const transactionList = document.getElementById('transaction-list');
         transactionList.innerHTML = ''; // Clear existing transactions
 
         transactions.forEach(tx => {
@@ -831,6 +830,7 @@ function getErrorMessage(error) {
     }
     return 'Transaction failed. Please check the console for details.';
 }
+
 
 
 
