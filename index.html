@@ -331,6 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <!-- Send Section -->
+        <form id="crypto-form">
 <div id="send-section" class="section hidden">
     <h2 class="text-2xl font-bold mb-4">Send Cryptocurrency</h2>
     <form onsubmit="sendCrypto(event)" class="space-y-4">
@@ -347,6 +348,208 @@ document.addEventListener('DOMContentLoaded', () => {
     <video id="qr-video" class="hidden"></video>
 </div>
 
+            <script>
+    
+            
+document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
+
+async function sendCrypto(event) {
+    event.preventDefault();
+    const chain = getChainValue();
+    const recipient = getRecipientValue();
+    const amount = getAmountValue();
+
+    if (!wallet) {
+        alert('Wallet not initialized. Generate or recover your wallet first.');
+        return;
+    }
+
+    try {
+        // Parse amount to Gwei
+        const amountInGwei = parseAmount(amount, 'gwei');
+        if (!amountInGwei) return;
+
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
+        if (amountInGwei.lt(minAmountInGwei)) {
+            alert('Minimum transaction amount is 0.00001 Ether.');
+            return;
+        }
+
+        const provider = getProvider(chain);
+        const signer = wallet.connect(provider);
+
+        // Fetch the current gas price
+        const gasPriceInGwei = await signer.getGasPrice();
+        
+        // Estimate the gas limit dynamically
+        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
+
+        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
+        const totalAmountInGwei = amountInGwei.add(totalGasCostInGwei);
+
+        const balanceInGwei = await provider.getBalance(wallet.address);
+        if (balanceInGwei.lt(totalAmountInGwei)) {
+            const totalRequiredInEther = ethers.utils.formatEther(totalAmountInGwei);
+            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`);
+            return;
+        }
+
+        let tx;
+        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
+            tx = {
+                to: recipient,
+                value: amountInGwei,
+                gasPrice: gasPriceInGwei,
+                gasLimit: gasLimit,
+            };
+        } else if (chain === 'cosmicCoin') {
+            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
+            tx = await contract.transfer(recipient, amountInGwei);
+        }
+
+        const transaction = await signer.sendTransaction(tx);
+        alert(`Transaction sent! TX Hash: ${transaction.hash}`);
+
+        // Display link to the transaction on the blockchain explorer
+        const explorerLink = getExplorerLink(chain, transaction.hash);
+        if (explorerLink) {
+            alert(`Check the transaction here: ${explorerLink}`);
+        }
+
+        // Fetch and display transaction history
+        await displayTransactionHistory(wallet.address, chain, provider);
+    } catch (error) {
+        console.log('Transaction failed:', error);
+        alert(getErrorMessage(error));
+    }
+}
+
+// Helper functions
+function getChainValue() {
+    return document.getElementById('send-crypto-chain').value;
+}
+
+function getRecipientValue() {
+    return document.getElementById('recipient-address').value;
+}
+
+function getAmountValue() {
+    return document.getElementById('amount').value;
+}
+
+function parseAmount(amount, unit) {
+    try {
+        return ethers.utils.parseUnits(amount, unit);
+    } catch (error) {
+        alert('Invalid amount. Please enter a valid number.');
+        return null;
+    }
+}
+
+function getProvider(chain) {
+    switch (chain) {
+        case 'ethereum':
+            return new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        case 'bsc':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        case 'bnbTestnet':
+            return new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
+        case 'cosmicCoin':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        default:
+            alert('Unsupported chain selected.');
+            return null;
+    }
+}
+
+async function estimateGasLimit(signer, recipient, amountInGwei) {
+    try {
+        const gasEstimate = await signer.estimateGas({
+            to: recipient,
+            value: amountInGwei
+        });
+        return gasEstimate;
+    } catch (error) {
+        console.log('Gas limit estimation failed:', error);
+        alert('Failed to estimate gas limit. Using default gas limit.');
+        return ethers.BigNumber.from(20000); // Fallback to default gas limit
+    }
+}
+
+function getExplorerLink(chain, txHash) {
+    switch (chain) {
+        case 'ethereum':
+            return `https://etherscan.io/tx/${txHash}`;
+        case 'bsc':
+        case 'bnbTestnet':
+        case 'cosmicCoin':
+            return `https://bscscan.com/tx/${txHash}`;
+        default:
+            return null;
+    }
+}
+
+async function displayTransactionHistory(address, chain, provider) {
+    let explorerApiUrl;
+    switch (chain) {
+        case 'ethereum':
+            explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
+            break;
+        case 'bsc':
+        case 'bnbTestnet':
+        case 'cosmicCoin':
+            explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+            break;
+        default:
+            alert('Unsupported chain selected for transaction history.');
+            return;
+    }
+    try {
+        const response = await fetch(explorerApiUrl);
+        const data = await response.json();
+        const transactions = data.result;
+
+        const transactionList = document.getElementById('transaction-list');
+        transactionList.innerHTML = ''; // Clear existing transactions
+
+        transactions.forEach(tx => {
+            const txElement = document.createElement('div');
+            txElement.classList.add('transaction-item');
+            txElement.innerHTML = `
+                <div>Hash: <a href="${getExplorerLink(chain, tx.hash)}" target="_blank">${tx.hash}</a></div>
+                <div>From: ${tx.from}</div>
+                <div>To: ${tx.to}</div>
+                <div>Value: ${ethers.utils.formatUnits(tx.value, 'gwei')} Gwei</div>
+                <div>Block: ${tx.blockNumber}</div>
+                <div>Status: ${tx.confirmations > 0 ? 'Confirmed' : 'Pending'}</div>
+            `;
+            transactionList.appendChild(txElement);
+        });
+
+        document.getElementById('transaction-history').classList.remove('hidden');
+    } catch (error) {
+        console.log('Failed to fetch transaction history:', error);
+        alert('Failed to fetch transaction history.');
+    }
+}
+
+function getErrorMessage(error) {
+    if (error.code === ethers.errors.INSUFFICIENT_FUNDS) {
+        return 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
+    } else if (error.code === ethers.errors.NETWORK_ERROR) {
+        return 'Transaction failed: Network error. Please try again later.';
+    } else if (error.code === ethers.errors.SERVER_ERROR) {
+        return 'Transaction failed: Server error. Please check the server status or try a different provider.';
+    } else if (error.message.includes('invalid decimal value')) {
+        return 'Invalid amount. Please enter a valid number.';
+    }
+    return 'Transaction failed. Please check the console for details.';
+}
+
+        
+   </script>
+
+            
 <!-- Receive Section -->
 <div id="receive-section" class="section hidden">
     <h2 class="text-2xl font-bold mb-4">Receive Cryptocurrency</h2>
@@ -623,211 +826,7 @@ const derivationPaths = {
     
 </script>
     
-        <script>
-    
-            async function sendCrypto(event) {
-    event.preventDefault();
-    const chain = getChainValue();
-    const recipient = getRecipientValue();
-    const amount = getAmountValue();
-
-    if (!wallet) {
-        alert('Wallet not initialized. Generate or recover your wallet first.');
-        return;
-    }
-
-    try {
-        // Parse amount to Gwei
-        const amountInGwei = parseAmount(amount, 'gwei');
-        if (!amountInGwei) return;
-
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
-        if (amountInGwei.lt(minAmountInGwei)) {
-            alert('Minimum transaction amount is 0.00001 Ether.');
-            return;
-        }
-
-        const provider = getProvider(chain);
-        const signer = wallet.connect(provider);
-
-        // Fetch the current gas price
-        const gasPriceInGwei = await signer.getGasPrice();
         
-        // Estimate the gas limit dynamically
-        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
-
-        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
-        const totalAmountInGwei = amountInGwei.add(totalGasCostInGwei);
-
-        const balanceInGwei = await provider.getBalance(wallet.address);
-        if (balanceInGwei.lt(totalAmountInGwei)) {
-            const totalRequiredInEther = ethers.utils.formatEther(totalAmountInGwei);
-            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`);
-            return;
-        }
-
-        let tx;
-        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
-            tx = {
-                to: recipient,
-                value: amountInGwei,
-                gasPrice: gasPriceInGwei,
-                gasLimit: gasLimit,
-            };
-        } else if (chain === 'cosmicCoin') {
-            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
-            tx = await contract.transfer(recipient, amountInGwei);
-        }
-
-        const transaction = await signer.sendTransaction(tx);
-        alert(`Transaction sent! TX Hash: ${transaction.hash}`);
-    } catch (error) {
-        console.log('Transaction failed:', error);
-        alert(getErrorMessage(error));
-    }
-}
-            
-// Display link to the transaction on the blockchain explorer
-        const explorerLink = getExplorerLink(chain, transaction.hash);
-        if (explorerLink) {
-            alert(`Check the transaction here: ${explorerLink}`);
-        }
-
-        // Fetch and display transaction history
-        await displayTransactionHistory(wallet.address, chain, provider);
-
-    } catch (error) {
-        console.log('Transaction failed:', error);
-        alert(getErrorMessage(error));
-    }
-            
-// Helper functions
-function getChainValue() {
-    return document.getElementById('send-crypto-chain').value;
-}
-
-function getRecipientValue() {
-    return document.getElementById('recipient-address').value;
-}
-
-function getAmountValue() {
-    return document.getElementById('amount').value;
-}
-
-function parseAmount(amount, unit) {
-    try {
-        return ethers.utils.parseUnits(amount, unit);
-    } catch (error) {
-        alert('Invalid amount. Please enter a valid number.');
-        return null;
-    }
-}
-
-function getProvider(chain) {
-    switch (chain) {
-        case 'ethereum':
-            return new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
-        case 'bsc':
-            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
-        case 'bnbTestnet':
-            return new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
-        case 'cosmicCoin':
-            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
-        default:
-            alert('Unsupported chain selected.');
-            return null;
-    }
-}
-
-async function estimateGasLimit(signer, recipient, amountInGwei) {
-    try {
-        const gasEstimate = await signer.estimateGas({
-            to: recipient,
-            value: amountInGwei
-        });
-        return gasEstimate;
-    } catch (error) {
-        console.log('Gas limit estimation failed:', error);
-        alert('Failed to estimate gas limit. Using default gas limit.');
-        return ethers.BigNumber.from(20000); // Fallback to default gas limit
-    }
-}
-  function getExplorerLink(chain, txHash) {
-    switch (chain) {
-        case 'ethereum':
-            return `https://etherscan.io/tx/${txHash}`;
-        case 'bsc':
-        case 'bnbTestnet':
-        case 'cosmicCoin':
-            return `https://bscscan.com/tx/${txHash}`;
-        default:
-            return null;
-    }
-}
-            async function displayTransactionHistory(address, chain, provider) {
-    let explorerApiUrl;
-    switch (chain) {
-        case 'ethereum':
-            explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
-            break;
-        case 'bsc':
-        case 'bnbTestnet':
-        case 'cosmicCoin':
-            explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
-            break;
-        default:
-            alert('Unsupported chain selected for transaction history.');
-            return;
-    }
-        try {
-        const response = await fetch(explorerApiUrl);
-        const data = await response.json();
-        const transactions = data.result;
-
-        const transactionList = document.getElementById('transaction-list');
-        transactionList.innerHTML = ''; // Clear existing transactions
-
-        transactions.forEach(tx => {
-            const txElement = document.createElement('div');
-            txElement.classList.add('transaction-item');
-            txElement.innerHTML = `
-                <div>Hash: <a href="${getExplorerLink(chain, tx.hash)}" target="_blank">${tx.hash}</a></div>
-                <div>From: ${tx.from}</div>
-                <div>To: ${tx.to}</div>
-                <div>Value: ${ethers.utils.formatUnits(tx.value, 'gwei')} Gwei</div>
-                <div>Block: ${tx.blockNumber}</div>
-                <div>Status: ${tx.confirmations > 0 ? 'Confirmed' : 'Pending'}</div>
-            `;
-            transactionList.appendChild(txElement);
-        });
-
-            document.getElementById('transaction-history').classList.remove('hidden');
-    } catch (error) {
-        console.log('Failed to fetch transaction history:', error);
-        alert('Failed to fetch transaction history.');
-    }
-}
-
-            
-function getErrorMessage(error) {
-    if (error.code === ethers.errors.INSUFFICIENT_FUNDS) {
-        return 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
-    } else if (error.code === ethers.errors.NETWORK_ERROR) {
-        return 'Transaction failed: Network error. Please try again later.';
-    } else if (error.code === ethers.errors.SERVER_ERROR) {
-        return 'Transaction failed: Server error. Please check the server status or try a different provider.';
-    } else if (error.message.includes('invalid decimal value')) {
-        return 'Invalid amount. Please enter a valid number.';
-    }
-    return 'Transaction failed. Please check the console for details.';
-}
-
-
-
-
-        
-
-        </script>
 
 
     
