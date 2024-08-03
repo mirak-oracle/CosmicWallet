@@ -464,12 +464,7 @@ async function sendCrypto(event) {
         const explorerLink = getExplorerLink(chain, transaction.hash);
         displayPopup(`Transaction sent! TX Hash: <a href="${explorerLink}" target="_blank">${transaction.hash}</a> <button class="copy-button" onclick="copyToClipboard('${transaction.hash}')">Copy</button>`, 'success');
 
-        // Fetch and display transaction history
-        await displayTransactionHistory(wallet.address, chain, provider);
-    } catch (error) {
-        console.log('Transaction failed:', error);
-        displayPopup(getErrorMessage(error), 'error');
-    }
+         }
 }
 
 // Helper functions
