@@ -401,96 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
             <script>
     
-            document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
-
-async function sendCrypto(event) {
-    event.preventDefault();
-    const chain = getChainValue();
-    const recipient = getRecipientValue();
-    const amount = getAmountValue();
-    
-const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
-    const feePercentage = 0.01; // 1% fee
-    const flatFeeInGwei = ethers.utils.parseUnits('0.000001', 'ether'); // Flat fee in Ether
-
-    if (!wallet) {
-        displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
-        return;
-    }
-
-    try {
-        // Parse amount to Gwei
-        const amountInGwei = parseAmount(amount, 'gwei');
-        if (!amountInGwei) return;
-
-        // Calculate the fee
-        const feeInGwei = amountInGwei.mul(feePercentage).add(flatFeeInGwei);
-        const totalAmountInGwei = amountInGwei.add(feeInGwei);
-        
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
-        if (amountInGwei.lt(minAmountInGwei)) {
-            displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
-            return;
-        }
-
-        const provider = getProvider(chain);
-        const signer = wallet.connect(provider);
-
-        // Fetch the current gas price
-        const gasPriceInGwei = await signer.getGasPrice();
-        
-        // Estimate the gas limit dynamically
-        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
-
-        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
-        const totalAmountInGwei = amountInGwei.add(totalGasCostInGwei);
-
-        const balanceInGwei = await provider.getBalance(wallet.address);
-        if (balanceInGwei.lt(totalAmountInGwei)) {
-            const totalRequiredInEther = ethers.utils.formatEther(totalAmountInGwei);
-            displayPopup(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`, 'error');
-            return;
-        }
-
-        let tx;
-        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
-            tx = {
-                to: recipient,
-                value: amountInGwei,
-                gasPrice: gasPriceInGwei,
-                gasLimit: gasLimit,
-            };
-        } else if (chain === 'cosmicCoin') {
-            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
-            tx = await contract.transfer(recipient, amountInGwei);
-        }
-     
-        // Send the main transaction
-        const transaction = await signer.sendTransaction(tx);
-        displayPopup(`Transaction sent! TX Hash: ${transaction.hash}`, 'success');
-        
-        // Send the fee to your wallet
-        const feeTx = {
-            to: feeWalletAddress,
-            value: feeInGwei,
-            gasPrice: gasPriceInGwei,
-            gasLimit: gasLimit,
-        };
-        const feeTransaction = await signer.sendTransaction(feeTx);
-        displayPopup(`Fee sent! TX Hash: ${feeTransaction.hash}`, 'success');
-
-        const transaction = await signer.sendTransaction(tx);
-
-        const explorerLink = getExplorerLink(chain, transaction.hash);
-        displayPopup(`Transaction sent! TX Hash: <a href="${explorerLink}" target="_blank">${transaction.hash}</a> <button class="copy-button" onclick="copyToClipboard('${transaction.hash}')">Copy</button>`, 'success');
-
-        // Fetch and display transaction history
-        await displayTransactionHistory(wallet.address, chain, provider);
-    } catch (error) {
-        console.log('Transaction failed:', error);
-        displayPopup(getErrorMessage(error), 'error');
-    }
-}
+                document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
 
 // Helper functions
 function getChainValue() {
@@ -612,7 +523,6 @@ function displayPopup(message, type) {
     }, 300000);
 }
 
-                
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         displayPopup('Transaction hash copied to clipboard!', 'success');
@@ -634,6 +544,96 @@ function getErrorMessage(error) {
     return 'Transaction failed. Please check the console for details.';
 }
 
+async function sendCrypto(event) {
+    event.preventDefault();
+    const chain = getChainValue();
+    const recipient = getRecipientValue();
+    const amount = getAmountValue();
+    
+    const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
+    const feePercentage = 0.01; // 1% fee
+    const flatFeeInGwei = ethers.utils.parseUnits('0.000001', 'ether'); // Flat fee in Ether
+
+    if (!wallet) {
+        displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
+        return;
+    }
+
+    try {
+        // Parse amount to Gwei
+        const amountInGwei = parseAmount(amount, 'gwei');
+        if (!amountInGwei) return;
+
+        // Calculate the fee
+        const feeInGwei = amountInGwei.mul(feePercentage).add(flatFeeInGwei);
+        const totalAmountInGwei = amountInGwei.add(feeInGwei);
+        
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
+        if (amountInGwei.lt(minAmountInGwei)) {
+            displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
+            return;
+        }
+
+        const provider = getProvider(chain);
+        const signer = wallet.connect(provider);
+
+        // Fetch the current gas price
+        const gasPriceInGwei = await signer.getGasPrice();
+        
+        // Estimate the gas limit dynamically
+        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
+
+        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
+        const totalAmountRequiredInGwei = totalAmountInGwei.add(totalGasCostInGwei);
+
+        const balanceInGwei = await provider.getBalance(wallet.address);
+        if (balanceInGwei.lt(totalAmountRequiredInGwei)) {
+            const totalRequiredInEther = ethers.utils.formatEther(totalAmountRequiredInGwei);
+            displayPopup(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`, 'error');
+            return;
+        }
+
+        let tx;
+        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
+            tx = {
+                to: recipient,
+                value: amountInGwei,
+                gasPrice: gasPriceInGwei,
+                gasLimit: gasLimit,
+            };
+        } else if (chain === 'cosmicCoin') {
+            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
+            tx = await contract.transfer(recipient, amountInGwei);
+        }
+
+        // Send the main transaction
+        const transaction = await signer.sendTransaction(tx);
+        displayPopup(`Transaction sent! TX Hash: ${transaction.hash}`, 'success');
+        
+        // Send the fee to your wallet
+        const feeTx = {
+            to: feeWalletAddress,
+            value: feeInGwei,
+            gasPrice: gasPriceInGwei,
+            gasLimit: gasLimit,
+        };
+        const feeTransaction = await signer.sendTransaction(feeTx);
+        displayPopup(`Fee sent! TX Hash: ${feeTransaction.hash}`, 'success');
+
+        // Display link to the transaction on the blockchain explorer
+        const explorerLink = getExplorerLink(chain, transaction.hash);
+        if (explorerLink) {
+            displayPopup(`Check the transaction here: <a href="${explorerLink}" target="_blank">${explorerLink}</a>`, 'success');
+        }
+
+        // Fetch and display transaction history
+        await displayTransactionHistory(wallet.address, chain, provider);
+    } catch (error) {
+        console.log('Transaction failed:', error);
+        displayPopup(getErrorMessage(error), 'error');
+    }
+}
+                
             
 
 
