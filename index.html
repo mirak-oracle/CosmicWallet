@@ -623,7 +623,9 @@ const derivationPaths = {
     
 </script>
         <script>
-        
+    const ethers = require('ethers');
+const Decimal = require('decimal.js');
+    
 
 async function sendCrypto(event) {
     event.preventDefault();
@@ -641,9 +643,9 @@ async function sendCrypto(event) {
         const amountInGwei = parseAmount(amount, 'gwei');
         if (!amountInGwei) return;
 
-        const minAmountInGwei = ethers.utils.parseUnits('10000', 'gwei');
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.utils.parseUnits('1', 'gwei'));
         if (amountInGwei.lt(minAmountInGwei)) {
-            alert('Minimum transaction amount is 0.00001 ether.');
+            alert('Minimum transaction amount is 0.00001 Ether.');
             return;
         }
 
@@ -720,7 +722,8 @@ function getAmountValue() {
 
 function parseAmount(amount, unit) {
     try {
-        return ethers.utils.parseUnits(amount, unit);
+        const decimalAmount = new Decimal(amount);
+        return ethers.utils.parseUnits(decimalAmount.toString(), unit);
     } catch (error) {
         alert('Invalid amount. Please enter a valid number.');
         return null;
