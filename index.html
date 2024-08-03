@@ -624,119 +624,149 @@ const derivationPaths = {
 </script>
         <script>
         
-
 async function sendCrypto(event) {
-  event.preventDefault();
-  const chain = document.getElementById('send-crypto-chain').value;
-  const recipient = document.getElementById('recipient-address').value;
-  const amount = document.getElementById('amount').value;
+    event.preventDefault();
+    const chain = getChainValue();
+    const recipient = getRecipientValue();
+    const amount = getAmountValue();
 
-  if (!wallet) {
-    alert('Wallet not initialized. Generate or recover your wallet first.');
-    return;
-  }
-
-  // Check and parse amount
-  let amountInWei;
-  try {
-    amountInWei = ethers.utils.parseUnits(amount, 18);
-  } catch (error) {
-    alert('Invalid amount. Please enter a valid number.');
-    return;
-  }
-
-  const minAmount = ethers.utils.parseUnits('0.00001', 18);
-  if (amountInWei.lt(minAmount)) {
-    alert('Minimum transaction amount is 0.00001.');
-    return;
-  }
-
-  let provider;
-  let signer;
-
-  // Determine provider based on selected chain
-  switch (chain) {
-    case 'ethereum':
-      provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
-      break;
-    case 'bsc':
-      provider = new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
-      break;
-    case 'bnbTestnet':
-      provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
-      break;
-    case 'cosmicCoin':
-      provider = new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com'); // Update if different
-      break;
-    default:
-      alert('Unsupported chain selected.');
-      return;
-  }
-
-  signer = wallet.connect(provider);
-
-  try {
-    let gasPriceResponse, gasData, gasPrice;
-
-    if (chain === 'ethereum') {
-      gasPriceResponse = await fetch(`https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`);
-    } else if (chain === 'bsc' || chain === 'bnbTestnet' || chain === 'cosmicCoin') {
-      gasPriceResponse = await fetch(`https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`);
+    if (!wallet) {
+        alert('Wallet not initialized. Generate or recover your wallet first.');
+        return;
     }
 
-    gasData = await gasPriceResponse.json();
+    try {
+        const amountInWei = parseAmount(amount);
+        if (!amountInWei) return;
 
-    if (gasData.status !== "1") {
-      console.log(`${chain} gas price API error:`, gasData);
-      alert(`Failed to fetch ${chain} gas price. Please try again.`);
-      return;
+        const minAmount = ethers.utils.parseUnits('0.00001', 18);
+        if (amountInWei.lt(minAmount)) {
+            alert('Minimum transaction amount is 0.00001.');
+            return;
+        }
+
+        const provider = getProvider(chain);
+        const gasPriceApiUrl = getGasPriceApiUrl(chain);
+        const signer = wallet.connect(provider);
+
+        const gasPrice = await fetchGasPrice(gasPriceApiUrl);
+        if (!gasPrice) return;
+
+        const gasLimit = ethers.BigNumber.from(50000);
+        const totalGasCost = gasPrice.mul(gasLimit);
+        const totalAmount = amountInWei.add(totalGasCost);
+
+        const balance = await provider.getBalance(wallet.address);
+        if (balance.lt(totalAmount)) {
+            alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${ethers.utils.formatEther(totalAmount)} ${chain.toUpperCase()}`);
+            return;
+        }
+
+        let tx;
+        if (chain === 'ethereum' ||  chain === 'cosmiccoin'|| chain === 'bsc' || chain === 'bnbTestnet') {
+            tx = {
+                to: recipient,
+                value: amountInWei,
+                gasPrice: gasPrice,
+                gasLimit: gasLimit,
+            };
+        } else if (chain === 'cosmicCoin') {
+            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
+            tx = await contract.transfer(recipient, amountInWei);
+        }
+
+        const transaction = await signer.sendTransaction(tx);
+        alert(`Transaction sent! TX Hash: ${transaction.hash}`);
+    } catch (error) {
+        console.log('Transaction failed:', error);
+        alert(getErrorMessage(error));
     }
-
-    gasPrice = ethers.utils.parseUnits(gasData.result.SafeGasPrice, 'gwei');
-    const gasLimit = ethers.utils.hexlify(50000); // Increased gas limit
-    const totalGasCost = gasPrice.mul(gasLimit);
-    const balance = await provider.getBalance(wallet.address);
-
-    // Check for sufficient funds including gas fees
-    if (balance.lt(amountInWei.add(totalGasCost))) {
-      alert(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${ethers.utils.formatEther(amountInWei.add(totalGasCost))} ${chain.toUpperCase()}`);
-      return;
-    }
-
-    let tx;
-    if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
-      tx = {
-        to: recipient,
-        value: amountInWei,
-        gasPrice: gasPrice,
-        gasLimit: gasLimit
-      };
-    } else if (chain === 'cosmicCoin') {
-      const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
-      tx = await contract.transfer(recipient, amountInWei);
-    }
-
-    const transaction = await signer.sendTransaction(tx);
-    alert(`Transaction sent! TX Hash: ${transaction.hash}`);
-    // Save transaction to history
-  } catch (error) {
-    console.log('Transaction failed:', error);
-    let errorMessage = 'Transaction failed. Please check the console for details.';
-
-    // Handle specific errors
-    if (error.code === ethers.errors.INSUFFICIENT_FUNDS) {
-      errorMessage = 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
-    } else if (error.code === ethers.errors.NETWORK_ERROR) {
-      errorMessage = 'Transaction failed: Network error. Please try again later.';
-    } else if (error.code === ethers.errors.SERVER_ERROR) {
-      errorMessage = 'Transaction failed: Server error. Please check the server status or try a different provider.';
-    } else if (error.message.includes('invalid decimal value')) {
-      errorMessage = 'Invalid amount. Please enter a valid number.';
-    }
-
-    alert(errorMessage);
-  }
 }
+
+// Helper functions
+function getChainValue() {
+    return document.getElementById('send-crypto-chain').value;
+}
+
+function getRecipientValue() {
+    return document.getElementById('recipient-address').value;
+}
+
+function getAmountValue() {
+    return document.getElementById('amount').value;
+}
+
+function parseAmount(amount) {
+    try {
+        return ethers.utils.parseUnits(amount, 18);
+    } catch (error) {
+        alert('Invalid amount. Please enter a valid number.');
+        return null;
+    }
+}
+
+function getProvider(chain) {
+    switch (chain) {
+        case 'ethereum':
+            return new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        case 'bsc':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        case 'bnbTestnet':
+            return new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
+        case 'cosmicCoin':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        default:
+            alert('Unsupported chain selected.');
+            return null;
+    }
+}
+
+function getGasPriceApiUrl(chain) {
+    switch (chain) {
+        case 'ethereum':
+            return 'https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y';
+        case 'bsc':
+            return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
+        case 'bnbTestnet':
+           return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
+       case 'cosmicCoin':
+            return 'https://api.bscscan.com/api?module=gastracker&action=gasoracle&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5';
+        default:
+            return null;
+    }
+}
+
+async function fetchGasPrice(url) {
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.status !== "1") {
+            console.log('Gas price API error:', data);
+            alert('Failed to fetch gas price. Please try again.');
+            return null;
+        }
+        return ethers.utils.parseUnits(data.result.SafeGasPrice, 'gwei');
+    } catch (error) {
+        console.log('Gas price API error:', error);
+        alert('Failed to fetch gas price. Please try again.');
+        return null;
+    }
+}
+
+function getErrorMessage(error) {
+    if (error.code === ethers.errors.INSUFFICIENT_FUNDS) {
+        return 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
+    } else if (error.code === ethers.errors.NETWORK_ERROR) {
+        return 'Transaction failed: Network error. Please try again later.';
+    } else if (error.code === ethers.errors.SERVER_ERROR) {
+        return 'Transaction failed: Server error. Please check the server status or try a different provider.';
+    } else if (error.message.includes('invalid decimal value')) {
+        return 'Invalid amount. Please enter a valid number.';
+    }
+    return 'Transaction failed. Please check the console for details.';
+}
+
+
 
 
 
