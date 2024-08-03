@@ -591,17 +591,6 @@ function displayPopup(message, type) {
     }, 300000);
 }
 
-    
-    // Save to localStorage
-    saveMessageToLocalStorage(type, message);
-}
-
-function saveMessageToLocalStorage(type, message) {
-    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
-    history.push({ type, message, timestamp: new Date().toISOString() });
-    localStorage.setItem('transactionHistory', JSON.stringify(history));
-               
-}
                 
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
