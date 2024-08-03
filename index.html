@@ -551,7 +551,7 @@ async function sendCrypto(event) {
     const amount = getAmountValue();
     
     const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
-    const feePercentage = 0.01; // 1% fee
+    const feePercentage = 100; // 1% fee in basis points 
     const flatFeeInGwei = ethers.utils.parseUnits('0.000001', 'ether'); // Flat fee in Ether
 
     if (!wallet) {
