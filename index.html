@@ -351,19 +351,19 @@ document.addEventListener('DOMContentLoaded', () => {
             #popup-message {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    bottom: 60px; /* At the bottom */
-    left: 60px; /* 20px from the left */
-    width: 300px; /* Set a width */
+    bottom: 80px; /* At the bottom */
+    left: 10px; /* 20px from the left */
+    width: 200px; /* Set a width */
     padding: 15px; /* Some padding */
-    border-radius: 8px; /* Rounded corners */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for a subtle 3D effect */
+    border-radius: 9px; /* Rounded corners */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1); /* Shadow for a subtle 3D effect */
     font-family: Arial, sans-serif; /* Font style */
-    font-size: 14px; /* Font size */
-    line-height: 1.5; /* Line height for readability */
+    font-size: 15px; /* Font size */
+    line-height: 1.7; /* Line height for readability */
 }
 
 #popup-message.success {
-    border-left: 5px solid #4caf50; /* Green border for success */
+    border-left: 6px solid #4caf50; /* Green border for success */
     background-color: #e8f5e9; /* Light green background */
     color: #2e7d32; /* Darker green text color */
 }
@@ -591,6 +591,18 @@ function displayPopup(message, type) {
     }, 300000);
 }
 
+    
+    // Save to localStorage
+    saveMessageToLocalStorage(type, message);
+}
+
+function saveMessageToLocalStorage(type, message) {
+    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+    history.push({ type, message, timestamp: new Date().toISOString() });
+    localStorage.setItem('transactionHistory', JSON.stringify(history));
+               
+}
+                
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         displayPopup('Transaction hash copied to clipboard!', 'success');
