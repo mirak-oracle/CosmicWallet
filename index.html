@@ -636,14 +636,19 @@ const derivationPaths = {
     }
 
     try {
-        const amountInGwei = parseAmount(amount, 'gwei');
-        if (!amountInGwei) return;
+    // Parse amount to Gwei
+    const amountInGwei = parseAmount(amount, 'gwei');
+    if (!amountInGwei) return;
 
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.utils.parseUnits('1', 'gwei'));
-        if (amountInGwei.lt(minAmountInGwei)) {
-            alert('Minimum transaction amount is 0.00001 Ether.');
-            return;
-        }
+    const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.utils.parseUnits('1', 'gwei'));
+    console.log(`Amount in Gwei: ${amountInGwei.toString()}`);
+    console.log(`Minimum amount in Gwei: ${minAmountInGwei.toString()}`);
+    
+    if (amountInGwei.lt(minAmountInGwei)) {
+      alert('Minimum transaction amount is 0.00001 Ether.');
+      return;
+    }
+
 
         const provider = getProvider(chain);
         const signer = wallet.connect(provider);
@@ -695,16 +700,18 @@ const derivationPaths = {
     }
 }
 
-// Function to parse amount to specified unit
 function parseAmount(amount, unit) {
-    try {
-        const decimalAmount = new Decimal(amount);
-        return ethers.utils.parseUnits(decimalAmount.toString(), unit);
-    } catch (error) {
-        alert('Invalid amount. Please enter a valid number.');
-        return null;
-    }
+  try {
+    const decimalAmount = new Decimal(amount);
+    console.log(`Parsed amount: ${decimalAmount.toString()}`);
+    return ethers.utils.parseUnits(decimalAmount.toString(), unit);
+  } catch (error) {
+    console.log('Parse Amount Error:', error);
+    alert('Invalid amount. Please enter a valid number.');
+    return null;
+  }
 }
+
 
 // Function to format amount from Gwei to Ether
 function formatAmount(amountInGwei) {
