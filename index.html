@@ -638,23 +638,9 @@ function getErrorMessage(error) {
 </div>
 
      </form>
-    <div id="transaction-history" class="transaction-history-container hidden bg-white p-6 rounded-lg shadow-lg mt-8">
-        <h3 class="text-xl font-semibold mb-4">Transaction History</h3>
-        <p class="mb-4">To check your wallet transactions, follow these steps:</p>
-        <ol class="list-decimal pl-6 mb-4">
-            <li>Recover your account successfully.</li>
-            <li>Copy the generated wallet address.</li>
-            <li>Visit one of the blockchain explorers:</li>
-            <ul class="list-disc pl-6">
-                <li><a href="https://testnet.bscscan.com/" target="_blank" class="text-blue-500 hover:underline">BSC Testnet Explorer</a></li>
-                <li><a href="https://etherscan.io/" target="_blank" class="text-blue-500 hover:underline">Etherscan</a></li>
-                <li><a href="https://bscscan.com/" target="_blank" class="text-blue-500 hover:underline">BSC Explorer</a></li>
-            </ul>
-            <li>Paste your wallet address into the search bar on the explorer,and search . ✔️ </li>
-        </ol>
-          <p class="mt-4 text-red-500">Note: CosmicCoin uses the BscScan explorer for transaction tracking. You can use BSC Explorer for both BNB and CosmicCoin transactions.</p>
+    <div id="transaction-history" class="hidden">
+        <h3>Transaction History</h3>
         <div id="transaction-list"></div>
-    </div>
      </div>
     <div id="popup-message" class="hidden"></div>
 
