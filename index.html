@@ -641,9 +641,9 @@ async function sendCrypto(event) {
         const amountInGwei = parseAmount(amount, 'gwei');
         if (!amountInGwei) return;
 
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'gwei');
         if (amountInGwei.lt(minAmountInGwei)) {
-            alert('Minimum transaction amount is 0.00001 Ether.');
+            alert('Minimum transaction amount is 0.00001 gwei.');
             return;
         }
 
@@ -681,6 +681,24 @@ async function sendCrypto(event) {
 
         const transaction = await signer.sendTransaction(tx);
         alert(`Transaction sent! TX Hash: ${transaction.hash}`);
+    } catch (error) {
+        console.log('Transaction failed:', error);
+        alert(getErrorMessage(error));
+    }
+}
+            
+const transaction = await signer.sendTransaction(tx);
+        alert(`Transaction sent! TX Hash: ${transaction.hash}`);
+
+        // Display link to the transaction on the blockchain explorer
+        const explorerLink = getExplorerLink(chain, transaction.hash);
+        if (explorerLink) {
+            alert(`Check the transaction here: ${explorerLink}`);
+        }
+
+        // Fetch and display transaction history
+        await displayTransactionHistory(wallet.address, chain, provider);
+
     } catch (error) {
         console.log('Transaction failed:', error);
         alert(getErrorMessage(error));
@@ -736,6 +754,62 @@ async function estimateGasLimit(signer, recipient, amountInGwei) {
         console.log('Gas limit estimation failed:', error);
         alert('Failed to estimate gas limit. Using default gas limit.');
         return ethers.BigNumber.from(20000); // Fallback to default gas limit
+    }
+}
+    function getExplorerLink(chain, txHash) {
+    switch (chain) {
+        case 'ethereum':
+            return `https://etherscan.io/tx/${txHash}`;
+        case 'bsc':
+        case 'bnbTestnet':
+        case 'cosmicCoin':
+            return `https://bscscan.com/tx/${txHash}`;
+        default:
+            return null;
+    }
+}
+async function displayTransactionHistory(address, chain, provider) {
+    let explorerApiUrl;
+    switch (chain) {
+        case 'ethereum':
+            explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
+            break;
+        case 'bsc':
+        case 'bnbTestnet':
+        case 'cosmicCoin':
+            explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+            break;
+        default:
+            alert('Unsupported chain selected for transaction history.');
+            return;
+    }
+
+    try {
+        const response = await fetch(explorerApiUrl);
+        const data = await response.json();
+        const transactions = data.result;
+        
+const transactionList = document.getElementById('transaction-list');
+        transactionList.innerHTML = ''; // Clear existing transactions
+
+        transactions.forEach(tx => {
+            const txElement = document.createElement('div');
+            txElement.classList.add('transaction-item');
+            txElement.innerHTML = `
+                <div>Hash: ${tx.hash}</div>
+                <div>From: ${tx.from}</div>
+                <div>To: ${tx.to}</div>
+                <div>Value: ${ethers.utils.formatEther(tx.value)} ETH</div>
+                <div>Block: ${tx.blockNumber}</div>
+                <div>Status: ${tx.confirmations > 0 ? 'Confirmed' : 'Pending'}</div>
+            `;
+            transactionList.appendChild(txElement);
+        });
+
+        document.getElementById('transaction-history').classList.remove('hidden');
+    } catch (error) {
+        console.log('Failed to fetch transaction history:', error);
+        alert('Failed to fetch transaction history.');
     }
 }
 
