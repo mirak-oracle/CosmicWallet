@@ -896,24 +896,122 @@ const derivationPaths = {
 <script>
     
 
-    async function generateReceiveAddress(event) {
-        event.preventDefault();
-        if (!wallet) {
-            wallet = ethers.Wallet.createRandom();
-        }
-        const address = wallet.address;
-        document.getElementById('receive-address').innerHTML = `
-            Address: ${address}<br>
-            <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
-            <canvas id="qrcode"></canvas>
-        `;
-        QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
-            if (error) console.error(error);
-            console.log('QR code generated!');
-        });
+    
+document.getElementById('receive-form').addEventListener('submit', generateReceiveAddress);
 
-        fetchBalances(); // Update balances after generating address
+let currentAddress = '';
+
+async function generateReceiveAddress(event) {
+    event.preventDefault();
+    if (!wallet) {
+        wallet = ethers.Wallet.createRandom();
     }
+    const address = wallet.address;
+    currentAddress = address;
+    document.getElementById('receive-address').innerHTML = `
+        Address: ${address}<br>
+        <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+        <canvas id="qrcode"></canvas>
+    `;
+    QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+    });
+
+    fetchBalances(); // Update balances after generating address
+    await fetchTransactionHistory(address); // Fetch and display transaction history
+    startPolling(address); // Start polling for new transactions
+}
+
+async function fetchTransactionHistory(address) {
+    const chains = ['ethereum', 'bsc', 'bnbTestnet', 'cosmicCoin'];
+    for (const chain of chains) {
+        let explorerApiUrl;
+        switch (chain) {
+            case 'ethereum':
+                explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
+                break;
+            case 'bsc':
+            case 'cosmicCoin':
+                explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+                break;
+            case 'bnbTestnet':
+                explorerApiUrl = `https://api-testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+                break;
+            default:
+                displayPopup('Unsupported chain selected for transaction history.', 'error');
+                return;
+        }
+
+        try {
+            const response = await fetch(explorerApiUrl);
+            const data = await response.json();
+            const transactions = data.result;
+
+            const transactionList = document.getElementById('transaction-list');
+            transactionList.innerHTML = ''; // Clear existing transactions
+
+            transactions.forEach(tx => {
+                const txElement = document.createElement('div');
+                txElement.classList.add('transaction-item');
+                txElement.innerHTML = `
+                    <div>Hash: <a href="${getExplorerLink(chain, tx.hash)}" target="_blank">${tx.hash}</a></div>
+                    <div>From: ${tx.from}</div>
+                    <div>To: ${tx.to}</div>
+                    <div>Value: ${ethers.utils.formatUnits(tx.value, 'ether')} ETH</div>
+                    <div>Block: ${tx.blockNumber}</div>
+                    <div>Status: ${tx.confirmations > 0 ? 'Confirmed' : 'Pending'}</div>
+                `;
+                transactionList.appendChild(txElement);
+            });
+
+            document.getElementById('transaction-history').classList.remove('hidden');
+        } catch (error) {
+            console.log('Failed to fetch transaction history:', error);
+            displayPopup('Failed to fetch transaction history.', 'error');
+        }
+    }
+}
+
+function startPolling(address) {
+    setInterval(() => {
+        fetchTransactionHistory(address);
+    }, 60000); // Poll every 60 seconds
+}
+
+function getExplorerLink(chain, txHash) {
+    switch (chain) {
+        case 'ethereum':
+            return `https://etherscan.io/tx/${txHash}`;
+        case 'bsc':
+            return `https://bscscan.com/tx/${txHash}`;
+        case 'bnbTestnet':
+            return `https://testnet.bscscan.com/tx/${txHash}`;
+        case 'cosmicCoin':
+            return `https://bscscan.com/tx/${txHash}`;
+        default:
+            return null;
+    }
+}
+
+function displayPopup(message, type) {
+    const popup = document.getElementById('popup-message');
+    popup.innerHTML = message;
+    popup.className = type === 'success' ? 'success' : 'error';
+    popup.style.display = 'block';
+
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 300000);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        displayPopup('Address copied to clipboard!', 'success');
+    }, () => {
+        displayPopup('Failed to copy address.', 'error');
+    });
+}
 
 
 
