@@ -418,7 +418,7 @@ function parseAmount(amount, unit) {
     try {
         return ethers.utils.parseUnits(amount, unit);
     } catch (error) {
-        displayPopup('Invalid amount. Please enter a valid number.', 'error');
+        displayPopup('Invalid amount. Please enter a valid number. Note: The minimum transaction amount for BNB, BSC, and CosmicCoin is 0.00001 Ether. Due to unit conversion, you need to enter at least 100000 Gwei (equivalent to 0.00001 Ether). This ensures your transaction meets the blockchain requirements and covers the necessary gas fees.', 'error');
         return null;
     }
 }
