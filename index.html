@@ -457,8 +457,9 @@ function getExplorerLink(chain, txHash) {
     switch (chain) {
         case 'ethereum':
             return `https://etherscan.io/tx/${txHash}`;
+            case 'bnbTestnet':
+             return `https://testnet.bscscan.com//tx/${txHash}`;
         case 'bsc':
-        case 'bnbTestnet':
         case 'cosmicCoin':
             return `https://bscscan.com/tx/${txHash}`;
         default:
@@ -472,8 +473,10 @@ async function displayTransactionHistory(address, chain, provider) {
         case 'ethereum':
             explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
             break;
+            case 'bnbTestnet':
+            explorerApiUrl = `https://api.testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+            break;
         case 'bsc':
-        case 'bnbTestnet':
         case 'cosmicCoin':
             explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
             break;
@@ -518,7 +521,7 @@ function displayPopup(message, type) {
 
     setTimeout(() => {
         popup.style.display = 'none';
-    }, 300000);
+    }, 60000);
 }
 
 function copyToClipboard(text) {
