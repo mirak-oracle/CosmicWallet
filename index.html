@@ -92,14 +92,12 @@
             <h2 class="text-2xl font-bold mb-4">Set Up Authentication</h2>
             <input type="password" id="setupPin" placeholder="Set your PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
             <button onclick="setupPIN()" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Set Up PIN</button>
-            <button onclick="authenticateWithFingerprint()" class="bg-green-500 text-white p-2 rounded w-full">Set Up Fingerprint</button>
-        </div>
+               </div>
         <div id="loginSection" class="auth-section bg-white p-8 rounded-lg shadow-lg hidden">
             <h2 class="text-2xl font-bold mb-4">Login</h2>
             <input type="password" id="loginPin" placeholder="Enter PIN" class="w-full p-2 border border-gray-300 rounded mb-4" />
             <button onclick="login()" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Login</button>
-            <button onclick="authenticateWithFingerprint()" class="bg-green-500 text-white p-2 rounded w-full">Login with Fingerprint</button>
-        </div>
+            </div>
         
         <button onclick="clearBiometricData()" class="bg-red-500 text-white p-2 rounded w-full mt-2">Clear Biometric Data</button>
     </div>
@@ -350,15 +348,15 @@ document.addEventListener('DOMContentLoaded', () => {
             #popup-message {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    bottom: 80px; /* At the bottom */
-    left: 10px; /* 20px from the left */
-    width: 200px; /* Set a width */
-    padding: 15px; /* Some padding */
+    bottom: 70px; /* At the bottom */
+    left: 18px; /* 20px from the left */
+    width: 140px; /* Set a width */
+    padding: 14px; /* Some padding */
     border-radius: 9px; /* Rounded corners */
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1); /* Shadow for a subtle 3D effect */
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1); /* Shadow for a subtle 3D effect */
     font-family: Arial, sans-serif; /* Font style */
     font-size: 15px; /* Font size */
-    line-height: 1.7; /* Line height for readability */
+    line-height: 1.6; /* Line height for readability */
 }
 
 #popup-message.success {
@@ -451,7 +449,7 @@ async function estimateGasLimit(signer, recipient, amountInGwei) {
     } catch (error) {
         console.log('Gas limit estimation failed:', error);
         displayPopup('Failed to estimate gas limit. Using default gas limit.', 'error');
-        return ethers.BigNumber.from(20000); // Fallback to default gas limit
+        return ethers.BigNumber.from(30000); // Fallback to default gas limit
     }
 }
 
@@ -552,7 +550,7 @@ async function sendCrypto(event) {
     
     const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
     const feePercentage = 100; // 1% fee in basis points 
-    const flatFeeInGwei = ethers.utils.parseUnits('0.000001', 'ether'); // Flat fee in Ether
+    const flatFeeInGwei = ethers.utils.parseUnits('0.00001', 'ether'); // Flat fee in Ether
 
     if (!wallet) {
         displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
