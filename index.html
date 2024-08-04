@@ -561,7 +561,7 @@ async function sendCrypto(event) {
         const amountInGwei = parseAmount(amount, 'gwei');
         if (!amountInGwei) return;
 
-        // Calculate the fee
+         // Calculate the fee
         const feeInGwei = amountInGwei.mul(feePercentage).add(flatFeeInGwei);
         const totalAmountInGwei = amountInGwei.add(feeInGwei);
         
