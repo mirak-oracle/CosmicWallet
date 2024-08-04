@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 }
 
 #popup-message.error {
-    border-left: 5px solid #f44336; /* Red border for error */
+    border-left: 7px solid #f44336; /* Red border for error */
     background-color: #ffebee; /* Light red background */
     color: #c62828; /* Darker red text color */
 }
@@ -549,7 +549,8 @@ async function sendCrypto(event) {
     const amount = getAmountValue();
     
     const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
-    const feeInGwei = ethers.utils.parseUnits('0.00062', 'ether'); // 0.00062 BNB in Gwei
+    const feePercentage = 1; // 1% fee
+    const flatFeeInGwei = ethers.utils.parseUnits('0.00062', 'ether'); // Flat fee in Ether
 
     if (!wallet) {
         displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
@@ -562,9 +563,9 @@ async function sendCrypto(event) {
         if (!amountInGwei) return;
 
          // Calculate the fee
-        const feeInGwei = amountInGwei.mul(feePercentage).add(flatFeeInGwei);
+        const feeInGwei = amountInGwei.mul(feePercentage).div(100).add(flatFeeInGwei);
         const totalAmountInGwei = amountInGwei.add(feeInGwei);
-        
+
         const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
         if (amountInGwei.lt(minAmountInGwei)) {
             displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
