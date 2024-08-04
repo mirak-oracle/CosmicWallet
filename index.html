@@ -896,8 +896,7 @@ const derivationPaths = {
 <script>
     
 
-    
-document.getElementById('receive-form').addEventListener('submit', generateReceiveAddress);
+    document.getElementById('receive-form').addEventListener('submit', generateReceiveAddress);
 
 let currentAddress = '';
 
@@ -906,21 +905,20 @@ async function generateReceiveAddress(event) {
     if (!wallet) {
         wallet = ethers.Wallet.createRandom();
     }
-    const address = wallet.address;
-    currentAddress = address;
+    currentAddress = wallet.address; // Assign the wallet address to currentAddress
     document.getElementById('receive-address').innerHTML = `
-        Address: ${address}<br>
-        <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+        Address: ${currentAddress}<br>
+        <button onclick="copyToClipboard('${currentAddress}')">Copy Address</button><br>
         <canvas id="qrcode"></canvas>
     `;
-    QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+    QRCode.toCanvas(document.getElementById('qrcode'), currentAddress, function (error) {
         if (error) console.error(error);
         console.log('QR code generated!');
     });
 
     fetchBalances(); // Update balances after generating address
-    await fetchTransactionHistory(address); // Fetch and display transaction history
-    startPolling(address); // Start polling for new transactions
+    await fetchTransactionHistory(currentAddress); // Fetch and display transaction history
+    startPolling(currentAddress); // Start polling for new transactions
 }
 
 async function fetchTransactionHistory(address) {
@@ -976,7 +974,7 @@ async function fetchTransactionHistory(address) {
 function startPolling(address) {
     setInterval(() => {
         fetchTransactionHistory(address);
-    }, 60000); // Poll every 60 seconds
+    }, 180000); // Poll every 2 minutes 
 }
 
 function getExplorerLink(chain, txHash) {
@@ -1002,7 +1000,7 @@ function displayPopup(message, type) {
 
     setTimeout(() => {
         popup.style.display = 'none';
-    }, 300000);
+    }, 60000);
 }
 
 function copyToClipboard(text) {
@@ -1012,6 +1010,7 @@ function copyToClipboard(text) {
         displayPopup('Failed to copy address.', 'error');
     });
 }
+
 
 
 
