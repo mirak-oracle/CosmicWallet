@@ -586,7 +586,7 @@ async function sendCrypto(event) {
         const totalAmountInGwei = amountInGwei.add(feeInGwei);
 
         
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether').div(ethers.BigNumber.from(10).pow(9));
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
         if (amountInGwei.lt(minAmountInGwei)) {
             displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
             return;
