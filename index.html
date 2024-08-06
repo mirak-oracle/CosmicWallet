@@ -407,6 +407,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         </style>
+
+        <script>
+            const ethers = require('ethers');
+
+// Function to parse amount to specified unit
+function parseAmount(amount, unit) {
+    try {
+        return ethers.utils.parseUnits(amount.toString(), unit);
+    } catch (error) {
+        displayPopup('Invalid amount. Please enter a valid number.', 'error');
+        return null;
+    }
+}
+
+// Display popup message
+function displayPopup(message, type) {
+    console.log(`[${type.toUpperCase()}] ${message}`);
+}
+
+// Function to handle transactions
+function handleTransaction(chain, amountInEther) {
+    // Parse amount to Gwei
+    const amountInGwei = parseAmount(amountInEther, 'gwei');
+    if (!amountInGwei) return;
+
+    // Minimum transaction amount in Gwei (0.00001 Ether = 10,000 Gwei)
+    const minAmountInGwei = ethers.utils.parseUnits('10000', 'gwei');
+
+    // Check if the amount is below the minimum
+    if (amountInGwei.lt(minAmountInGwei)) {
+        displayPopup(`Minimum transaction amount for ${chain} is 0.00001 Ether (10,000 Gwei).`, 'error');
+        return;
+    }
+
+    const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
+    const feePercentage = 1; // 1% fee
+    const flatFeeInGwei = ethers.utils.parseUnits('0.00062', 'ether'); // Flat fee in Ether
+
+    // Calculate the fee
+    const feeInGwei = amountInGwei.mul(feePercentage).div(100).add(flatFeeInGwei);
+    const totalAmountInGwei = amountInGwei.add(feeInGwei);
+
+    // Ensure total amount is correctly formatted
+    console.log(`Total amount in Gwei for ${chain}:`, totalAmountInGwei.toString());
+
+    // Proceed with the transaction using totalAmountInGwei
+    // Replace the following with your transaction sending logic
+    console.log(`Proceeding with transaction on ${chain}...`);
+}
+
+// Supported chains and their configurations
+const chains = ['BnbTestnet', 'Bnb', 'Ethereum', 'CosmicCoin'];
+const amountToSend = '0.00001'; // Replace with the amount you want to send
+
+chains.forEach(chain => {
+    handleTransaction(chain, amountToSend);
+});
+
+        </script> 
         
             <script>
     
@@ -425,15 +484,8 @@ function getAmountValue() {
     return document.getElementById('amount').value;
 }
 
-function parseAmount(amount, unit) {
-    try {
-        return ethers.utils.parseUnits(amount, unit);
-    } catch (error) {
-        displayPopup('Invalid amount. Please enter a valid number. Note: The minimum transaction amount for BNB, BSC, and CosmicCoin is 0.00001 Ether. Due to unit conversion, you need to enter at least 100000 Gwei (equivalent to 0.00001 Ether). This ensures your transaction meets the blockchain requirements and covers the necessary gas fees.', 'error');
-        return null;
-    }
-}
 
+                
 function getProvider(chain) {
     switch (chain) {
         case 'ethereum':
@@ -562,29 +614,13 @@ async function sendCrypto(event) {
     const recipient = getRecipientValue();
     const amount = getAmountValue();
     
-    const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
-    const feePercentage = 1; // 1% fee
-    const flatFeeInGwei = ethers.utils.parseUnits('0.00062', 'ether'); // Flat fee in Ether
-
+    
     if (!wallet) {
         displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
         return;
     }
 
-    try {
-        // Parse amount to Gwei
-        const amountInGwei = parseAmount(amount, 'gwei');
-        if (!amountInGwei) return;
-
-         // Calculate the fee
-        const feeInGwei = amountInGwei.mul(feePercentage).div(100).add(flatFeeInGwei);
-        const totalAmountInGwei = amountInGwei.add(feeInGwei);
-
-        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
-        if (amountInGwei.lt(minAmountInGwei)) {
-            displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
-            return;
-        }
+    
 
         const provider = getProvider(chain);
         const signer = wallet.connect(provider);
