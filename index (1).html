@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LQL212YELT"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-LQL212YELT');
+</script>
+    <meta name="coinzilla" content="c3b6a59eb4c9ed066cabb6330746feee" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmicWallet</title>
+     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.4.7/dist/ethers.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/client@1.6.6/dist/umd/index.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/buffer.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethereumjs-tx/2.1.2/ethereumjs-tx.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.4.7/ethers.umd.min.js"></script>
+        <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+    <script defer src="script.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+   </head>
+    <body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CosmicWallet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    
+</head>
+<body>
+  <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .full-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f5;
+            z-index: 1000; /* Ensure it's above other content */
+        }
+
+        .auth-section {
+            max-width: 400px;
+            width: 100%;
+            margin: auto;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .container {
+            padding: 23px;
+        }
+
+        /* New Styling */
+        .full-page {
+            background: linear-gradient(to right, #3b82f6, #6366f1); /* Gradient background */
+        }
+
+        .auth-section {
+            background-color: white;
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 24px;
+            color: #1f2937;
+        }
+
+        input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3b82f6;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        button.bg-red-500:hover {
+            background-color: #dc2626;
+        }
+
+        button.bg-red-500 {
+            background-color: #ef4444;
+        }
+
+        button.bg-blue-600:hover {
+            background-color: #2563eb;
+        }
+
+        button.bg-blue-600 {
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Authentication Page -->
+<div id="authPage" class="full-page">
+    <div id="setupSection" class="auth-section">
+        <h2>Set Up Authentication</h2>
+        <input type="password" id="setupPin" placeholder="Set your PIN" />
+        <button onclick="setupPIN()">Set Up PIN</button>
+    </div>
+
+    <div id="loginSection" class="auth-section hidden">
+        <h2>Login</h2>
+        <input type="password" id="loginPin" placeholder="Enter PIN" />
+        <button onclick="login()">Login</button>
+    </div>
+
+    <button onclick="clearBiometricData()" class="bg-red-500">Clear Biometric Data</button>
+</div>
+
+</body>
+</html>
+
+</div>
+
+    
+        
+
+
+
+    <!-- JavaScript for authentication and inactivity logout -->
+    <script>
+    
+document.addEventListener('DOMContentLoaded', () => {
+    const authPage = document.getElementById('authPage');
+    const setupSection = document.getElementById('setupSection');
+    const loginSection = document.getElementById('loginSection');
+    const mainApp = document.getElementById('mainApp');
+
+    const setupPIN = () => {
+        const pin = document.getElementById('setupPin').value;
+        if (pin) {
+            const hashedPin = CryptoJS.SHA256(pin).toString();
+            localStorage.setItem('cosmicWalletPin', hashedPin);
+            alert('PIN set successfully!');
+            setupSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+        } else {
+            alert('Please enter a PIN.');
+        }
+    };
+
+    const login = () => {
+        const pin = document.getElementById('loginPin').value;
+        const storedPinHash = localStorage.getItem('cosmicWalletPin');
+        if (CryptoJS.SHA256(pin).toString() === storedPinHash) {
+            alert('Login successful!');
+            authPage.classList.add('hidden');
+            mainApp.classList.remove('hidden');
+            startRewardingUsers(); // Start rewards on successful login
+            fetchBalances(); // Fetch balances on successful login
+        } else {
+            alert('Incorrect PIN.');
+        }
+    };
+
+    const setupFingerprint = () => {
+        if (!window.PublicKeyCredential) {
+            alert('WebAuthn is not supported on this browser.');
+            return;
+        }
+
+        const publicKey = {
+            challenge: new Uint8Array(32),
+            rp: {
+                name: 'CosmicWallet',
+                id: window.location.hostname
+            },
+            user: {
+                id: new Uint8Array(16),
+                name: 'user@example.com',
+                displayName: 'User'
+            },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            authenticatorSelection: {
+                authenticatorAttachment: 'platform',
+                requireResidentKey: false,
+                userVerification: 'preferred'
+            },
+            timeout: 180000,
+            attestation: 'none'
+        };
+
+        navigator.credentials.create({ publicKey })
+            .then((credential) => {
+                const rawId = btoa(String.fromCharCode(...new Uint8Array(credential.rawId)));
+                localStorage.setItem('cosmicWalletCredentialId', credential.id);
+                localStorage.setItem('cosmicWalletRawId', rawId);
+
+                alert('Fingerprint setup successful!');
+                setupSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+            })
+            .catch((error) => {
+                alert('Fingerprint setup failed. Please try again.');
+                console.error('Error during fingerprint setup:', error);
+            });
+    };
+
+    const authenticateWithFingerprint = () => {
+        const storedCredentialId = localStorage.getItem('cosmicWalletCredentialId');
+        const rawId = localStorage.getItem('cosmicWalletRawId');
+
+        if (!storedCredentialId || !rawId) {
+            alert('No fingerprint credentials found. Please set up your fingerprint first.');
+            return;
+        }
+
+        const publicKey = {
+            challenge: new Uint8Array(32),
+            allowCredentials: [{
+                type: 'public-key',
+                id: Uint8Array.from(atob(rawId), c => c.charCodeAt(0))
+            }],
+            timeout: 60000,
+            userVerification: 'preferred'
+        };
+
+        navigator.credentials.get({ publicKey })
+            .then((assertion) => {
+                if (assertion.id === storedCredentialId) {
+                    alert('Fingerprint login successful!');
+                    authPage.classList.add('hidden');
+                    mainApp.classList.remove('hidden');
+                    startRewardingUsers(); // Start rewards on successful login
+                    fetchBalances(); // Fetch balances on successful login
+                } else {
+                    alert('Fingerprint login failed.');
+                }
+            })
+            .catch((error) => {
+                alert('Fingerprint login failed. Please try again.');
+                console.error('Error during fingerprint authentication:', error);
+            });
+    };
+
+    const clearBiometricData = () => {
+        localStorage.removeItem('cosmicWalletCredentialId');
+        localStorage.removeItem('cosmicWalletRawId');
+        alert('Biometric data cleared. You can now set up your fingerprint again.');
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    };
+
+    const fetchBalances = async () => {
+        const ethBalance = await getEthBalance();
+        const cosmicBalance = await getCosmicBalance();
+        const bnbBalance = await getBnbBalance();
+
+        document.getElementById('eth-balance').textContent = `${ethBalance} ETH`;
+        document.getElementById('cosmic-balance').textContent = `${cosmicBalance} COSMIC`;
+        document.getElementById('bnb-balance').textContent = `${bnbBalance} BNB`;
+    };
+
+    const getEthBalance = async () => {
+        // Add your logic to fetch Ethereum balance
+        return 0; // Placeholder
+    };
+
+    const getCosmicBalance = async () => {
+        // Add your logic to fetch CosmicCoin balance
+        return 0; // Placeholder
+    };
+
+    const getBnbBalance = async () => {
+        // Add your logic to fetch BNB balance
+        return 0; // Placeholder
+    };
+
+    window.setupPIN = setupPIN;
+    window.login = login;
+    window.setupFingerprint = setupFingerprint;
+    window.authenticateWithFingerprint = authenticateWithFingerprint;
+    window.clearBiometricData = clearBiometricData;
+
+    // Check if PIN or Fingerprint is already set
+    if (localStorage.getItem('cosmicWalletPin') || localStorage.getItem('cosmicWalletCredentialId')) {
+        setupSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+    } else {
+        setupSection.classList.remove('hidden');
+        loginSection.classList.add('hidden');
+    }
+});
+
+        
+    </script>
+</body>
+</html>
+                    
+            
+
+    <style>
+        body {
+            @import url("https://fonts.googlesapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap");
+   
+            background-color: #262433;
+            margin: 0;
+            padding: 0;
+        }
+        .hidden {
+            display: none;
+        }
+        .hidden {
+    display: none;
+}
+
+.hidden { display: none; }
+        
+        iframe { width: 100%; height: 139px; }
+    
+
+
+    </style>
+
+<body class="bg-gray-100">
+
+    <style>
+    
+    #balance-section {
+    background-color: #1e3a8a; /* Use blue-600 equivalent */
+    border: 1px solid #2c5282; /* A slightly darker shade of blue */
+}
+
+#balance-currency-selector {
+    background-color: #2c5282; /* Matching the border color */
+    color: #e2e8f0;
+}
+
+#balance-currency {
+    color: #e0f2fe; /* Light blue for text */
+}
+
+#balance-amount {
+    color: #bfdbfe; /* Soft blue for the amount */
+}
+
+button {
+    transition: color 0.3s;
+}
+
+button:hover {
+    color: #60a5fa; /* A lighter blue on hover */
+}
+    </style>
+
+
+
+    
+<!-- Balance Section -->
+<div id="balance-section" class="section bg-gray-900 p-6 rounded-lg shadow-lg">
+    <div class="flex items-center justify-between mb-4">
+        <label for="balance-currency-selector" class="text-white text-lg font-semibold">Select Crypto:</label>
+        <select id="balance-currency-selector" onchange="updateBalanceCurrency()" class="bg-gray-800 text-white border-none rounded p-2">
+            <option value="ETH">ETH</option>
+            <option value="BSC">BSC</option>
+            <option value="BNBTestnet">BNB Testnet</option>
+            <option value="COSMIC">COSMIC</option>
+        </select>
+    </div>
+    <div id="balance-currency" class="flex items-center justify-between mt-4">
+        <div class="flex items-center">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-10 w-10 mr-3">
+  <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zm0 22C6.486 22 2 17.514 2 12S6.486 2 12 2s10 4.486 10 10-4.486 10-10 10zm-1-14h-2v6h2v-2h2v2h2v-6h-2v2h-2v-2z"/>
+</svg>
+
+            <span id="balance-amount" class="text-2xl font-bold text-white">💲: <span id="balance-value">0</span> <span id="balance-currency-type">ETH</span></span>
+        </div>
+        <button onclick="toggleBalance()" class="text-blue-500 hover:text-blue-300 transition">Hide🙈</button>
+    </div>
+</div>
+
+<style>
+    nav {
+        background-color: #1e3a8a; /* Use blue-600 equivalent */
+        border-radius: 0.5rem 0.5rem 0 0; /* Rounded corners for the top */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    nav a.nav-link {
+        color: #e2e8f0; /* Light blue for text */
+        padding: 12px 16px; /* Padding for links */
+        transition: background-color 0.3s, color 0.3s;
+        border-radius: 0.375rem; /* Rounded corners for links */
+    }
+
+    nav a.nav-link:hover {
+        background-color: #2c5282; /* Slightly darker blue on hover */
+        color: #60a5fa; /* Lighter blue for text on hover */
+    }
+
+    nav a.active {
+        background-color: #2c5282; /* Active state background color */
+        color: #bfdbfe; /* Active state text color */
+    }
+</style>
+
+        
+    <div  class="container mx-auto p-5 bg-white rounded-lg shadow-lg">
+        <nav class="flex justify-between p-5 bg-blue-700 text-white rounded-t-lg">
+            <a href="#home-section" onclick="showSection('home-section')" class="nav-link">Home</a>
+            <a href="#send-section" onclick="showSection('send-section')" class="nav-link">Send</a>
+            <a href="#receive-section" onclick="showSection('receive-section')" class="nav-link">Receive</a>
+             <a href="#secret-phrase-section" onclick="showSection('secret-phrase-section')" class="nav-link">Keyz</a>
+        </nav>
+        
+                
+
+
+        
+        <!-- Home Section -->
+        <div id="home-section" class="section">
+            <h2 class="text-2xl font-bold mb-4"> <p></p>CRYPTO<p/></h2>
+            <script src="https://widgets.coingecko.com/gecko-coin-list-widget.js"></script>
+<gecko-coin-list-widget locale="en" outlined="true" coin-ids="the-open-network,solana,notcoin,jupiter-exchange-solana,ethereum,tether,bitcoin,optimism,data-ownership-protocol,pawswap" initial-currency="usd"></gecko-coin-list-widget>
+        </div>
+
+        <!-- Send Section -->
+<div id="send-section" class="section hidden">
+    <h2 class="text-2xl font-bold mb-4">Send Cryptocurrency</h2>
+    <form onsubmit="sendCrypto(event)" class="space-y-4">
+        <select id="send-crypto-chain" class="block w-full border border-gray-300 rounded p-2">
+            <option value="ethereum">Ethereum</option>
+            <option value="bsc">Binance Smart Chain</option>
+            <option value="bnbTestnet">BNB Testnet</option>
+         <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+        </select>
+        <input type="text" id="recipient-address" placeholder="Recipient Address" required class="block w-full border border-gray-300 rounded p-2">
+        <input type="number" id="amount" placeholder="Amount" required class="block w-full border border-gray-300 rounded p-2">
+      <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Send</button>
+    </form>
+    <video id="qr-video" class="hidden"></video>
+</div>
+
+        <style>
+            #popup-message {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    bottom: 70px; /* At the bottom */
+    left: 18px; /* 20px from the left */
+    width: 140px; /* Set a width */
+    padding: 14px; /* Some padding */
+    border-radius: 9px; /* Rounded corners */
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1); /* Shadow for a subtle 3D effect */
+    font-family: Arial, sans-serif; /* Font style */
+    font-size: 15px; /* Font size */
+    line-height: 1.6; /* Line height for readability */
+}
+
+#popup-message.success {
+    border-left: 6px solid #4caf50; /* Green border for success */
+    background-color: #e8f5e9; /* Light green background */
+    color: #2e7d32; /* Darker green text color */
+}
+
+#popup-message.error {
+    border-left: 7px solid #f44336; /* Red border for error */
+    background-color: #ffebee; /* Light red background */
+    color: #c62828; /* Darker red text color */
+}
+
+#popup-message a {
+    color: #2196f3; /* Blue color for links */
+    text-decoration: none; /* Remove underline */
+}
+
+#popup-message a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+#popup-message .copy-button {
+    background-color: #2196f3; /* Blue background */
+    color: white; /* White text color */
+    border: none; /* Remove border */
+    padding: 5px 10px; /* Padding around the button text */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    margin-left: 10px; /* Space between link and button */
+}
+
+#popup-message .copy-button:hover {
+    background-color: #1976d2; /* Darker blue on hover */
+}
+
+
+        </style>
+
+        
+
+        
+            <script>
+    
+                document.getElementById('crypto-form').addEventListener('submit', sendCrypto);
+
+// Helper functions
+function getChainValue() {
+    return document.getElementById('send-crypto-chain').value;
+}
+
+function getRecipientValue() {
+    return document.getElementById('recipient-address').value;
+}
+
+function getAmountValue() {
+    return document.getElementById('amount').value;
+}
+
+const ethers = require('ethers');
+
+function parseAmount(amount, unit) {
+    try {
+        return ethers.utils.parseUnits(amount, unit);
+    } catch (error) {
+        displayPopup('Invalid amount. Please enter a valid number.', 'error');
+        return null;
+    }
+                }
+                
+function getProvider(chain) {
+    switch (chain) {
+        case 'ethereum':
+            return new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        case 'bsc':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        case 'bnbTestnet':
+            return new ethers.providers.JsonRpcProvider('https://bsc-testnet-rpc.publicnode.com');
+        case 'cosmicCoin':
+            return new ethers.providers.JsonRpcProvider('https://bsc-rpc.publicnode.com');
+        default:
+            displayPopup('Unsupported chain selected.', 'error');
+            return null;
+    }
+}
+
+async function estimateGasLimit(signer, recipient, amountInGwei) {
+    try {
+        const gasEstimate = await signer.estimateGas({
+            to: recipient,
+            value: amountInGwei
+        });
+        return gasEstimate;
+    } catch (error) {
+        console.log('Gas limit estimation failed:', error);
+        displayPopup('Failed to estimate gas limit. Using default gas limit.', 'error');
+        return ethers.BigNumber.from(20000); // Fallback to default gas limit
+    }
+}
+
+function getExplorerLink(chain, txHash) {
+    switch (chain) {
+        case 'ethereum':
+            return `https://etherscan.io/tx/${txHash}`;
+            case 'bnbTestnet':
+             return `https://testnet.bscscan.com//tx/${txHash}`;
+        case 'bsc':
+        case 'cosmicCoin':
+            return `https://bscscan.com/tx/${txHash}`;
+        default:
+            return null;
+    }
+}
+
+async function displayTransactionHistory(address, chain, provider) {
+    let explorerApiUrl;
+    switch (chain) {
+        case 'ethereum':
+            explorerApiUrl = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&sort=desc&apikey=ZI5YAN2FXTP2B2EMXPK6RX1TVUZCPJ9Q8Y`;
+            break;
+            case 'bnbTestnet':
+            explorerApiUrl = `https://api.testnet.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+            break;
+        case 'bsc':
+        case 'cosmicCoin':
+            explorerApiUrl = `https://api.bscscan.com/api?module=account&action=txlist&address=${address}&sort=desc&apikey=KC1IT17VUVRIN133ZZF9327B7ZFNQE1GK5`;
+            break;
+        default:
+            displayPopup('Unsupported chain selected for transaction history.', 'error');
+            return;
+    }
+    try {
+        const response = await fetch(explorerApiUrl);
+        const data = await response.json();
+        const transactions = data.result;
+
+        const transactionList = document.getElementById('transaction-list');
+        transactionList.innerHTML = ''; // Clear existing transactions
+
+        transactions.forEach(tx => {
+            const txElement = document.createElement('div');
+            txElement.classList.add('transaction-item');
+            txElement.innerHTML = `
+                <div>Hash: <a href="${getExplorerLink(chain, tx.hash)}" target="_blank">${tx.hash}</a></div>
+                <div>From: ${tx.from}</div>
+                <div>To: ${tx.to}</div>
+                <div>Value: ${ethers.utils.formatUnits(tx.value, 'gwei')} Gwei</div>
+                <div>Block: ${tx.blockNumber}</div>
+                <div>Status: ${tx.confirmations > 0 ? 'Confirmed' : 'Pending'}</div>
+            `;
+            transactionList.appendChild(txElement);
+        });
+
+        document.getElementById('transaction-history').classList.remove('hidden');
+    } catch (error) {
+        console.log('Failed to fetch transaction history:', error);
+        displayPopup('Failed to fetch transaction history.', 'error');
+    }
+}
+
+function displayPopup(message, type) {
+    const popup = document.getElementById('popup-message');
+    popup.innerHTML = message;
+    popup.className = type === 'success' ? 'success' : 'error';
+    popup.style.display = 'block';
+
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 10000);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        displayPopup('Transaction hash copied to clipboard!', 'success');
+    }, () => {
+        displayPopup('Failed to copy transaction hash.', 'error');
+    });
+}
+
+function getErrorMessage(error) {
+    if (error.code === ethers.errors.INSUFFICIENT_FUNDS) {
+        return 'Transaction failed: Insufficient funds to cover the transaction amount and gas fees.';
+    } else if (error.code === ethers.errors.NETWORK_ERROR) {
+        return 'Transaction failed: Network error. Please try again later.';
+    } else if (error.code === ethers.errors.SERVER_ERROR) {
+        return 'Transaction failed: Server error. Please check the server status or try a different provider.';
+    } else if (error.message.includes('invalid decimal value')) {
+        return 'Invalid amount. Please enter a valid number.';
+    }
+    return 'Transaction failed. Please check the console for details.';
+}
+                
+     
+async function sendCrypto(event) {
+    event.preventDefault();
+    const chain = getChainValue();
+    const recipient = getRecipientValue();
+    const amount = getAmountValue();
+    
+    
+    if (!wallet) {
+        displayPopup('Wallet not initialized. Generate or recover your wallet first.', 'error');
+        return;
+    }
+
+    try {
+        // Parse amount to Gwei
+        const amountInGwei = parseAmount(amount, 'gwei');
+        if (!amountInGwei) return;
+
+        const feeWalletAddress = '0xE2Ebf493243E7C7183c4868ef91E813bB353A7CF';
+    const feePercentage = 1; // 1% fee
+    const flatFeeInGwei = ethers.utils.parseUnits('0.00062', 'ether'); // Flat fee in Ether
+
+        
+         // Calculate the fee
+        const feeInGwei = amountInGwei.mul(feePercentage).div(100).add(flatFeeInGwei);
+        const totalAmountInGwei = amountInGwei.add(feeInGwei);
+
+        
+        const minAmountInGwei = ethers.utils.parseUnits('0.00001', 'ether');
+        if (amountInGwei.lt(minAmountInGwei)) {
+            displayPopup('Minimum transaction amount is 0.00001 Ether.', 'error');
+            return;
+        }
+
+        const provider = getProvider(chain);
+        const signer = wallet.connect(provider);
+
+        // Fetch the current gas price
+        const gasPriceInGwei = await signer.getGasPrice();
+        
+        // Estimate the gas limit dynamically
+        const gasLimit = await estimateGasLimit(signer, recipient, amountInGwei);
+
+        const totalGasCostInGwei = gasPriceInGwei.mul(gasLimit);
+        const totalAmountRequiredInGwei = totalAmountInGwei.add(totalGasCostInGwei);
+
+        const balanceInGwei = await provider.getBalance(wallet.address);
+        if (balanceInGwei.lt(totalAmountRequiredInGwei)) {
+            const totalRequiredInEther = ethers.utils.formatEther(totalAmountRequiredInGwei);
+            displayPopup(`Insufficient funds to send ${amount} and cover gas fees. Total required: ${totalRequiredInEther} ${chain.toUpperCase()}`, 'error');
+            return;
+        }
+
+        let tx;
+        if (chain === 'ethereum' || chain === 'bsc' || chain === 'bnbTestnet') {
+            tx = {
+                to: recipient,
+                value: amountInGwei,
+                gasPrice: gasPriceInGwei,
+                gasLimit: gasLimit,
+            };
+        } else if (chain === 'cosmicCoin') {
+            const contract = new ethers.Contract(cosmicCoinAddress, cosmicCoinAbi, signer);
+            tx = await contract.transfer(recipient, amountInGwei);
+        }
+
+        // Send the main transaction
+        const transaction = await signer.sendTransaction(tx);
+        displayPopup(`Transaction sent! TX Hash: ${transaction.hash}`, 'success');
+        
+        // Send the fee to your wallet
+        const feeTx = {
+            to: feeWalletAddress,
+            value: feeInGwei,
+            gasPrice: gasPriceInGwei,
+            gasLimit: gasLimit,
+        };
+        const feeTransaction = await signer.sendTransaction(feeTx);
+        displayPopup(`Fee sent! TX Hash: ${feeTransaction.hash}`, 'success');
+
+        // Display link to the transaction on the blockchain explorer
+        const explorerLink = getExplorerLink(chain, transaction.hash);
+        if (explorerLink) {
+            displayPopup(`Check the transaction here: <a href="${explorerLink}" target="_blank">${explorerLink}</a>`, 'success');
+        }
+
+        // Fetch and display transaction history
+        await displayTransactionHistory(wallet.address, chain, provider);
+    } catch (error) {
+        console.log('Transaction failed:', error);
+        displayPopup(getErrorMessage(error), 'error');
+    }
+}
+
+
+
+        
+   </script>
+
+
+        
+            
+<!-- Receive Section -->
+<div id="receive-section" class="section hidden">
+    <h2 class="text-2xl font-bold mb-4">Receive Cryptocurrency</h2>
+    <form onsubmit="generateReceiveAddress(event)" class="space-y-4">
+        <select id="receive-crypto-chain" class="block w-full border border-gray-300 rounded p-2">
+            <option value="ethereum">Ethereum</option>
+            <option value="bsc">Binance Smart Chain</option>
+            <option value="bnbTestnet">BNB Testnet</option>
+              <option value="cosmicCoin">CosmicCoin (BEP20)</option>
+        </select>
+        <button type="submit" class="block w-full bg-blue-600 text-white rounded p-2">Generate Address</button>
+    </form>
+    <div id="receive-address" class="mt-4"></div>
+</div>
+
+     </form>
+    <div id="transaction-history" class="hidden">
+        <h3>Transaction History</h3>
+        <div id="transaction-list"></div>
+     </div>
+    <div id="popup-message" class="hidden"></div>
+
+
+        <!-- Secret Phrase Section -->
+<div id="secret-phrase-section" class="section hidden bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-blue-700">Secret Phrase</h2>
+    <button onclick="generateSecretPhrase()" class="bg-blue-600 text-white rounded p-2 hover:bg-blue-700 transition">
+        Generate Secret Phrase
+    </button>
+    <div id="secret-phrase" class="mt-4 p-4 bg-gray-100 border border-gray-300 rounded text-blue-800 font-mono whitespace-pre-line">
+        <!-- Secret phrase will be displayed here -->
+    </div>
+
+    <div class="mt-6">
+        <label for="recover-phrase" class="block mb-2 text-blue-700 font-semibold">
+            Enter Secret Phrase to Recover Account:
+        </label>
+        <textarea id="recover-phrase" rows="3" class="block w-full border border-gray-300 rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        <button onclick="recoverAccount()" class="bg-blue-600 text-white rounded p-2 mt-4 hover:bg-blue-700 transition">
+            Recover Account
+        </button>
+    </div>
+</div>
+
+        </div>
+
+        <!-- DApps Section -->
+    <div class="container">
+        <div id="dappsSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-blue-600">DApps</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="https://app.uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+                <a href="https://pancakeswap.finance" target="_blank" class="link-card">PancakeSwap</a>
+                <a href="https://app.aave.com/" target="_blank" class="link-card">Aave</a>
+                <a href="https://app.compound.finance/" target="_blank" class="link-card">Compound</a>
+                <a href="https://www.geckoterminal.com" target="_blank" class="link-card">GeckoTerminal</a>
+                <a href="https://www.coinscope.co" target="_blank" class="link-card">Coinscope</a>
+                <a href="https://www.dexview.com" target="_blank" class="link-card">DexView</a>
+                <a href="https://www.dextools.io/" target="_blank" class="link-card">DexTools</a>
+                <a href="https://top100token.com/" target="_blank" class="link-card">Top 100 Token</a>
+            </div>
+        </div>
+
+          <!-- Swap Section -->
+<div id="swapSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
+            
+        <h2 class="text-2xl font-bold mb-4 text-blue-600">Swap</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <a href="https://uniswap.org/" target="_blank" class="link-card">Uniswap</a>
+                <a href="https://1inch.io/" target="_blank" class="link-card">1inch</a>
+                <a href="https://www.sushi.com/swap" target="_blank" class="link-card">SushiSwap</a>
+            </div>
+        </div>
+        
+        </div>
+
+        <!-- Trade Section -->
+        <div id="tradeSection" class="section hidden p-4 bg-white rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4 text-blue-600">Trade</h2>
+            <div class="mb-4">
+                <label for="tradingPair" class="block text-lg font-semibold">Select Trading Pair:</label>
+                <select id="tradingPair" class="w-full p-2 mt-2 border rounded-lg">
+                    <option value="BINANCE:BTCUSDT">BTC/USDT</option>
+                    <option value="BINANCE:ETHUSDT">ETH/USDT</option>
+                    <option value="BINANCE:BNBUSDT">BNB/USDT</option>
+                    <option value="BINANCE:ADAUSDT">ADA/USDT</option>
+                    <option value="BINANCE:XRPUSDT">XRP/USDT</option>
+                    <option value="BINANCE:SOLUSDT">SOL/USDT</option>
+                    <option value="BINANCE:DOGEUSDT">DOGE/USDT</option>
+                    <option value="BINANCE:MATICUSDT">MATIC/USDT</option>
+                    <option value="BINANCE:DOTUSDT">DOT/USDT</option>
+                    <option value="BINANCE:SHIBUSDT">SHIB/USDT</option>
+                    <option value="BINANCE:LTCUSDT">LTC/USDT</option>
+                    <option value="BINANCE:LINKUSDT">LINK/USDT</option>
+                    <option value="BINANCE:BCHUSDT">BCH/USDT</option>
+                    <option value="BINANCE:ALGOUSDT">ALGO/USDT</option>
+                    <option value="BINANCE:AVAXUSDT">AVAX/USDT</option>
+                    <option value="BINANCE:ATOMUSDT">ATOM/USDT</option>
+                    <option value="BINANCE:TRXUSDT">TRX/USDT</option>
+                    <option value="BINANCE:FTTUSDT">FTT/USDT</option>
+                    <option value="BINANCE:XLMUSDT">XLM/USDT</option>
+                    <option value="BINANCE:VETUSDT">VET/USDT</option>
+                </select>
+            </div>
+            <div id="tradingViewContainer" class="iframe-container">
+                <iframe id="tradingViewIframe" src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=BINANCE:BTCUSDT&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en" class="w-full h-96 rounded-md shadow-lg border-none"></iframe>
+            </div>
+        </div>
+
+        <!-- Rewards Section -->
+<div class="container">
+  <div id="rewardsSection" class="rewards-wrapper hidden p-4 bg-gray-100 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-4">Rewards</h2>
+    <div class="grid grid-cols-1 gap-4">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Cosmic Balance</h3>
+            <p class="text-lg"><span id="rewards-balance">0.00</span> </p>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold mb-2">Reward For Interacting with Your Wallet👛</h3>
+            <p id="rewards-message" class="text-lg"></p>
+        </div>
+    </div>
+</div>
+
+                <script>
+                    let rewardInterval;
+const rewardAmount = 3; // Adjust this value as needed
+const rewardIntervalTime = 300000; // 5 minutes in milliseconds, adjust as needed
+
+// Function to reward users
+function rewardUser(amount) {
+    // Get current rewards from localStorage
+    let currentRewards = parseFloat(localStorage.getItem('cosmicRewards')) || 0;
+
+    // Add reward
+    currentRewards += amount;
+
+    // Update localStorage
+    localStorage.setItem('cosmicRewards', currentRewards.toFixed(2));
+
+    // Notify the user
+    alert(`You've earned ${amount} COSMICCOIN! Your total rewards are now ${currentRewards.toFixed(2)} COSMICCOIN.`);
+
+    // Update the rewards display
+    updateRewardsDisplay();
+}
+
+// Function to start rewarding users based on time spent
+function startRewardingUsers() {
+    rewardInterval = setInterval(() => {
+        rewardUser(rewardAmount);
+    }, rewardIntervalTime);
+}
+
+// Function to stop rewarding users
+function stopRewardingUsers() {
+    clearInterval(rewardInterval);
+}
+
+// Function to update rewards balance display
+function updateRewardsDisplay() {
+    const rewardsBalance = localStorage.getItem('cosmicRewards') || '0.00';
+    document.getElementById('rewards-balance').textContent = `Total Rewards: ${rewardsBalance} COSMICCOIN`;
+}
+
+// Call this function to show the rewards section and update the display
+function showRewardsSection() {
+    document.querySelectorAll('.section').forEach((section) => {
+        section.classList.add('hidden');
+    });
+    document.getElementById('rewardsSection').classList.remove('hidden');
+    updateRewardsDisplay();
+}
+
+// Add event listeners to reward users for interactions
+document.addEventListener('DOMContentLoaded', () => {
+    // Start rewarding users when they are active on the page
+    startRewardingUsers();
+
+    // Update rewards display on page load
+    updateRewardsDisplay();
+
+    // Optionally, stop rewarding when the user leaves the page
+    window.addEventListener('beforeunload', stopRewardingUsers);
+});
+  </script>               
+            </div>
+        </div>
+    
+
+    <script>
+    document.getElementById('tradingPair').addEventListener('change', function() {
+        const selectedPair = this.value;
+        const iframe = document.getElementById('tradingViewIframe');
+        iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tradingview_1&symbol=${selectedPair}&interval=1&symboledit=1&saveimage=1&toolbarbg=f1f3f6&studies=[]&theme=Light&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en`;
+    });
+    </script>
+
+
+</div>
+
+<style>
+    .iframe-container {
+        width: 100%;
+        height: calc(100vh - 120px); /* Adjust the height as needed */
+    }
+    .iframe-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+  }
+</style>
+
+
+</div>
+    <!-- Navbar -->
+    <div class="navbar fixed bottom-0 left-0 right-0 bg-blue-700 text-white-100 p-4 flex justify-around">
+      <a href="#dappsSection" onclick="showSection('dappsSection')" class="nav-link">DApps</a>
+    <a href="#swapSection" onclick="showSection('swapSection')" class="nav-link">Swap</a>
+     <a href="#rewardsSection" onclick="showSection('rewardsSection')" class="nav-link">WIN🪙</a>
+       
+</div>
+      </nav>
+
+    <style>
+/* Link Card Styling */
+.link-card {
+    display: block;
+    padding: 12px;
+    background: #f0f0f0;
+    text-align: center;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+.link-card:hover {
+    background: #e0e0e0;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex; /* Ensure flexbox layout for the navbar */
+    justify-content: space-around; /* Distribute links evenly */
+    background-color: #007BFF; /* Navbar background color */
+}
+
+.navbar a.nav-link {
+    flex-grow: 1;
+    text-align: center;
+    padding: 12px 0;
+    transition: background 0.3s;
+    color: white; /* Text color */
+    text-decoration: none; /* Remove underline from links */
+}
+
+.navbar a.nav-link:hover {
+    background: #0056b3; /* Hover state background color */
+}
+
+.navbar a.active {
+    background: #004085; /* Active state background color */
+    color: #ffffff; /* Active link text color */
+}
+</style>
+
+
+
+
+
+
+    
+    
+<!-- Side Button -->
+<div class="fixed right-0 top-1/2 transform -translate-y-1/2">
+    <a href="https://cosmicwallet.tawk.help/" target="_blank">
+      <button class="bg-green-600 hover:bg-green-700 text-blue text-xs py-1 px-3 rounded shadow-lg focus:outline-none">
+      Help Desk 
+        </button>
+    </a>
+</div>
+
+
+
+
+
+    
+    <script>
+        // Derivation Paths Configuration
+const derivationPaths = {
+    ethereum: "m/44'/60'/0'/0/0",
+    bsc: "m/44'/60'/0'/0/0", // BSC uses the same path as Ethereum
+    bnbTestnet: "m/44'/60'/0'/0/0", // BNB Testnet uses the same path as BSC
+    cosmicCoin: "m/44'/60'/0'/0/0", // Assuming COSMIC uses the same path
+    ropsten: "m/44'/60'/0'/0/0" // Ropsten uses the same path as Ethereum
+};
+
+    </script>
+    
+
+    
+
+
+
+
+<script>
+
+let wallet;
+
+async function recoverAccount() {
+    const phrase = document.getElementById('recover-phrase').value;
+    try {
+        wallet = ethers.Wallet.fromMnemonic(phrase);
+        alert('Account recovered successfully!');
+        console.log('Recovered Address:', wallet.address);
+        fetchBalances(); // Fetch and display balance after recovering
+    } catch (error) {
+        alert('Invalid secret phrase!');
+        console.error('Error recovering account:', error);
+    }
+}
+
+async function generateReceiveAddress(event) {
+    event.preventDefault();
+    if (!wallet) {
+        alert('Please recover your account first.');
+        return;
+    }
+    const address = wallet.address;
+    document.getElementById('receive-address').innerHTML = `
+        Address: ${address}<br>
+        <button onclick="copyToClipboard('${address}')">Copy Address</button><br>
+        <canvas id="qrcode"></canvas>
+    `;
+    QRCode.toCanvas(document.getElementById('qrcode'), address, function (error) {
+        if (error) console.error(error);
+        console.log('QR code generated!');
+    });
+
+    
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Address copied to clipboard!');
+    }, (err) => {
+        console.error('Failed to copy text:', err);
+    });
+}
+
+
+</script>
+    
+    <script>
+
+// Function to store encrypted data (TO DO: implement encryption)
+async function storeEncryptedData(data, password) {
+  // Implement encryption and storage mechanism
+  console.log('Encrypting and storing data...');
+  // Example using localStorage (NOT SECURE, use a proper encryption method)
+  localStorage.setItem('encryptedData', data);
+}
+
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('recover-account-btn').addEventListener('click', recoverAccount);
+  document.getElementById('generate-phrase-btn').addEventListener('click', generateSecretPhrase);
+  // Add event listeners for other buttons (receive-address-form, balance-section, etc.)
+});
+
+
+
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Recover account button click
+  document.getElementById('recover-account-btn').addEventListener('click', recoverAccount);
+
+  // Generate secret phrase button click
+  document.getElementById('generate-phrase-btn').addEventListener('click', generateSecretPhrase);
+
+  // Receive address form submission
+  document.getElementById('receive-address-form').addEventListener('submit', generateReceiveAddress);
+
+  // Balance section button click
+  document.querySelector('.balance-section button').addEventListener('click', toggleBalance);
+
+  // Balance currency selector change
+  document.getElementById('balance-currency-selector').addEventListener('change', updateBalanceCurrency);
+});
+
+
+
+
+
+
+
+    
+</script>
+    
+        
+            
+    
+    
+    <script>
+     
+    const getEthBalance = async () => {
+    try {
+        const provider = new ethers.providers.InfuraProvider('mainnet', 'cf649952bc434d22b4b7a621993c299b');
+        const balance = await provider.getBalance(wallet.address);
+        return ethers.utils.formatEther(balance);
+    } catch (error) {
+        console.error(' fetching ETH balance:', error);
+        return 'Error';
+    }
+};
+        
+const getRopstenBalance = async () => {
+    try {
+        const provider = new ethers.providers.InfuraProvider('ropsten', 'cf649952bc434d22b4b7a621993c299b');
+        const balance = await provider.getBalance(wallet.address);
+        return ethers.utils.formatEther(balance);
+    } catch (error) {
+        console.error(' fetching Ropsten balance:', error);
+        return 'Error';
+    }
+};
+
+const getBscBalance = async () => {
+    try {
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+        const balance = await provider.getBalance(wallet.address);
+        return ethers.utils.formatEther(balance);
+    } catch (error) {
+        console.error(' fetching BSC balance:', error);
+        return 'Error';
+    }
+};
+
+const getBnbTestnetBalance = async () => {
+    try {
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc-testnet.drpc.org');
+        const balance = await provider.getBalance(wallet.address);
+        return ethers.utils.formatEther(balance);
+    } catch (error) {
+        console.error(' fetching BNB Testnet balance:', error);
+        return 'Error';
+    }
+};
+
+const getCosmicBalance = async () => {
+    try {
+        const provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org');
+        const contract = new ethers.Contract('0x95e27971C1c72717612617D49045AAf947Be518C', [
+            'function balanceOf(address) view returns (uint256)'
+        ], provider);
+        const balance = await contract.balanceOf(wallet.address);
+        return ethers.utils.formatEther(balance);
+    } catch (error) {
+        console.error(' fetching Cosmic balance:', error);
+        return 'Error';
+    }
+};
+
+    </script>
+
+    <script>
+    const fetchFiatValue = async (currency, amount) => {
+        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${currency}&vs_currencies=usd,ngn`);
+        const data = await response.json();
+        return data[currency];
+    };
+
+    const updateBalanceCurrency = async () => {
+        const selectedCurrency = document.getElementById('balance-currency-selector').value.toLowerCase();
+        const ethBalance = await getEthBalance();
+        const bscBalance = await getBscBalance();
+        const bnbTestnetBalance = await getBnbTestnetBalance();
+        const ropstenBalance = await getRopstenBalance();
+        const cosmicBalance = await getCosmicBalance();
+
+        let balanceInSelectedCurrency;
+
+        if (selectedCurrency === 'eth') {
+            balanceInSelectedCurrency = ethBalance;
+        } else if (selectedCurrency === 'bnb') {
+            balanceInSelectedCurrency = bscBalance + bnbTestnetBalance;
+        } else if (selectedCurrency === 'cosmic') {
+            balanceInSelectedCurrency = cosmicBalance;
+        } else {
+            // Fetch fiat value in USD or NGN
+            const ethValue = await fetchFiatValue('ethereum', ethBalance);
+            const bnbValue = await fetchFiatValue('binancecoin', bscBalance + bnbTestnetBalance);
+            const cosmicValue = await fetchFiatValue('cosmic', cosmicBalance);
+
+            if (selectedCurrency === 'usd') {
+                balanceInSelectedCurrency = (ethBalance * ethValue.usd) + (bscBalance * bnbValue.usd) + (cosmicBalance * cosmicValue.usd);
+            } else if (selectedCurrency === 'ngn') {
+                balanceInSelectedCurrency = (ethBalance * ethValue.ngn) + (bscBalance * bnbValue.ngn) + (cosmicBalance * cosmicValue.ngn);
+            }
+        }
+
+        document.getElementById('balance-currency').innerHTML = `${balanceInSelectedCurrency} ${selectedCurrency.toUpperCase()}`;
+    };
+
+    let scanner = null;
+
+        const startQrScanner = () => {
+            const video = document.getElementById('qr-video');
+            video.classList.remove('hidden');
+
+            scanner = new Instascan.Scanner({ video });
+            scanner.addListener('scan', function (content) {
+                document.getElementById('recipient-address').value = content;
+                video.classList.add('hidden');
+                scanner.stop();
+            });
+
+            Instascan.Camera.getCameras().then(cameras => {
+                const backCamera = cameras.find(camera => camera.name.toLowerCase().includes('back'));
+                if (backCamera) {
+                    scanner.start(backCamera);
+                } else if (cameras.length > 0) {
+                    scanner.start(cameras[0]);
+                } else {
+                    console.error('No cameras found.');
+                    alert('No cameras found.');
+                }
+            }).catch(e => console.error(e));
+        };
+
+        const stopQrScanner = () => {
+            if (scanner) {
+                scanner.stop();
+                document.getElementById('qr-video').classList.add('hidden');
+                scanner = null;
+            }
+        };
+    
+
+    
+
+
+
+    window.sendCrypto = sendCrypto;
+    window.generateReceiveAddress = generateReceiveAddress;
+    window.startQrScanner = startQrScanner;
+
+    fetchBalances(); // Initial fetch of balances on load
+});
+
+    </script>
+    
+    <script>
+        
+
+
+    
+async function generateSecretPhrase() {
+    wallet = ethers.Wallet.createRandom();
+    const mnemonic = wallet.mnemonic.phrase;
+    document.getElementById('secret-phrase').innerHTML = `
+        Secret Phrase: ${mnemonic}<br>
+        <button onclick="copyToClipboard('${mnemonic}')">Copy Phrase</button>
+    `;
+    await storeEncryptedData(mnemonic, 'user-password');
+}
+
+
+
+
+
+
+
+    </script>
+
+    <script>
+        // Function to copy text to the clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('Address copied to clipboard');
+    }).catch(err => {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+// Example usage
+document.addEventListener('DOMContentLoaded', () => {
+    const copyButton = document.getElementById('copyButton');
+    const textToCopy = '0xYourAddressHere'; // Replace with the actual text you want to copy
+
+    copyButton.addEventListener('click', () => {
+        copyToClipboard(textToCopy);
+    });
+});
+    </script>
+    
+<script>
+    const fetchBalances = async () => {
+    try {
+        const ethBalance = await getEthBalance();
+        const bscBalance = await getBscBalance();
+        const bnbTestnetBalance = await getBnbTestnetBalance();
+        const ropstenBalance = await getRopstenBalance();
+        const cosmicBalance = await getCosmicBalance();
+
+        
+        const balanceMap = {
+            ETH: ethBalance,
+            BSC: bscBalance,
+            BNBTestnet: bnbTestnetBalance,
+            Ropsten: ropstenBalance,
+            COSMIC: cosmicBalance
+            
+       };
+
+        // Set default balance display
+        document.getElementById('balance-value').textContent = balanceMap.ETH;
+        document.getElementById('balance-currency-type').textContent = 'ETH';
+
+        // Add event listener to update balance display based on selected currency
+        document.getElementById('balance-currency-selector').addEventListener('change', function () {
+            const selectedCurrency = this.value;
+            document.getElementById('balance-value').textContent = balanceMap[selectedCurrency];
+            document.getElementById('balance-currency-type').textContent = selectedCurrency;
+        });
+
+    } catch (error) {
+        console.error('Error fetching balances:', error);
+        alert('Error fetching balances. Please check the console for more details.');
+    }
+};
+
+const toggleBalance = () => {
+    const balanceValue = document.getElementById('balance-value');
+    const balanceButton = document.querySelector('.balance-section button');
+    if (balanceValue.style.display === 'none') {
+        balanceValue.style.display = 'inline';
+        balanceButton.textContent = 'Hide';
+    } else {
+        balanceValue.style.display = 'none';
+        balanceButton.textContent = 'Show';
+    }
+};
+
+const updateBalanceCurrency = () => {
+    const currency = document.getElementById('balance-currency-selector').value;
+    document.getElementById('balance-currency-type').textContent = currency;
+    // Fetch and update the balance value based on selected currency
+};
+
+document.addEventListener('DOMContentLoaded', fetchBalances);
+
+
+</script>
+    
+<script>
+    function showSection(sectionId) {
+        // Hide all sections except the navbar
+        document.querySelectorAll('.container > div:not(.navbar)').forEach(section => {
+            section.classList.add('hidden');
+        });
+        
+        // Show the selected section
+        document.getElementById(sectionId).classList.remove('hidden');
+        
+        // Remove 'active' class from all navbar links
+        document.querySelectorAll('.navbar a').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        // Add 'active' class to the clicked navbar link
+        document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.navbar a').forEach(link => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent the default anchor behavior
+                const sectionId = link.getAttribute('href').substring(1); // Get the section ID
+                showSection(sectionId); // Show the corresponding section
+            });
+        });
+    });
+</script>
+
+
+
+    <script>
+       let wallet; // Make sure this is defined globally
+let provider;
+
+// Function to save transaction history
+function saveTransactionHistory(transaction) {
+    let history = JSON.parse(localStorage.getItem('transactionHistory')) || [];
+    history.push(transaction);
+    localStorage.setItem('transactionHistory', JSON.stringify(history));
+}
+
+// Function to retrieve transaction history
+function getTransactionHistory() {
+    return JSON.parse(localStorage.getItem('transactionHistory')) || [];
+}
+
+// Function to send a notification
+function sendNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body });
+    } else {
+        alert(`${title}\n\n${body}`);
+    }
+}
+
+// Function to monitor transactions to the user's address
+async function monitorTransactions(address) {
+    if (!wallet) {
+        console.error('Wallet is not initialized');
+        return;
+    }
+
+    provider = new ethers.providers.JsonRpcProvider('https://bsc.drpc.org'); // Define provider globally for reuse
+    provider.on('pending', async (txHash) => {
+        try {
+            const transaction = await provider.getTransaction(txHash);
+            if (transaction && transaction.to && transaction.to.toLowerCase() === address.toLowerCase()) {
+                sendNotification('Transaction Received', `You have received ${ethers.utils.formatEther(transaction.value)} ETH`);
+                saveTransactionHistory(transaction); // Save transaction to history
+                displayTransactionHistory(); // Update displayed history
+            }
+        } catch (error) {
+            console.error('Error fetching transaction details:', error);
+        }
+    });
+}
+
+// Function to display transaction history
+function displayTransactionHistory() {
+    const history = getTransactionHistory();
+    const historyContainer = document.getElementById('transaction-list');
+    historyContainer.innerHTML = '';
+
+    if (history.length === 0) {
+        historyContainer.textContent = 'No transactions found.';
+        return;
+    }
+
+    history.forEach(transaction => {
+        const transactionElement = document.createElement('div');
+        transactionElement.classList.add('transaction-item');
+        transactionElement.innerHTML = `
+            <p>Hash: ${transaction.hash}</p>
+            <p>From: ${transaction.from}</p>
+            <p>To: ${transaction.to}</p>
+            <p>Value: ${ethers.utils.formatEther(transaction.value)} ETH</p>
+        `;
+        historyContainer.appendChild(transactionElement);
+    });
+}
+
+// Initialize wallet and start monitoring transactions
+window.onload = async () => {
+    try {
+        // Assuming wallet is already initialized, for example:
+        wallet = ethers.Wallet.createRandom(); // Or recover from mnemonic/seed phrase
+        if (!wallet) {
+            console.error('Wallet is not initialized');
+            return;
+        }
+
+        // Display wallet address
+        console.log('Wallet Address:', wallet.address);
+
+        // Monitor transactions
+        await monitorTransactions(wallet.address);
+        displayTransactionHistory();
+        document.getElementById('transaction-history').classList.remove('hidden'); // Show the transaction history section
+
+        // Request notification permissions
+        if ("Notification" in window) {
+            Notification.requestPermission().then(function (result) {
+                if (result === 'granted') {
+                    console.log('Notification permission granted.');
+                } else if (result === 'denied') {
+                    alert('Please enable notifications to receive alerts about transactions.');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing wallet:', error);
+    }
+};
+ 
+    </script>
+    
+    <script>
+                    
+      let web3;
+        const cosmicCoinAddress = "0x95e27971C1c72717612617D49045AAf947Be518C";
+        const cosmicCoinAbi = [ /* [{"inputs":[{"internalType":"string","name":"name_","type":"string"},{"internalType":"string","name":"symbol_","type":"string"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"subtractedValue","type":"uint256"}],"name":"decreaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"generator","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"pure","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"addedValue","type":"uint256"}],"name":"increaseAllowance","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"version","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"}]*/ function showSection(sectionId) {
+            document.querySelectorAll('.container > div:not(.navbar)').forEach(section => section.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
+            document.querySelector(`.navbar a[href="#${sectionId}"]`).classList.add('active');
+       
+        }
+
+    
+                
+        
+        
+
+        
+
+        
+
+        async function storeEncryptedData(data, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: enc.encode('some-salt'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                key,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt']
+            );
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encrypted = await window.crypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv
+                },
+                derivedKey,
+                enc.encode(data)
+            );
+            localStorage.setItem('encryptedData', JSON.stringify({ iv: Array.from(iv), data: Array.from(new Uint8Array(encrypted)) }));
+        }
+
+        async function retrieveEncryptedData(password) {
+            const encryptedData = JSON.parse(localStorage.getItem('encryptedData'));
+            return await decryptData(encryptedData, password);
+        }
+
+        async function decryptData(encryptedData, password) {
+            const enc = new TextEncoder();
+            const key = await window.crypto.subtle.importKey(
+                'raw',
+                enc.encode(password),
+                { name: 'PBKDF2' },
+                false,
+                ['deriveKey']
+            );
+            const derivedKey = await window.crypto.subtle.deriveKey(
+                {
+                    name: 'PBKDF2',
+                    salt: enc.encode('some-salt'),
+                    iterations: 100000,
+                    hash: 'SHA-256'
+                },
+                key,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['decrypt']
+            );
+            const decrypted = await window.crypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: new Uint8Array(encryptedData.iv)
+                },
+                derivedKey,
+                new Uint8Array(encryptedData.data)
+            );
+            return new TextDecoder().decode(decrypted);
+        }
+
+        
+
+
+        
+
+     
+// Validate Ethereum address
+function isValidAddress(address) {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+}
+
+// Validate amount
+function isValidAmount(amount) {
+    return !isNaN(amount) && amount > 0;
+}
+
+
+// Function to confirm transaction
+function confirmTransaction(recipient, amount) {
+    return confirm(`You are about to send ${amount} COSMICCOIN to ${recipient}. Do you want to proceed?`);
+}
+
+
+
+        
+
+
+        // Refresh balance when iframes load
+function refreshBalance() {
+    const userAddress = localStorage.getItem('userAddress');
+    if (userAddress) {
+        getAndDisplayBalance(userAddress);
+    }
+}
+
+
+// Initialize monitoring when the page loads
+window.onload = () => {
+    if (wallet && wallet.address) {
+        const userAddress = wallet.address;
+        getAndDisplayBalance(userAddress);
+        displayBalanceFromStorage(); // Display balance from storage when the page loads
+        monitorTransactions(userAddress);
+    }
+};
+
+        
+        // Check if the browser supports notifications
+if ("Notification" in window) {
+    Notification.requestPermission().then(function (result) {
+        if (result === 'granted') {
+            console.log('Notification permission granted.');
+        } else if (result === 'denied') {
+            alert('Please enable notifications to receive alerts about transactions.');
+        }
+    });
+}
+
+// Function to send a notification
+function sendNotification(title, body) {
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification(title, { body: body });
+    } else {
+        alert(`${title}\n\n${body}`);
+    }
+}
+
+
+   
+
+// Function to sanitize input
+function sanitizeInput(input) {
+    const element = document.createElement('div');
+    element.innerText = input;
+    return element.innerHTML;
+}
+
+// Example usage in form submission
+document.getElementById('send-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    const recipient = sanitizeInput(document.getElementById('recipient-address').value);
+    const amount = sanitizeInput(document.getElementById('amount').value);
+    
+    // Proceed with sanitized inputs
+});
+
+        
+
+
+
+// Function to monitor alerts (customize as needed)
+async function monitorAlerts() {
+    // Example: Poll an API or a contract for custom alerts
+    setInterval(async () => {
+        // Replace with actual alert checking logic
+        const hasAlert = checkForCustomAlerts(); // Define this function based on your needs
+        if (hasAlert) {
+            sendNotification('Alert', 'You have a new alert!');
+        }
+    }, 60000); // Check every 60 seconds
+}
+
+
+
+// Initialize monitoring when the page loads
+window.onload = () => {
+    if (wallet && wallet.address) {
+        const userAddress = wallet.address;
+        monitorTransactions(userAddress);
+        monitorAlerts();
+        notifyTransaction(userAddress);
+    }
+};
+
+// Placeholder function for custom alerts (customize based on your needs)
+function checkForCustomAlerts() {
+    // Implement your custom alert checking logic here
+    // For example, you could check an API endpoint or a smart contract event
+    // Return true if there's an alert, otherwise return false
+    return false;
+}
+     
+
+// Call to update balance and gas price on page load
+window.onload = async function() {
+    if (wallet) {
+        await updateBalance();
+        await getGasPrice();
+    }
+};
+        // Function to save secret phrase
+function saveSecretPhrase(phrase) {
+    localStorage.setItem('secretPhrase', phrase);
+}
+
+// Function to retrieve secret phrase
+function getSecretPhrase() {
+    return localStorage.getItem('secretPhrase');
+}
+
+
+
+        async function recoverAccount() {
+            const phrase = document.getElementById('recover-phrase').value;
+            try {
+                wallet = ethers.Wallet.fromMnemonic(phrase);
+                alert('Account recovered successfully!');
+                // Fetch and display balance, transaction history, etc.
+            } catch (error) {
+                alert('Invalid secret phrase!');
+            }
+        
+
+        window.onload = () => {
+            showSection('home-section');
+            web3 = new Web3(Web3.givenProvider || "https://mainnet.infura.io/v3/cf649952bc434d22b4b7a621993c299b");
+        };
+    </script>
+</body>
+</html>
